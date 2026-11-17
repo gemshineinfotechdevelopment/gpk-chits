@@ -5,6 +5,7 @@ import logger from '../utils/logger.js';
 import Category from '../models/Category.js';
 import Product from '../models/Product.js';
 import User from '../models/User.js';
+import ChitScheme from '../models/ChitScheme.js';
 
 const autoSeedIfEmpty = async () => {
   try {
@@ -94,6 +95,53 @@ const autoSeedIfEmpty = async () => {
         }
       ]);
       logger.info('Default admin users seeded successfully.');
+    }
+
+    const defaultSchemesData = [
+      {
+        title: "Diwali Special Savings Scheme 2026",
+        description: "Save monthly and receive crackers bonus packages with bumper gifts!",
+        startDate: "2026-01-01",
+        totalMonths: 10,
+        dueDateDay: 10,
+        monthlyAmount: 3000,
+        status: "Active",
+        isActive: true,
+        displayOrder: 1,
+        url: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1200&auto=format&fit=crop"
+      },
+      {
+        title: "Diwali Family Savings Scheme",
+        description: "Affordable monthly plan for family celebrations.",
+        startDate: "2026-01-01",
+        totalMonths: 10,
+        dueDateDay: 10,
+        monthlyAmount: 2000,
+        status: "Active",
+        isActive: true,
+        displayOrder: 2,
+        url: "https://images.unsplash.com/photo-1531058020387-3be344556be6?q=80&w=1200&auto=format&fit=crop"
+      },
+      {
+        title: "Diwali Economy Savings Scheme",
+        description: "Budget-friendly installment plan for everyone.",
+        startDate: "2026-01-01",
+        totalMonths: 10,
+        dueDateDay: 10,
+        monthlyAmount: 1000,
+        status: "Active",
+        isActive: true,
+        displayOrder: 3,
+        url: "https://images.unsplash.com/photo-1498931299472-f7a63a5a1cfa?q=80&w=1200&auto=format&fit=crop"
+      }
+    ];
+
+    for (const sch of defaultSchemesData) {
+      const exists = await ChitScheme.findOne({ title: sch.title });
+      if (!exists) {
+        await ChitScheme.create(sch);
+        logger.info(`Seeded default chit scheme: ${sch.title}`);
+      }
     }
   } catch (err) {
     logger.warn('Auto-seed check encountered warning:', err.message);

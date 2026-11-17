@@ -36,7 +36,7 @@ const AdminLogin = () => {
     try {
       await login(email.trim(), password.trim());
       toast.success("Admin login successful!");
-      navigate("/admin/chit-scheme");
+      navigate("/admin");
     } catch (error: any) {
       toast.error(error.message || "Login failed");
     } finally {

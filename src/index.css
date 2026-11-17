@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Jost:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&family=Quicksand:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Cinzel:wght@400;600;700;900&family=Jost:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&family=Quicksand:wght@300;400;500;600;700&display=swap');
 
 @import "tailwindcss/base";
 @import "tailwindcss/components";
@@ -106,23 +106,81 @@
     font-family: 'Google Sans', 'Product Sans', 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   }
 
-  /* Admin Scope Isolation: Keep Admin Side Fonts Untouched */
-  .admin-scope,
-  .admin-scope * {
-    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif !important;
+  /* Premium Modern Admin Typography System (Plus Jakarta Sans + Inter) */
+  .admin-scope {
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Hide scrollbar globally for all browsers while keeping scrolling functional */
+  .admin-scope h1,
+  .admin-scope h2,
+  .admin-scope h3,
+  .admin-scope h4,
+  .admin-scope h5,
+  .admin-scope h6,
+  .admin-scope .font-display {
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif !important;
+    letter-spacing: -0.025em;
+  }
+
+  .admin-scope p,
+  .admin-scope span,
+  .admin-scope button,
+  .admin-scope input,
+  .admin-scope select,
+  .admin-scope textarea,
+  .admin-scope td,
+  .admin-scope th,
+  .admin-scope label,
+  .admin-scope a {
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  .admin-scope .font-mono,
+  .admin-scope code,
+  .admin-scope kbd {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+    letter-spacing: 0;
+  }
+
+  /* Modern sleek scrollbars for admin dialogs and overflow containers */
+  .admin-scope .overflow-y-auto,
+  .admin-scope .overflow-x-auto,
+  [role="dialog"] .overflow-y-auto,
+  [role="dialog"] {
+    scrollbar-width: thin !important;
+    scrollbar-color: #cbd5e1 transparent !important;
+    -ms-overflow-style: auto !important;
+  }
+
+  .admin-scope .overflow-y-auto::-webkit-scrollbar,
+  .admin-scope .overflow-x-auto::-webkit-scrollbar,
+  [role="dialog"] .overflow-y-auto::-webkit-scrollbar,
+  [role="dialog"]::-webkit-scrollbar {
+    display: block !important;
+    width: 6px !important;
+    height: 6px !important;
+  }
+
+  .admin-scope .overflow-y-auto::-webkit-scrollbar-thumb,
+  .admin-scope .overflow-x-auto::-webkit-scrollbar-thumb,
+  [role="dialog"] .overflow-y-auto::-webkit-scrollbar-thumb,
+  [role="dialog"]::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1 !important;
+    border-radius: 9999px !important;
+  }
+
+  /* Hide scrollbar globally for standard page views */
   html,
-  body,
-  * {
+  body {
     -ms-overflow-style: none !important;
     scrollbar-width: none !important;
   }
 
   html::-webkit-scrollbar,
-  body::-webkit-scrollbar,
-  *::-webkit-scrollbar {
+  body::-webkit-scrollbar {
     display: none !important;
     width: 0 !important;
     height: 0 !important;

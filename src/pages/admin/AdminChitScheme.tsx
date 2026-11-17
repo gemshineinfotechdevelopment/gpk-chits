@@ -1089,38 +1089,43 @@ _Sai Yogi Crackers_`;
               <div>
                 <h2 className="text-xl font-extrabold text-[#2A1B54] flex items-center gap-2">
                   <Users className="w-5 h-5 text-[#7A1416]" />
-                  Customer Applications ({filteredSubscriptions.length})
+                  <span>Customer Applications</span>
+                  <span className="text-xs bg-purple-100 text-purple-900 font-black px-2.5 py-0.5 rounded-full">
+                    {filteredSubscriptions.length}
+                  </span>
                 </h2>
                 <p className="text-xs text-gray-500 font-medium mt-0.5">
                   Click customer name to open full payment progress. Only approved customers can be marked for monthly payment.
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2.5">
+              <div className="flex items-center gap-3 shrink-0 flex-wrap">
                 {/* Download Excel Button */}
                 <button
                   type="button"
                   onClick={() => setIsExportModalOpen(true)}
-                  className="bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-extrabold text-xs px-3.5 py-2 rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+                  className="bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-extrabold text-xs px-3.5 py-2 rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer shrink-0"
                   title="Download Chit Scheme Applications to Excel with Date Sorting"
                 >
                   <FileSpreadsheet className="w-4 h-4 stroke-[2.5]" />
                   <span>Download Excel</span>
                 </button>
 
-                <span className="text-xs font-bold text-gray-600 ml-1">Filters:</span>
-                <span className="text-xs text-gray-400">|</span>
-                <span className="text-xs text-emerald-700 font-semibold bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
-                  {approvedCustomersCount} Approved
-                </span>
-                <span className="text-xs text-amber-800 font-semibold bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
-                  {pendingApplicationsCount} Pending
-                </span>
+                {/* Filter Status Badge Capsule */}
+                <div className="inline-flex items-center gap-2 bg-gray-50 border border-gray-200/90 rounded-xl px-3 py-1.5 shrink-0">
+                  <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Filters:</span>
+                  <span className="text-xs text-emerald-800 font-black bg-emerald-100/90 px-2.5 py-0.5 rounded-md">
+                    {approvedCustomersCount} Approved
+                  </span>
+                  <span className="text-xs text-amber-900 font-black bg-amber-100/90 px-2.5 py-0.5 rounded-md">
+                    {pendingApplicationsCount} Pending
+                  </span>
+                </div>
               </div>
             </div>
 
             {/* Filter Controls Bar */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 bg-gray-50/90 p-4 rounded-2xl border border-gray-200/80">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 bg-gray-50/90 p-4 rounded-2xl border border-gray-200/80 items-center">
               {/* Search Box */}
               <div className="relative col-span-1 sm:col-span-2 lg:col-span-1">
                 <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -1129,7 +1134,7 @@ _Sai Yogi Crackers_`;
                   placeholder="Search name, mobile, scheme..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full text-xs p-2.5 pl-9 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-medium"
+                  className="w-full h-10 text-xs pl-9 pr-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-medium"
                 />
               </div>
 
@@ -1138,7 +1143,7 @@ _Sai Yogi Crackers_`;
                 <select
                   value={schemeFilter}
                   onChange={(e) => setSchemeFilter(e.target.value)}
-                  className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold text-gray-700"
+                  className="w-full h-10 text-xs px-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold text-gray-700 cursor-pointer"
                 >
                   <option value="all">All Schemes ▼</option>
                   {schemes.map(s => (
@@ -1154,7 +1159,7 @@ _Sai Yogi Crackers_`;
                 <select
                   value={approvalFilter}
                   onChange={(e) => setApprovalFilter(e.target.value as any)}
-                  className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold text-gray-700"
+                  className="w-full h-10 text-xs px-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold text-gray-700 cursor-pointer"
                 >
                   <option value="all">Approval: All ▼</option>
                   <option value="Pending">Pending</option>
@@ -1168,7 +1173,7 @@ _Sai Yogi Crackers_`;
                 <select
                   value={paymentFilter}
                   onChange={(e) => setPaymentFilter(e.target.value as any)}
-                  className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold text-gray-700"
+                  className="w-full h-10 text-xs px-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold text-gray-700 cursor-pointer"
                 >
                   <option value="all">Payment: All ▼</option>
                   <option value="Paid">Payments Started (&gt;0)</option>
@@ -1181,7 +1186,7 @@ _Sai Yogi Crackers_`;
                 <select
                   value={dateSortOrder}
                   onChange={(e) => setDateSortOrder(e.target.value as any)}
-                  className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold text-gray-700 cursor-pointer"
+                  className="w-full h-10 text-xs px-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold text-gray-700 cursor-pointer"
                   title="Date Sorting Option"
                 >
                   <option value="desc">Date: Newest First ⬇️</option>
@@ -1201,18 +1206,18 @@ _Sai Yogi Crackers_`;
                 No customer chit applications found matching filters.
               </div>
             ) : (
-              <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white">
-                <table className="w-full text-left border-collapse">
+              <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-2xs">
+                <table className="min-w-[1240px] w-full text-left border-collapse table-fixed">
                   <thead>
-                    <tr className="bg-gray-100/90 text-gray-700 text-xs uppercase font-extrabold tracking-wider border-b border-gray-200">
-                      <th className="p-4">Customer &amp; App ID</th>
-                      <th className="p-4">Contact Info</th>
-                      <th className="p-4">Selected Schemes</th>
-                      <th className="p-4 text-center">Total Persons</th>
-                      <th className="p-4 text-right">Monthly Total</th>
-                      <th className="p-4 text-right">Grand Total</th>
-                      <th className="p-4 text-center">Status</th>
-                      <th className="p-4 text-right">Actions</th>
+                    <tr className="bg-gray-100/90 text-gray-700 text-xs uppercase font-extrabold tracking-wider border-b border-gray-200 whitespace-nowrap">
+                      <th className="p-4 w-[180px]">Customer &amp; App ID</th>
+                      <th className="p-4 w-[150px]">Contact Info</th>
+                      <th className="p-4 w-[260px]">Selected Schemes</th>
+                      <th className="p-4 w-[100px] text-center">Total Persons</th>
+                      <th className="p-4 w-[120px] text-right">Monthly Total</th>
+                      <th className="p-4 w-[130px] text-right">Grand Total</th>
+                      <th className="p-4 w-[110px] text-center">Status</th>
+                      <th className="p-4 w-[190px] text-right pr-4">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 text-xs">
@@ -1233,70 +1238,71 @@ _Sai Yogi Crackers_`;
                       const paidAmount = sub.totalPaidAmount || 0;
 
                       return (
-                        <tr key={id} className="hover:bg-gray-50/90 transition-colors">
+                        <tr key={id} className="hover:bg-gray-50/80 transition-colors">
                           {/* Column 1: Customer Name & Application ID */}
-                          <td className="p-4">
+                          <td className="p-4 align-middle">
                             <button
                               type="button"
                               onClick={() => setSelectedSubscription(sub)}
-                              className="font-extrabold text-[#7A1416] hover:text-[#900000] hover:underline text-sm text-left flex items-center gap-1.5 group cursor-pointer"
+                              className="font-extrabold text-[#7A1416] hover:text-[#900000] hover:underline text-sm text-left truncate block max-w-full cursor-pointer"
+                              title={sub.name || sub.customerName || 'Customer'}
                             >
-                              <span>{sub.name || sub.customerName || 'Customer'}</span>
+                              {sub.name || sub.customerName || 'Customer'}
                             </button>
-                            <div className="flex items-center gap-1.5 mt-1">
-                              <span className="font-mono text-[10px] bg-purple-50 text-purple-900 border border-purple-200 px-2 py-0.5 rounded font-extrabold">
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="font-mono text-[10px] bg-purple-50 text-purple-900 border border-purple-200 px-2 py-0.5 rounded font-extrabold shrink-0">
                                 {sub.applicationNumber || `APP-${String(id).slice(-5)}`}
                               </span>
-                              <span className="text-[10px] text-gray-400 font-medium">
+                              <span className="text-[10px] text-gray-400 font-medium shrink-0">
                                 {sub.createdAt ? new Date(sub.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : 'Recent'}
                               </span>
                             </div>
                           </td>
 
                           {/* Column 2: Mobile & Location */}
-                          <td className="p-4">
-                            <div className="font-extrabold text-gray-900 font-mono text-xs flex items-center gap-1.5">
+                          <td className="p-4 align-middle">
+                            <div className="font-bold text-gray-900 font-mono text-xs flex items-center gap-1.5">
                               <Phone className="w-3.5 h-3.5 text-gray-400 shrink-0" />
                               <span>{sub.phone || sub.mobileNumber}</span>
                             </div>
-                            <div className="text-[11px] text-gray-500 font-medium flex items-center gap-1.5 mt-0.5">
+                            <div className="text-[11px] text-gray-500 font-medium flex items-center gap-1.5 mt-1">
                               <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                              <span className="truncate max-w-[140px]">{sub.location}</span>
+                              <span className="truncate" title={sub.location || 'N/A'}>{sub.location || 'N/A'}</span>
                             </div>
                           </td>
 
                           {/* Column 3: Selected Schemes & Formula Calculation */}
-                          <td className="p-4">
+                          <td className="p-4 align-middle">
                             {enrolledSchemes ? (
                               <div className="space-y-1">
-                                <div className="flex items-center gap-1.5 flex-wrap">
-                                  <span className="bg-amber-100 text-amber-900 font-black text-[10px] px-2 py-0.5 rounded inline-block">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="bg-amber-100 text-amber-900 font-black text-[10px] px-2 py-0.5 rounded shrink-0">
                                     {schemeCount} Scheme{schemeCount > 1 ? 's' : ''}
                                   </span>
-                                  <span className="bg-rose-50 text-[#7A1416] border border-rose-200 font-extrabold text-[10px] px-2 py-0.5 rounded inline-block">
+                                  <span className="bg-rose-50 text-[#7A1416] border border-rose-200 font-extrabold text-[10px] px-2 py-0.5 rounded shrink-0">
                                     {personsCount} Persons
                                   </span>
                                 </div>
-                                <div className="text-[11px] font-bold text-[#7A1416] font-mono">
+                                <div className="text-[11px] font-bold text-[#7A1416] font-mono leading-tight">
                                   {enrolledSchemes.map(s => {
                                     const rate = s.monthlyAmountPerPerson || s.monthlyAmount || s.price || 0;
                                     const count = s.personCount || 1;
                                     return `${rate} × ${count} = ₹${(rate * count).toLocaleString()}`;
                                   }).join(" + ")}
                                 </div>
-                                <div className="text-[10px] text-gray-500 font-medium truncate max-w-[220px]">
+                                <div className="text-[10px] text-gray-500 font-medium truncate" title={enrolledSchemes.map(s => `${s.schemeName} (${s.personCount || 1}p)`).join(", ")}>
                                   {enrolledSchemes.map(s => `${s.schemeName} (${s.personCount || 1}p)`).join(", ")}
                                 </div>
                               </div>
                             ) : (
-                              <div className="font-extrabold text-[#2A1B54]">
+                              <div className="font-extrabold text-[#2A1B54] text-xs">
                                 {sub.schemeName || 'Chit Scheme'}
                               </div>
                             )}
                           </td>
 
                           {/* Column 4: Total Persons */}
-                          <td className="p-4 text-center">
+                          <td className="p-4 text-center align-middle">
                             <span className="bg-amber-50 border border-amber-200 text-amber-950 font-black px-2.5 py-1 rounded-xl text-xs inline-flex items-center gap-1">
                               <Users className="w-3.5 h-3.5 text-[#7A1416]" />
                               <span>{personsCount}</span>
@@ -1304,7 +1310,7 @@ _Sai Yogi Crackers_`;
                           </td>
 
                           {/* Column 5: Monthly Total */}
-                          <td className="p-4 text-right">
+                          <td className="p-4 text-right align-middle">
                             <div className="font-black text-emerald-700 text-sm">
                               ₹{monthlyTotal.toLocaleString()}
                             </div>
@@ -1312,7 +1318,7 @@ _Sai Yogi Crackers_`;
                           </td>
 
                           {/* Column 6: Grand Total & Paid */}
-                          <td className="p-4 text-right">
+                          <td className="p-4 text-right align-middle">
                             <div className="font-extrabold text-[#2A1B54]">
                               ₹{grandTotal.toLocaleString()}
                             </div>
@@ -1322,8 +1328,8 @@ _Sai Yogi Crackers_`;
                           </td>
 
                           {/* Column 7: Status */}
-                          <td className="p-4 text-center">
-                            <span className={`px-2.5 py-1 rounded-full font-extrabold text-[11px] ${
+                          <td className="p-4 text-center align-middle">
+                            <span className={`px-2.5 py-1 rounded-full font-extrabold text-[11px] inline-block whitespace-nowrap ${
                               currentApproval === 'Approved' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' :
                               currentApproval === 'Rejected' ? 'bg-rose-100 text-rose-800 border border-rose-300' :
                               'bg-amber-100 text-amber-800 border border-amber-300'
@@ -1333,22 +1339,23 @@ _Sai Yogi Crackers_`;
                           </td>
 
                           {/* Column 8: Actions */}
-                          <td className="p-4 text-right">
-                            <div className="flex items-center justify-end gap-1.5">
+                          <td className="p-4 text-right align-middle pr-4">
+                            <div className="flex items-center justify-end gap-1.5 whitespace-nowrap">
                               {currentApproval === 'Pending' && (
                                 <>
                                   <button
                                     type="button"
                                     onClick={() => handleApproveApplicationPrompt(sub)}
-                                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-2.5 py-1.5 rounded-xl transition-all shadow-2xs flex items-center gap-1 cursor-pointer"
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-2.5 py-1.5 rounded-xl transition-all shadow-2xs flex items-center gap-1 cursor-pointer shrink-0"
                                     title="Approve Application"
                                   >
-                                    <Check className="w-3.5 h-3.5 stroke-[3]" /> Approve
+                                    <Check className="w-3.5 h-3.5 stroke-[3]" />
+                                    <span>Approve</span>
                                   </button>
                                   <button
                                     type="button"
                                     onClick={() => handleRejectApplicationPrompt(sub)}
-                                    className="bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold text-xs px-2 py-1.5 rounded-xl transition-all border border-rose-300 flex items-center gap-1 cursor-pointer"
+                                    className="bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold text-xs p-1.5 rounded-xl transition-all border border-rose-300 flex items-center justify-center cursor-pointer shrink-0"
                                     title="Reject Application"
                                   >
                                     <X className="w-3.5 h-3.5 stroke-[3]" />
@@ -1358,7 +1365,7 @@ _Sai Yogi Crackers_`;
                               <button
                                 type="button"
                                 onClick={() => setSelectedSubscription(sub)}
-                                className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs px-3 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1"
+                                className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs px-2.5 py-1.5 rounded-xl transition-all cursor-pointer flex items-center gap-1 shrink-0"
                               >
                                 <span>Details</span>
                                 <ChevronRight className="w-3.5 h-3.5" />
@@ -2673,145 +2680,148 @@ _Sai Yogi Crackers_`;
       {/* MODAL 5: ADMIN PAYMENT ENTRY MODAL (WITH PERSON COUNT & AUTO RECEIPT) */}
       {paymentModalState.isOpen && (
         <Dialog open={paymentModalState.isOpen} onOpenChange={(open) => setPaymentModalState(prev => ({ ...prev, isOpen: open }))}>
-          <DialogContent className="sm:max-w-md p-6 bg-white rounded-3xl font-sans space-y-4">
-            <DialogHeader>
+          <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto p-5 sm:p-6 bg-white rounded-3xl font-sans space-y-4">
+            <DialogHeader className="pb-1 border-b border-gray-100">
               <DialogTitle className="text-lg font-extrabold text-[#2A1B54] flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
                 <span>Record Installment Payment</span>
               </DialogTitle>
-              <DialogDescription className="text-xs text-gray-600">
+              <DialogDescription className="text-xs text-gray-600 pt-0.5">
                 Customer: <strong className="text-gray-900">{paymentModalState.subscription?.name}</strong> • Scheme: <strong className="text-[#7A1416]">{paymentModalState.schemeName}</strong>
               </DialogDescription>
             </DialogHeader>
 
-            <form onSubmit={handleConfirmPaymentEntry} className="space-y-3.5 text-xs">
+            <form onSubmit={handleConfirmPaymentEntry} className="space-y-4 text-xs">
               {/* Scheme Summary Badge */}
-              <div className="bg-amber-50 p-3.5 rounded-2xl border border-amber-200/80 space-y-1.5">
+              <div className="bg-amber-50/80 p-3.5 rounded-2xl border border-amber-200/80 space-y-1.5">
                 <div className="flex justify-between items-center text-xs font-black text-amber-950">
-                  <span>{paymentModalState.monthName || `Month ${paymentModalState.monthNumber}`}</span>
+                  <span className="font-bold">{paymentModalState.monthName || `Month ${paymentModalState.monthNumber}`}</span>
                   <span className="bg-amber-200 text-amber-900 px-2 py-0.5 rounded font-black text-[10px]">
                     {paymentModalState.personCount} Person(s)
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-xs border-t border-amber-200/60 pt-1">
-                  <span className="text-gray-600">Expected Installment:</span>
-                  <strong className="text-emerald-800 text-sm font-black">
+                  <span className="text-gray-600 font-medium">Expected Installment:</span>
+                  <strong className="text-emerald-800 text-base font-black">
                     ₹{paymentModalState.expectedMonthlyAmount.toLocaleString()}
                   </strong>
                 </div>
               </div>
 
-              {/* Installment Month Selector */}
-              <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-                  Installment Month *
-                </label>
-                <select
-                  value={paymentModalState.monthNumber}
-                  onChange={(e) => {
-                    const m = parseInt(e.target.value, 10);
-                    setPaymentModalState(prev => ({
-                      ...prev,
-                      monthNumber: m,
-                      monthName: `Month ${m}`
-                    }));
-                  }}
-                  className="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold text-gray-900"
-                  required
-                >
-                  {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
-                    <option key={m} value={m}>
-                      Month {m}
-                    </option>
-                  ))}
-                </select>
+              {/* 2-Column Responsive Form Fields */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                {/* Installment Month Selector */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
+                    Installment Month *
+                  </label>
+                  <select
+                    value={paymentModalState.monthNumber}
+                    onChange={(e) => {
+                      const m = parseInt(e.target.value, 10);
+                      setPaymentModalState(prev => ({
+                        ...prev,
+                        monthNumber: m,
+                        monthName: `Month ${m}`
+                      }));
+                    }}
+                    className="w-full h-10 text-xs px-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold text-gray-900 cursor-pointer"
+                    required
+                  >
+                    {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
+                      <option key={m} value={m}>
+                        Month {m}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Amount Received */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
+                    Amount Received (₹) *
+                  </label>
+                  <input
+                    type="number"
+                    value={paymentModalState.amount}
+                    onChange={(e) => setPaymentModalState(prev => ({ ...prev, amount: parseFloat(e.target.value) || 0 }))}
+                    className="w-full h-10 text-xs font-black px-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none text-emerald-800 text-sm"
+                    required
+                  />
+                </div>
+
+                {/* Payment Date */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
+                    Payment Date *
+                  </label>
+                  <input
+                    type="date"
+                    value={paymentModalState.paymentDate}
+                    onChange={(e) => setPaymentModalState(prev => ({ ...prev, paymentDate: e.target.value }))}
+                    className="w-full h-10 text-xs px-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold cursor-pointer"
+                    required
+                  />
+                </div>
+
+                {/* Payment Method */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
+                    Payment Method *
+                  </label>
+                  <select
+                    value={paymentModalState.paymentMethod}
+                    onChange={(e) => setPaymentModalState(prev => ({ ...prev, paymentMethod: e.target.value as any }))}
+                    className="w-full h-10 text-xs px-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold text-gray-900 cursor-pointer"
+                    required
+                  >
+                    <option value="UPI">UPI / GPay / PhonePe</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Bank Transfer">Bank Transfer / NEFT</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                {/* Transaction ID */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
+                    Transaction ID / Reference
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. TXN123456 or Receipt #99"
+                    value={paymentModalState.transactionNumber}
+                    onChange={(e) => setPaymentModalState(prev => ({ ...prev, transactionNumber: e.target.value }))}
+                    className="w-full h-10 text-xs px-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-medium"
+                  />
+                </div>
+
+                {/* Notes */}
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
+                    Notes
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Received via store counter"
+                    value={paymentModalState.notes}
+                    onChange={(e) => setPaymentModalState(prev => ({ ...prev, notes: e.target.value }))}
+                    className="w-full h-10 text-xs px-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-medium"
+                  />
+                </div>
               </div>
 
-              {/* Amount Received */}
-              <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-                  Amount Received (₹) *
-                </label>
-                <input
-                  type="number"
-                  value={paymentModalState.amount}
-                  onChange={(e) => setPaymentModalState(prev => ({ ...prev, amount: parseFloat(e.target.value) || 0 }))}
-                  className="w-full text-xs font-black p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none text-emerald-800 text-sm"
-                  required
-                />
-              </div>
-
-              {/* Payment Date */}
-              <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-                  Payment Date *
-                </label>
-                <input
-                  type="date"
-                  value={paymentModalState.paymentDate}
-                  onChange={(e) => setPaymentModalState(prev => ({ ...prev, paymentDate: e.target.value }))}
-                  className="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold"
-                  required
-                />
-              </div>
-
-              {/* Payment Method */}
-              <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-                  Payment Method *
-                </label>
-                <select
-                  value={paymentModalState.paymentMethod}
-                  onChange={(e) => setPaymentModalState(prev => ({ ...prev, paymentMethod: e.target.value as any }))}
-                  className="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold text-gray-900"
-                  required
-                >
-                  <option value="UPI">UPI / GPay / PhonePe</option>
-                  <option value="Cash">Cash</option>
-                  <option value="Bank Transfer">Bank Transfer / NEFT</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-
-              {/* Transaction ID */}
-              <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-                  Transaction ID / Reference (Optional)
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. TXN123456 or Receipt #99"
-                  value={paymentModalState.transactionNumber}
-                  onChange={(e) => setPaymentModalState(prev => ({ ...prev, transactionNumber: e.target.value }))}
-                  className="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold"
-                />
-              </div>
-
-              {/* Notes */}
-              <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-                  Notes (Optional)
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Received via store counter"
-                  value={paymentModalState.notes}
-                  onChange={(e) => setPaymentModalState(prev => ({ ...prev, notes: e.target.value }))}
-                  className="w-full text-xs p-2.5 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none"
-                />
-              </div>
-
-              <DialogFooter className="gap-2 pt-3 border-t">
+              <DialogFooter className="gap-2.5 pt-3 border-t mt-4 flex flex-row items-center justify-end">
                 <button
                   type="button"
                   onClick={() => setPaymentModalState(prev => ({ ...prev, isOpen: false }))}
-                  className="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold cursor-pointer"
+                  className="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold cursor-pointer transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center gap-1.5"
+                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center gap-1.5"
                 >
                   <Check className="w-4 h-4 stroke-[3]" />
                   <span>Save Payment &amp; Generate Receipt</span>

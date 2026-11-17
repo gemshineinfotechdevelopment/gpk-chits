@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import companyLogo from "@/assets/saiyogi-logo-1.png";
 
 const navItems = [
-  // { label: "Dashboard", icon: LayoutDashboard, href: "/admin" },
+  { label: "Dashboard", icon: LayoutDashboard, href: "/admin" },
   // { label: "Brands", icon: Tag, href: "/admin/brands" },
   // { label: "Products", icon: Package, href: "/admin/products" },
   // { label: "Categories", icon: FolderTree, href: "/admin/categories" },
@@ -35,7 +35,7 @@ const AdminNavbar = () => {
   return (
     <nav className="lg:hidden sticky top-0 z-50 border-b border-border bg-sidebar">
       <div className="flex items-center justify-between p-4">
-        <Link to="/admin/chit-scheme" className="flex items-center gap-3">
+        <Link to="/admin" className="flex items-center gap-3">
           <img src={companyLogo} alt="Sai Yogi" className="h-14 object-contain" />
           <span className="font-display font-bold text-sidebar-primary hidden sm:inline text-lg leading-none">Admin Panel</span>
           <span className="font-display font-bold text-sidebar-primary sm:hidden text-lg leading-none">Admin</span>

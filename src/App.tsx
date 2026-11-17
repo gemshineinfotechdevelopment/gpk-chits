@@ -25,7 +25,7 @@ import ChitScheme from "./pages/ChitScheme";
 // import MyAccount from "./pages/MyAccount";
 // import Terms from "./pages/Terms";
 import AdminLogin from "./pages/admin/AdminLogin";
-// import Dashboard from "./pages/admin/Dashboard";
+import Dashboard from "./pages/admin/Dashboard";
 // import AdminBrands from "./pages/admin/AdminBrands";
 // import AdminProducts from "./pages/admin/AdminProducts";
 // import AdminOrders from "./pages/admin/AdminOrders";
@@ -99,7 +99,7 @@ const App = () => (
                     path="/admin"
                     element={
                       <ProtectedRoute>
-                        <Navigate to="/admin/chit-scheme" replace />
+                        <Dashboard />
                       </ProtectedRoute>
                     }
                   />

@@ -7,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect, useRef } from "react";
 
 const navItems = [
-  // { label: "Dashboard", icon: LayoutDashboard, href: "/admin" },
+  { label: "Dashboard", icon: LayoutDashboard, href: "/admin" },
   // { label: "Brands", icon: Tag, href: "/admin/brands" },
   // { label: "Products", icon: Package, href: "/admin/products" },
   // { label: "Categories", icon: FolderTree, href: "/admin/categories" },
@@ -65,7 +65,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = () => {
       <div className={cn("p-4 shrink-0 flex flex-col gap-2", !isCollapsed && "p-6")}>
         <div className={cn("flex items-center", isCollapsed ? "justify-center" : "justify-between")}>
           {!isCollapsed && (
-            <Link to="/admin/chit-scheme" className="flex items-center gap-2 overflow-hidden">
+            <Link to="/admin" className="flex items-center gap-2 overflow-hidden">
               <img src={companyLogo} alt="Logo" className="h-8 object-contain shrink-0" />
               <span className="font-display text-lg font-bold text-sidebar-primary whitespace-nowrap">Admin Panel</span>
             </Link>

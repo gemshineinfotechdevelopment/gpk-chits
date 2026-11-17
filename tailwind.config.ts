@@ -18,6 +18,7 @@ export default {
         display: ["Google Sans", "Product Sans", "Outfit", "sans-serif"],
         body: ["Google Sans", "Product Sans", "Outfit", "sans-serif"],
         sans: ["Google Sans", "Product Sans", "Outfit", "sans-serif"],
+        mono: ["'JetBrains Mono'", "ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",

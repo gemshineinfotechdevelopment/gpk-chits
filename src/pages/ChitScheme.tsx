@@ -49,36 +49,6 @@ interface SelectedSchemeEnrollment {
   personCount: number;
 }
 
-const DEFAULT_SCHEMES: SchemeOption[] = [
-  {
-    id: "default-1",
-    title: "Diwali Special Savings Scheme 2026",
-    description: "Save monthly and receive crackers bonus packages with bumper gifts!",
-    startDate: "2026-01-01",
-    totalMonths: 10,
-    dueDateDay: 10,
-    monthlyAmount: 3000
-  },
-  {
-    id: "default-2",
-    title: "Diwali Family Savings Scheme",
-    description: "Affordable monthly plan for family celebrations.",
-    startDate: "2026-01-01",
-    totalMonths: 10,
-    dueDateDay: 10,
-    monthlyAmount: 2000
-  },
-  {
-    id: "default-3",
-    title: "Diwali Economy Savings Scheme",
-    description: "Budget-friendly installment plan for everyone.",
-    startDate: "2026-01-01",
-    totalMonths: 10,
-    dueDateDay: 10,
-    monthlyAmount: 1000
-  }
-];
-
 export const getMonthNameForIndex = (
   monthIndex: number,
   startDateStr?: string
@@ -182,7 +152,7 @@ const ChitScheme: React.FC = () => {
     const loadChit = () => {
       getChitSchemes()
         .then((data) => {
-          if (Array.isArray(data) && data.length > 0) {
+          if (Array.isArray(data)) {
             const schemeList = data
               .filter((item: ChitSchemeItem) => item.title || item.schemeName)
               .map((item: ChitSchemeItem) => ({
@@ -204,17 +174,16 @@ const ChitScheme: React.FC = () => {
                 monthlyAmount: item.monthlyAmount || 0
               }));
 
-            const finalSchemes = schemeList.length > 0 ? schemeList : DEFAULT_SCHEMES;
-            setSchemes(finalSchemes);
+            setSchemes(schemeList);
             setBannerImages(imageList);
           } else {
-            setSchemes(DEFAULT_SCHEMES);
+            setSchemes([]);
             setBannerImages([]);
           }
         })
         .catch((err) => {
           console.error("Failed to fetch chit schemes from API:", err);
-          setSchemes(DEFAULT_SCHEMES);
+          setSchemes([]);
         });
     };
 
@@ -647,19 +616,19 @@ const ChitScheme: React.FC = () => {
                         }`}
                       >
                         {/* Header Row: Title & Toggle Button */}
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <div className="flex items-center gap-1.5">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
                               <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${
                                 isSelected ? "bg-[#7A1416] text-white" : "border-2 border-gray-300 text-transparent"
                               }`}>
                                 ✓
                               </span>
-                              <h4 className="text-xs font-black text-[#2A1B54]">
+                              <h4 className="text-xs font-black text-[#2A1B54] truncate" title={sch.title}>
                                 {sch.title}
                               </h4>
                             </div>
-                            <div className="text-[11px] text-gray-500 font-medium pl-5 mt-0.5">
+                            <div className="text-[11px] text-gray-500 font-medium pl-6 mt-0.5">
                               ₹{sch.monthlyAmount.toLocaleString()} / person / mo • {sch.totalMonths || 10} Months
                             </div>
                           </div>
@@ -673,7 +642,7 @@ const ChitScheme: React.FC = () => {
                                 handleAddScheme(sch.title);
                               }
                             }}
-                            className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 ${
                               isSelected
                                 ? "bg-rose-100 hover:bg-rose-200 text-rose-700"
                                 : "bg-[#7A1416] hover:bg-[#900000] text-white shadow-2xs"
@@ -807,9 +776,9 @@ const ChitScheme: React.FC = () => {
                       <div
                         key={banner.id}
                         onClick={() => setActiveZoomImage(banner)}
-                        className="group relative overflow-hidden rounded-2xl border-2 border-amber-200/90 bg-white shadow-2xs hover:shadow-lg transition-all duration-300 cursor-pointer"
+                        className="group relative overflow-hidden rounded-2xl border-2 border-amber-200/90 bg-white shadow-2xs hover:shadow-lg transition-all duration-300 cursor-pointer flex flex-col"
                       >
-                        <div className="aspect-[4/3] w-full overflow-hidden bg-gray-50 flex items-center justify-center">
+                        <div className="aspect-[16/10] w-full overflow-hidden bg-gray-50 flex items-center justify-center">
                           <img
                             src={banner.url}
                             alt={banner.title}
@@ -817,11 +786,11 @@ const ChitScheme: React.FC = () => {
                             loading="lazy"
                           />
                         </div>
-                        <div className="p-3 bg-white border-t border-gray-100 flex items-center justify-between">
-                          <span className="font-extrabold text-[#2A1B54] text-xs truncate max-w-[200px]">
+                        <div className="h-10 px-3.5 bg-white border-t border-gray-100 flex items-center justify-between gap-2">
+                          <span className="font-extrabold text-[#2A1B54] text-xs truncate flex-1" title={banner.title}>
                             {banner.title}
                           </span>
-                          <span className="text-[10px] font-bold text-[#7A1416] bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                          <span className="text-[10px] font-bold text-[#7A1416] bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200 shrink-0">
                             Zoom 🔍
                           </span>
                         </div>
@@ -841,76 +810,113 @@ const ChitScheme: React.FC = () => {
                   <span className="text-[11px] text-gray-500 font-medium">Click a scheme card to add or enroll</span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {schemes.map((sch) => {
-                    const isSelected = selectedSchemes.some(s => s.schemeName === sch.title);
-                    const selectedItem = selectedSchemes.find(s => s.schemeName === sch.title);
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
+                  {schemes.length === 0 ? (
+                    <div className="col-span-full bg-white rounded-3xl p-8 border-2 border-dashed border-gray-200 text-center space-y-3">
+                      <div className="w-12 h-12 rounded-2xl bg-amber-50 text-[#7A1416] mx-auto flex items-center justify-center border border-amber-200 shadow-2xs">
+                        <Sparkles className="w-6 h-6" />
+                      </div>
+                      <h4 className="font-extrabold text-[#2A1B54] text-base">New Schemes Launching Soon!</h4>
+                      <p className="text-xs text-gray-500 max-w-md mx-auto leading-relaxed">
+                        Currently there are no active chit schemes open for registration. New savings schemes will be announced shortly.
+                      </p>
+                    </div>
+                  ) : (
+                    schemes.map((sch) => {
+                      const isSelected = selectedSchemes.some(s => s.schemeName === sch.title);
+                      const selectedItem = selectedSchemes.find(s => s.schemeName === sch.title);
 
-                    return (
-                      <div
-                        key={sch.id}
-                        onClick={() => handleAddScheme(sch.title)}
-                        className={`bg-white rounded-3xl p-5 border-2 transition-all shadow-2xs cursor-pointer flex flex-col justify-between space-y-4 group ${
-                          isSelected
-                            ? "border-[#7A1416] bg-amber-50/20 shadow-md ring-2 ring-[#7A1416]/10"
-                            : "border-gray-200 hover:border-[#7A1416] hover:shadow-md"
-                        }`}
-                      >
-                        <div className="space-y-3">
-                          <div className="flex items-start justify-between gap-2">
-                            <span className="bg-amber-100 text-amber-900 font-extrabold text-[10px] px-2.5 py-0.5 rounded-full uppercase">
+                      return (
+                        <div
+                          key={sch.id}
+                          onClick={() => handleAddScheme(sch.title)}
+                          className={`bg-white rounded-3xl p-5 border-2 transition-all shadow-2xs cursor-pointer flex flex-col h-full group ${
+                            isSelected
+                              ? "border-[#7A1416] bg-amber-50/20 shadow-md ring-2 ring-[#7A1416]/10"
+                              : "border-gray-200 hover:border-[#7A1416] hover:shadow-md"
+                          }`}
+                        >
+                          {/* Header Badge Row - Fixed Height */}
+                          <div className="flex items-center justify-between gap-2 h-7 mb-3">
+                            <span className="bg-amber-100 text-amber-900 font-extrabold text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wider inline-flex items-center gap-1">
                               {sch.totalMonths || 10} Months Plan
                             </span>
-                            {isSelected && (
-                              <span className="bg-emerald-100 text-emerald-800 font-extrabold text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1 border border-emerald-300">
+                            {isSelected ? (
+                              <span className="bg-emerald-100 text-emerald-800 font-extrabold text-[10px] px-2.5 py-1 rounded-full inline-flex items-center gap-1 border border-emerald-300 shrink-0">
                                 <Check className="w-3 h-3 stroke-[3]" /> Added ({selectedItem?.personCount}p)
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-bold text-gray-400 group-hover:text-[#7A1416] transition-colors shrink-0">
+                                + Click to Add
                               </span>
                             )}
                           </div>
 
-                          <div>
-                            <h4 className="text-base font-extrabold text-[#2A1B54] group-hover:text-[#7A1416] transition-colors">
+                          {/* Title & Description - Fixed Heights for Pixel-Perfect Horizontal Alignment */}
+                          <div className="mb-4">
+                            <h4
+                              className="text-base font-extrabold text-[#2A1B54] group-hover:text-[#7A1416] transition-colors line-clamp-2 h-12 flex items-center leading-snug"
+                              title={sch.title}
+                            >
                               {sch.title}
                             </h4>
-                            <p className="text-xs text-gray-500 font-medium mt-1 line-clamp-2">
+                            <p
+                              className="text-xs text-gray-500 font-medium mt-1 line-clamp-2 h-9 flex items-center leading-relaxed"
+                              title={sch.description}
+                            >
                               {sch.description || "Join our monthly savings scheme & unlock exclusive Diwali bonus perks!"}
                             </p>
                           </div>
 
-                          <div className="bg-gray-50 rounded-2xl p-3 border border-gray-100 text-xs space-y-1.5">
-                            <div className="flex justify-between">
+                          {/* Specification Table - Uniform Row Heights */}
+                          <div className="bg-gray-50/90 rounded-2xl p-3.5 border border-gray-100 text-xs space-y-2 mb-4">
+                            <div className="flex justify-between items-center h-5">
                               <span className="text-gray-500 font-medium">Monthly Installment:</span>
-                              <strong className="text-emerald-700 font-extrabold">₹{sch.monthlyAmount.toLocaleString()} / person</strong>
+                              <strong className="text-emerald-700 font-black text-sm">
+                                ₹{sch.monthlyAmount.toLocaleString()} <span className="text-[10px] font-normal text-gray-500">/ person</span>
+                              </strong>
                             </div>
-                            <div className="flex justify-between">
+                            <div className="flex justify-between items-center h-5">
                               <span className="text-gray-500 font-medium">Total Duration:</span>
-                              <strong className="text-gray-900 font-semibold">{sch.totalMonths || 10} Months</strong>
+                              <strong className="text-gray-900 font-bold">{sch.totalMonths || 10} Months</strong>
                             </div>
-                            <div className="flex justify-between">
+                            <div className="flex justify-between items-center h-5">
                               <span className="text-gray-500 font-medium">Due Day:</span>
-                              <strong className="text-gray-900 font-semibold">Before {sch.dueDateDay || 10}th of month</strong>
+                              <strong className="text-gray-900 font-bold">Before {sch.dueDateDay || 10}th of month</strong>
                             </div>
-                            <div className="flex justify-between pt-1 border-t border-gray-200">
-                              <span className="text-gray-500 font-medium">Total Scheme Value:</span>
-                              <strong className="text-[#2A1B54] font-black">₹{(sch.monthlyAmount * (sch.totalMonths || 10)).toLocaleString()}</strong>
+                            <div className="flex justify-between items-center pt-2 border-t border-gray-200/80 h-7">
+                              <span className="text-gray-600 font-bold text-[11px] uppercase tracking-tight">Total Scheme Value:</span>
+                              <strong className="text-[#2A1B54] font-black text-sm">
+                                ₹{(sch.monthlyAmount * (sch.totalMonths || 10)).toLocaleString()}
+                              </strong>
                             </div>
                           </div>
-                        </div>
 
-                        <button
-                          type="button"
-                          className={`w-full py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-2xs ${
-                            isSelected
-                              ? "bg-[#7A1416] text-white"
-                              : "bg-gray-100 hover:bg-[#7A1416] hover:text-white text-gray-800"
-                          }`}
-                        >
-                          <span>{isSelected ? "+ Increase Persons" : "Select & Enroll"}</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    );
-                  })}
+                          {/* Action Button - Anchored to Bottom */}
+                          <button
+                            type="button"
+                            className={`mt-auto w-full h-11 rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer ${
+                              isSelected
+                                ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+                                : "bg-[#7A1416] hover:bg-[#5C0F11] text-white shadow-sm group-hover:scale-[1.01]"
+                            }`}
+                          >
+                            {isSelected ? (
+                              <>
+                                <Check className="w-4 h-4 stroke-[3]" />
+                                <span>Scheme Selected ({selectedItem?.personCount}p)</span>
+                              </>
+                            ) : (
+                              <>
+                                <Plus className="w-4 h-4 stroke-[2.5]" />
+                                <span>Select &amp; Enroll</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
               </div>
             </div>
