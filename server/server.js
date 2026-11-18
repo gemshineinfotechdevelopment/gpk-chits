@@ -134,7 +134,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.json({ status: 'ok', message: 'Sai Yogi Crackers Backend API Server' });
+  res.json({ status: 'ok', message: 'GPK Crackers Backend API Server' });
 });
 
 // Routes
@@ -164,7 +164,7 @@ app.get('*', (req, res, next) => {
   if (fs.existsSync(indexPath)) {
     return res.sendFile(indexPath);
   }
-  res.status(200).json({ status: 'ok', message: 'Sai Yogi Crackers Backend API Server' });
+  res.status(200).json({ status: 'ok', message: 'GPK Crackers Backend API Server' });
 });
 
 // Error Handler (must be last)

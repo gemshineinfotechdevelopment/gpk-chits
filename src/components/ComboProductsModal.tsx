@@ -165,7 +165,7 @@ export const ComboProductsModal: React.FC<ComboProductsModalProps> = ({
             <div className="text-center py-12 px-4">
               <ListOrdered className="w-12 h-12 text-gray-300 mx-auto mb-3" />
               <p className="text-gray-600 font-bold text-base">No items list added yet for this combo pack.</p>
-              <p className="text-gray-400 text-xs mt-1">Detailed list of products will be updated soon by Sai Yogi.</p>
+              <p className="text-gray-400 text-xs mt-1">Detailed list of products will be updated soon by GPK.</p>
             </div>
           ) : filteredItems.length === 0 ? (
             <div className="text-center py-10 px-4">

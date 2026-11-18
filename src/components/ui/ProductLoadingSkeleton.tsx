@@ -16,7 +16,7 @@ export const ProductLoadingSkeleton: React.FC<ProductLoadingSkeletonProps> = ({
       <div className="w-full bg-gradient-to-r from-amber-500/10 via-red-500/10 to-amber-500/10 border border-amber-300/60 rounded-2xl p-4 sm:p-6 text-center flex flex-col items-center justify-center gap-2 shadow-xs">
         <div className="flex items-center gap-2 text-[#A80000] font-black text-base sm:text-lg">
           <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin text-[#A80000]" />
-          <span>Connecting to Sai Yogi Crackers...</span>
+          <span>Connecting to GPK Crackers...</span>
           <Sparkles className="w-4 h-4 text-amber-500 animate-pulse" />
         </div>
         <p className="text-xs sm:text-sm text-gray-600 font-medium max-w-md">

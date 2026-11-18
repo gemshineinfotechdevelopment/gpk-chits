@@ -1,4 +1,4 @@
-import companyLogo from "@/assets/saiyogi-logo-1.png";
+import companyLogo from "@/assets/gpk-logo.svg";
 import { Link } from "react-router-dom";
 import { useSiteSettings } from "@/context/SiteSettingsContext";
 import { Facebook, Instagram, Youtube, ShieldCheck, Tag, Truck, CreditCard, HeadphonesIcon } from "lucide-react";
@@ -45,7 +45,17 @@ const UserFooter = () => {
           {/* About Section */}
           <div>
             <div className="flex flex-col items-start mb-4">
-              <img src={companyLogo} alt="Sai Yogi Logo" className="h-24 w-auto object-contain" />
+              <div className="flex items-center gap-3">
+                <img src={companyLogo} alt="GPK Crackers Logo" className="h-16 w-auto object-contain" />
+                <div className="flex flex-col">
+                  <span className="font-black text-xl tracking-tight text-gray-900 leading-none">
+                    GPK <span className="text-[#35520D]">CRACKERS</span>
+                  </span>
+                  <span className="text-[10px] font-extrabold text-[#35520D] uppercase tracking-widest mt-1">
+                    Premium Fireworks &amp; Chit Scheme
+                  </span>
+                </div>
+              </div>
             </div>
             <p className="text-xs text-gray-600 leading-relaxed mb-6">
               {settings.siteDescription || "Premium crackers and fireworks store based in Sivakasi. We offer the best quality crackers at wholesale prices for all your celebrations."}
@@ -68,7 +78,7 @@ const UserFooter = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       title={platform.charAt(0).toUpperCase() + platform.slice(1)}
-                      className="w-8 h-8 flex items-center justify-center bg-[#A80000] rounded text-white hover:bg-[#9c1b1e] transition-colors duration-200"
+                      className="w-8 h-8 flex items-center justify-center bg-[#A1CB35] rounded-lg text-gray-950 font-bold hover:bg-[#8FB82B] transition-colors duration-200 shadow-xs"
                     >
                       {icon}
                     </a>
@@ -78,7 +88,7 @@ const UserFooter = () => {
                   <span
                     key={platform}
                     title={`${platform.charAt(0).toUpperCase() + platform.slice(1)} (not set)`}
-                    className="w-8 h-8 flex items-center justify-center bg-gray-300 rounded text-gray-500 cursor-default"
+                    className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-lg text-gray-400 cursor-default"
                   >
                     {icon}
                   </span>
@@ -89,22 +99,22 @@ const UserFooter = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-bold text-black mb-6 text-sm uppercase">Quick Links</h4>
+            <h4 className="font-bold text-gray-900 mb-6 text-sm uppercase tracking-wider">Quick Links</h4>
             <nav className="flex flex-col gap-3 text-xs text-gray-600 font-semibold">
-              <Link to="/chit-scheme" className="hover:text-[#A80000] transition-colors duration-200">
+              <Link to="/chit-scheme" className="hover:text-[#35520D] transition-colors duration-200">
                 Chit Scheme
               </Link>
               {/*
-              <Link to="/" className="hover:text-[#A80000] transition-colors duration-200">
+              <Link to="/" className="hover:text-[#35520D] transition-colors duration-200">
                 Home
               </Link>
-              <Link to="/about-us" className="hover:text-[#A80000] transition-colors duration-200">
+              <Link to="/about-us" className="hover:text-[#35520D] transition-colors duration-200">
                 About Us
               </Link>
-              <Link to="/privacy-policy" className="hover:text-[#A80000] transition-colors duration-200">
+              <Link to="/privacy-policy" className="hover:text-[#35520D] transition-colors duration-200">
                 Privacy Policy
               </Link>
-              <Link to="/terms" className="hover:text-[#A80000] transition-colors duration-200">
+              <Link to="/terms" className="hover:text-[#35520D] transition-colors duration-200">
                 Terms & Conditions
               </Link>
               */}
@@ -114,12 +124,12 @@ const UserFooter = () => {
           {/* Customer Service */}
           {/*
           <div>
-            <h4 className="font-bold text-black mb-6 text-sm uppercase">Customer Service</h4>
+            <h4 className="font-bold text-gray-900 mb-6 text-sm uppercase tracking-wider">Customer Service</h4>
             <nav className="flex flex-col gap-3 text-xs text-gray-600 font-semibold">
-              <Link to="/my-account" className="hover:text-[#A80000] cursor-pointer transition-colors duration-200">
+              <Link to="/my-account" className="hover:text-[#35520D] cursor-pointer transition-colors duration-200">
                 My Account
               </Link>
-              <Link to="/contact" className="hover:text-[#A80000] cursor-pointer transition-colors duration-200">
+              <Link to="/contact" className="hover:text-[#35520D] cursor-pointer transition-colors duration-200">
                 Returns/Exchange
               </Link>
             </nav>
@@ -128,23 +138,23 @@ const UserFooter = () => {
 
           {/* Contact Us */}
           <div>
-            <h4 className="font-bold text-black mb-6 text-sm uppercase">Factory & Contact Info</h4>
+            <h4 className="font-bold text-gray-900 mb-6 text-sm uppercase tracking-wider">Factory &amp; Contact Info</h4>
             <div className="flex flex-col gap-3 text-xs text-gray-600 font-semibold mb-4 leading-relaxed">
               <span>📍 {settings.contact?.address || "Aanoor & Co, Sivakasi Crackers Main Market, Sivakasi - 626123, Tamil Nadu."}</span>
               <span>🏢 GST Registration: <b>33CAFPR4172K1ZG</b></span>
               <div className="flex flex-col gap-1 mt-2">
                 {settings.contact?.phone && (
-                  <a href={`tel:${settings.contact.phone.replace(/[^0-9+]/g, '')}`} className="flex items-center gap-2 border border-gray-300 bg-white px-3 py-1.5 rounded text-[#A80000] hover:bg-gray-50 transition-colors w-max">
+                  <a href={`tel:${settings.contact.phone.replace(/[^0-9+]/g, '')}`} className="flex items-center gap-2 border border-gray-200 bg-white px-3 py-1.5 rounded-lg text-[#35520D] font-bold hover:bg-[#A1CB35]/15 hover:border-[#A1CB35] transition-colors w-max shadow-2xs">
                     📞 {settings.contact.phone}
                   </a>
                 )}
                 {settings.contact?.phone2 && (
-                  <a href={`tel:${settings.contact.phone2.replace(/[^0-9+]/g, '')}`} className="flex items-center gap-2 border border-gray-300 bg-white px-3 py-1.5 rounded text-[#A80000] hover:bg-gray-50 transition-colors w-max">
+                  <a href={`tel:${settings.contact.phone2.replace(/[^0-9+]/g, '')}`} className="flex items-center gap-2 border border-gray-200 bg-white px-3 py-1.5 rounded-lg text-[#35520D] font-bold hover:bg-[#A1CB35]/15 hover:border-[#A1CB35] transition-colors w-max shadow-2xs">
                     📞 {settings.contact.phone2}
                   </a>
                 )}
                 {settings.contact?.email && (
-                  <a href={`mailto:${settings.contact.email}`} className="hover:text-[#A80000] transition-colors mt-2">
+                  <a href={`mailto:${settings.contact.email}`} className="hover:text-[#35520D] transition-colors mt-2">
                     ✉️ {settings.contact.email}
                   </a>
                 )}
@@ -166,7 +176,7 @@ const UserFooter = () => {
         <div className="bg-[#EBEBEB] border-t border-gray-300 py-4">
           <div className="container mx-auto px-4 flex flex-col sm:flex-row justify-between items-center text-[10px] text-gray-500 uppercase tracking-widest font-semibold gap-2 text-center sm:text-left">
             <div>
-              © 2026 {settings.siteName || "Sai Yogi Crackers"}. All rights reserved.
+              © 2026 {settings.siteName || "GPK Crackers"}. All rights reserved.
             </div>
           </div>
         </div>

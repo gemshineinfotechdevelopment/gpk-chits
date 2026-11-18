@@ -496,7 +496,7 @@ const AdminProducts = () => {
                         />
                         <Label htmlFor="isSaiYogiVerified" className="cursor-pointer font-extrabold text-emerald-900 text-sm flex items-center gap-1.5 select-none">
                           <CheckCircle className="w-5 h-5 text-emerald-600 fill-emerald-100 shrink-0" />
-                          <span>Verified by Sai Yogi</span>
+                          <span>Verified by GPK</span>
                         </Label>
                       </div>
                       <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-full border border-emerald-300">
@@ -1017,7 +1017,7 @@ const AdminProducts = () => {
                                 });
 
                                 if (!res.ok) throw new Error('Update failed');
-                                toast.success(`Verified by Sai Yogi ${newStatus ? 'enabled' : 'disabled'}`);
+                                toast.success(`Verified by GPK ${newStatus ? 'enabled' : 'disabled'}`);
                               } catch (err) {
                                 console.error('Update error:', err);
                                 toast.error('Failed to update verified status');

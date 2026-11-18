@@ -27,6 +27,8 @@ dist-ssr
 .env.local
 .env.*.local
 server/.env
+server/data/
+server/data/db/
 server/*.json
 !server/package.json
 !server/package-lock.json

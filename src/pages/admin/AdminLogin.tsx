@@ -51,7 +51,7 @@ const AdminLogin = () => {
           <div className="text-center mb-8">
             <span className="text-5xl mb-4 block">🎆</span>
             <h1 className="font-display text-2xl font-bold">Admin Panel</h1>
-            <p className="text-sm text-muted-foreground mt-2">Cracker Hub Administration</p>
+            <p className="text-sm text-muted-foreground mt-2">GPK Crackers Administration</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -59,7 +59,7 @@ const AdminLogin = () => {
               <label className="text-sm font-medium">Email</label>
               <Input
                 type="email"
-                placeholder="cracker@saiyogi.com"
+                placeholder="admin@gpkcrackers.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}

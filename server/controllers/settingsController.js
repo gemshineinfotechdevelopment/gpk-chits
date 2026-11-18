@@ -9,8 +9,16 @@ export const getSettings = async (req, res, next) => {
       settings = await Settings.create({});
     }
 
-    if (settings.billing?.companyName && /avinaash|bala/i.test(settings.billing.companyName)) {
-      settings.billing.companyName = 'Sai Yogi Crackers';
+    let needsSave = false;
+    if (settings.billing?.companyName && /avinaash|bala|sai\s*yogi/i.test(settings.billing.companyName)) {
+      settings.billing.companyName = 'GPK Crackers';
+      needsSave = true;
+    }
+    if (!settings.siteName || /avinaash|bala|sai\s*yogi|cracker\s*hub/i.test(settings.siteName)) {
+      settings.siteName = 'GPK Crackers';
+      needsSave = true;
+    }
+    if (needsSave) {
       await settings.save();
     }
 
@@ -51,12 +59,14 @@ export const getSiteInfo = async (req, res, next) => {
     }
 
     const billing = settings.billing ? (settings.billing.toObject ? settings.billing.toObject() : { ...settings.billing }) : {};
-    if (billing.companyName && /avinaash|bala/i.test(billing.companyName)) {
-      billing.companyName = 'Sai Yogi Crackers';
+    if (!billing.companyName || /avinaash|bala|sai\s*yogi/i.test(billing.companyName)) {
+      billing.companyName = 'GPK Crackers';
     }
 
+    const resolvedSiteName = (!settings.siteName || /avinaash|bala|sai\s*yogi|cracker\s*hub/i.test(settings.siteName)) ? 'GPK Crackers' : settings.siteName;
+
     const info = {
-      siteName: settings.siteName,
+      siteName: resolvedSiteName,
       siteDescription: settings.siteDescription || '',
       logo: settings.logo || '',
       favicon: settings.favicon || '',

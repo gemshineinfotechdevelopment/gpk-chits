@@ -6,9 +6,10 @@ import {
   Gift, Users, ArrowRight, ShieldCheck, CheckCircle2, Clock,
   AlertCircle, ChevronRight, Phone, Mail, MapPin, User, LogIn, Lock,
   Plus, Minus, Trash2, Calendar, DollarSign, FileText, ArrowLeft,
-  Sparkles, Check, X, Printer, Download, Receipt
+  Sparkles, Check, X, Printer, Download, Receipt, Calculator, Award, TrendingUp, SlidersHorizontal
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { useAuth } from "@/context/AuthContext";
 import {
   getChitSchemes,
@@ -101,23 +102,52 @@ const ChitScheme: React.FC = () => {
   // Receipt Modal State
   const [activeReceipt, setActiveReceipt] = useState<ChitReceiptData | null>(null);
 
+  // Modern Fintech UI State: Drawer & Interactive Calculator
+  const [isEnrollmentDrawerOpen, setIsEnrollmentDrawerOpen] = useState(false);
+  const [calcSchemeId, setCalcSchemeId] = useState<string>("");
+  const [calcPersons, setCalcPersons] = useState<number>(1);
+  const [cardPersonCounts, setCardPersonCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    if (schemes.length > 0 && !calcSchemeId) {
+      setCalcSchemeId(schemes[0].id);
+    }
+  }, [schemes, calcSchemeId]);
+
   const formRef = useRef<HTMLDivElement>(null);
 
-  // Auto-fill customer form from login or local storage
+  // Auto-fill customer form from login or clear on logout
   useEffect(() => {
-    if (isUserLoggedIn) {
+    if (isUserLoggedIn && userPhone) {
       setFormData(prev => ({
         name: prev.name || userName || "",
         phone: prev.phone || userPhone || "",
         email: prev.email || localStorage.getItem("user_email") || "",
         location: prev.location || localStorage.getItem("user_location") || ""
       }));
+    } else {
+      // Clear sensitive customer data and subscriptions when logged out
+      setFormData({
+        name: "",
+        phone: "",
+        email: "",
+        location: ""
+      });
+      setUserSubscriptions([]);
+      setShowPurchasedModal(false);
+      setSelectedPassbookSub(null);
+      setSelectedPassbookScheme(null);
     }
   }, [isUserLoggedIn, userPhone, userName]);
 
-  // Fetch logged in user subscriptions
+  // Fetch logged in user subscriptions (STRICTLY for authenticated users only)
   const loadUserSubscriptions = () => {
-    const cleanPhone = (userPhone || formData.phone || localStorage.getItem("user_phone") || "").replace(/\D/g, "").slice(-10);
+    if (!isUserLoggedIn || !userPhone) {
+      setUserSubscriptions([]);
+      return;
+    }
+
+    const cleanPhone = userPhone.replace(/\D/g, "").slice(-10);
     if (cleanPhone && cleanPhone.length === 10) {
       getChitSubscriptions()
         .then(allSubs => {
@@ -135,7 +165,7 @@ const ChitScheme: React.FC = () => {
 
   useEffect(() => {
     loadUserSubscriptions();
-  }, [isUserLoggedIn, userPhone, formData.phone]);
+  }, [isUserLoggedIn, userPhone]);
 
   useEffect(() => {
     if (isUserLoggedIn && userPhone) {
@@ -253,6 +283,66 @@ const ChitScheme: React.FC = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const getCardCount = (schemeId: string, schemeName: string) => {
+    const selected = selectedSchemes.find(s => s.schemeName === schemeName);
+    if (selected) return selected.personCount;
+    return cardPersonCounts[schemeId] || 1;
+  };
+
+  const updateCardCount = (sch: SchemeOption, delta: number) => {
+    const existingIdx = selectedSchemes.findIndex(s => s.schemeName === sch.title);
+    if (existingIdx > -1) {
+      const current = selectedSchemes[existingIdx].personCount;
+      const next = Math.max(1, current + delta);
+      handlePersonCountChange(existingIdx, next);
+    } else {
+      setCardPersonCounts(prev => {
+        const cur = prev[sch.id] || 1;
+        return { ...prev, [sch.id]: Math.max(1, cur + delta) };
+      });
+    }
+  };
+
+  const handleCardToggle = (sch: SchemeOption) => {
+    const existingIdx = selectedSchemes.findIndex(s => s.schemeName === sch.title);
+    if (existingIdx > -1) {
+      handleRemoveScheme(existingIdx);
+    } else {
+      const count = cardPersonCounts[sch.id] || 1;
+      setSelectedSchemes(prev => [
+        ...prev,
+        {
+          schemeId: sch.id,
+          schemeName: sch.title,
+          monthlyAmount: sch.monthlyAmount,
+          totalMonths: sch.totalMonths || 10,
+          dueDateDay: sch.dueDateDay || 10,
+          personCount: count
+        }
+      ]);
+      toast.success(`Selected ${sch.title} (${count} Person${count > 1 ? 's' : ''})`);
+    }
+  };
+
+  const handleEnrollDirectly = (sch: SchemeOption) => {
+    const existingIdx = selectedSchemes.findIndex(s => s.schemeName === sch.title);
+    if (existingIdx === -1) {
+      const count = cardPersonCounts[sch.id] || 1;
+      setSelectedSchemes(prev => [
+        ...prev,
+        {
+          schemeId: sch.id,
+          schemeName: sch.title,
+          monthlyAmount: sch.monthlyAmount,
+          totalMonths: sch.totalMonths || 10,
+          dueDateDay: sch.dueDateDay || 10,
+          personCount: count
+        }
+      ]);
+    }
+    setIsEnrollmentDrawerOpen(true);
+  };
+
   // Aggregated Calculations
   const totalPersons = selectedSchemes.reduce((sum, s) => sum + (s.personCount || 1), 0);
   const combinedMonthlyAmount = selectedSchemes.reduce((sum, s) => sum + (s.monthlyAmount * (s.personCount || 1)), 0);
@@ -328,6 +418,7 @@ const ChitScheme: React.FC = () => {
       if (formData.location) localStorage.setItem("user_location", formData.location.trim());
 
       setSubmittedData(result);
+      setIsEnrollmentDrawerOpen(false);
       setShowSuccessModal(true);
       toast.success("Chit scheme application submitted successfully! 🎉");
 
@@ -342,598 +433,840 @@ const ChitScheme: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAF9FC]">
+    <div className="min-h-screen flex flex-col bg-[#FBFDF8]">
       <UserHeader />
 
       {/* Breadcrumb Header Bar */}
-      <div className="bg-[#F8F7FA] border-b border-gray-200/80 py-3.5 px-4 sm:px-12">
+      <div className="bg-[#F5F9EC] border-b border-[#A1CB35]/30 py-3.5 px-4 sm:px-12">
         <div className="max-w-6xl mx-auto flex items-center gap-2 text-xs text-gray-600 font-medium">
-          <Link to="/" className="hover:text-[#4C1D95] transition-colors">
+          <Link to="/" className="hover:text-[#35520D] transition-colors">
             Home
           </Link>
           <span>/</span>
-          <span className="text-[#4C1D95] font-bold">Chit Scheme</span>
+          <span className="text-[#35520D] font-bold">Chit Scheme</span>
         </div>
       </div>
 
-      <main className="flex-1 py-10 px-4 sm:px-12 max-w-6xl mx-auto w-full">
-        {/* Title Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 bg-white p-6 rounded-3xl border border-gray-200/80 shadow-2xs">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-amber-100 text-[#7A1416] flex items-center justify-center border border-amber-200 shadow-2xs shrink-0">
-              <Gift className="w-6 h-6" />
+      {!isUserLoggedIn ? (
+        <main className="flex-1 flex items-center justify-center p-4 sm:p-8 min-h-[60vh]">
+          <div className="bg-white border-2 border-[#A1CB35]/40 rounded-3xl p-8 sm:p-12 shadow-sm text-center max-w-md w-full space-y-6">
+            <div className="w-16 h-16 rounded-3xl bg-[#F4F9EA] text-[#35520D] flex items-center justify-center mx-auto border-2 border-[#A1CB35]/40 shadow-2xs">
+              <Lock className="w-8 h-8" />
             </div>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#2A1B54]">
-                Sai Yogi Chit Scheme
-              </h1>
-              <p className="text-xs text-gray-500 font-medium mt-0.5">
-                Multiple Persons &amp; Bulk Enrollment Available • Join our monthly savings scheme &amp; unlock bonus fireworks gifts!
+
+            <div className="space-y-2">
+              <span className="text-[10px] font-black uppercase tracking-wider bg-[#F4F9EA] text-[#2D4505] px-3 py-1 rounded-full border border-[#A1CB35]/40 inline-block">
+                Diwali 2026 Chit Scheme
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black text-gray-950 tracking-tight">
+                Login / Register
+              </h2>
+              <p className="text-xs text-gray-600 font-medium leading-relaxed max-w-xs mx-auto">
+                Please login with your WhatsApp mobile number to view our chit schemes and enroll.
               </p>
             </div>
+
+            <button
+              type="button"
+              onClick={openLoginModal}
+              className="w-full bg-[#A1CB35] hover:bg-[#8FB82B] active:scale-95 text-gray-950 text-xs font-black py-4 px-6 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider"
+            >
+              <LogIn className="w-4 h-4 text-gray-950" />
+              <span>Login / Register</span>
+            </button>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
+        </main>
+      ) : (
+        <main className="flex-1 pb-28 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 space-y-12 pt-6">
+        {/* Top Header / Account Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white/90 backdrop-blur-sm p-4 sm:p-5 rounded-3xl border border-[#A1CB35]/30 shadow-2xs">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-2xl bg-[#A1CB35]/20 text-[#35520D] flex items-center justify-center border border-[#A1CB35]/40 shadow-2xs shrink-0">
+              <Gift className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider bg-[#A1CB35]/20 text-[#2D4505] px-2.5 py-0.5 rounded-full border border-[#A1CB35]/40">
+                  Diwali 2026 Savings
+                </span>
+                <span className="text-xs font-semibold text-gray-500 hidden sm:inline">• 10 Months Fixed Scheme</span>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight mt-0.5">
+                GPK Chit Scheme
+              </h1>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2.5">
             {isUserLoggedIn && (
-              <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-300 text-emerald-950 px-3.5 py-2 rounded-2xl text-xs font-bold shadow-2xs">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Logged in as: <strong className="text-emerald-900">{userName || 'Customer'}</strong> ({userPhone})</span>
+              <div className="flex items-center gap-2 bg-[#F4F9EA] border border-[#A1CB35]/40 text-[#2D4505] px-3.5 py-2 rounded-2xl text-xs font-bold shadow-2xs">
+                <CheckCircle2 className="w-4 h-4 text-[#35520D] shrink-0" />
+                <span><span className="text-gray-500 font-normal">Account:</span> <strong className="text-gray-950 font-bold">{userName || 'Customer'}</strong></span>
               </div>
             )}
-            {userSubscriptions.length > 0 && (
+            {isUserLoggedIn && userSubscriptions.length > 0 && (
               <button
                 type="button"
                 onClick={() => setShowPurchasedModal(true)}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-2xl text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer"
+                className="bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black px-4 py-2.5 rounded-2xl text-xs transition-all shadow-sm flex items-center gap-2 cursor-pointer active:scale-95"
               >
-                <CheckCircle2 className="w-4 h-4 text-white" />
-                <span>View Purchased Schemes ({userSubscriptions.length})</span>
+                <FileText className="w-4 h-4 text-gray-950" />
+                <span>My Passbook ({userSubscriptions.length})</span>
               </button>
             )}
             {!isUserLoggedIn && (
               <button
                 type="button"
                 onClick={openLoginModal}
-                className="bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all shadow-2xs flex items-center gap-2 cursor-pointer"
+                className="bg-white hover:bg-[#F4F9EA] text-[#35520D] border border-[#A1CB35] px-4 py-2.5 rounded-2xl text-xs font-bold transition-all shadow-2xs flex items-center gap-2 cursor-pointer"
               >
-                <LogIn className="w-4 h-4 text-amber-700" />
+                <LogIn className="w-4 h-4 text-[#35520D]" />
                 <span>Login / Register</span>
               </button>
             )}
           </div>
         </div>
 
-        {!isUserLoggedIn ? (
-          <div className="bg-white border border-gray-200/90 rounded-3xl p-8 sm:p-12 shadow-sm text-center max-w-2xl mx-auto my-8 space-y-6">
-            <div className="w-16 h-16 rounded-3xl bg-amber-100 text-[#7A1416] flex items-center justify-center mx-auto border border-amber-200 shadow-2xs">
-              <Lock className="w-8 h-8" />
-            </div>
-            <div className="space-y-2">
-              <h2 className="text-2xl font-extrabold text-[#2A1B54]">
-                Customer Login Required
+        {/* HERO SECTION + INTERACTIVE SAVINGS CALCULATOR */}
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-[#F7FBEF] to-[#EBF5D4]/60 border border-[#A1CB35]/40 shadow-sm p-6 sm:p-10 lg:p-12">
+          {/* Subtle background decorative glow */}
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#A1CB35]/15 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-[#A1CB35]/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* Left Hero Pitch */}
+            <div className="lg:col-span-7 space-y-5">
+              <div className="inline-flex items-center gap-2 bg-white/90 border border-[#A1CB35]/50 px-3.5 py-1.5 rounded-full shadow-2xs">
+                <Sparkles className="w-4 h-4 text-[#35520D]" />
+                <span className="text-xs font-black text-[#2D4505] tracking-wide uppercase">
+                  Zero Burden Diwali Fireworks
+                </span>
+              </div>
+
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-950 tracking-tight leading-[1.15]">
+                Save small each month. <br className="hidden sm:inline" />
+                Celebrate grand this <span className="text-[#35520D] underline decoration-[#A1CB35] decoration-wavy underline-offset-8">Diwali</span>.
               </h2>
-              <p className="text-xs text-gray-600 leading-relaxed max-w-lg mx-auto font-medium">
-                Please log in with your WhatsApp mobile number to view our chit schemes, verify your identity, and submit your chit enrollment request. Only authenticated customers can submit applications and track their monthly passbook.
+
+              <p className="text-sm sm:text-base text-gray-600 font-medium leading-relaxed max-w-xl">
+                Join our trusted GPK monthly chit scheme. Secure guaranteed premium crackers packages, earn generous festive bonus fireworks, and manage family bulk enrollments effortlessly.
               </p>
-            </div>
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <button
-                type="button"
-                onClick={openLoginModal}
-                className="w-full sm:w-auto bg-[#7A1416] hover:bg-[#900000] text-white text-xs font-extrabold px-8 py-3.5 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider active:scale-95"
-              >
-                <LogIn className="w-4 h-4 text-amber-300" />
-                <span>Login with Mobile Number</span>
-              </button>
-            </div>
-            <div className="pt-4 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
-              <div className="bg-amber-50/60 p-3.5 rounded-2xl border border-amber-200/60 space-y-1">
-                <span className="text-xs font-extrabold text-amber-950 block">🔒 Verified Account</span>
-                <span className="text-[11px] text-gray-500 font-medium">Applications are safely linked to your verified phone number.</span>
-              </div>
-              <div className="bg-amber-50/60 p-3.5 rounded-2xl border border-amber-200/60 space-y-1">
-                <span className="text-xs font-extrabold text-amber-950 block">📱 Digital Passbook</span>
-                <span className="text-[11px] text-gray-500 font-medium">Track approved schemes and monthly installment due dates.</span>
-              </div>
-              <div className="bg-amber-50/60 p-3.5 rounded-2xl border border-amber-200/60 space-y-1">
-                <span className="text-xs font-extrabold text-amber-950 block">📄 Official Receipts</span>
-                <span className="text-[11px] text-gray-500 font-medium">View and download authorized payment receipts instantly.</span>
+
+              {/* Trust Badges */}
+              <div className="grid grid-cols-3 gap-3 pt-2">
+                <div className="bg-white/80 border border-[#A1CB35]/30 rounded-2xl p-3 shadow-2xs">
+                  <span className="block text-xs font-black text-[#2D4505]">100% Guaranteed</span>
+                  <span className="text-[11px] text-gray-500 font-medium">Direct Factory Stock</span>
+                </div>
+                <div className="bg-white/80 border border-[#A1CB35]/30 rounded-2xl p-3 shadow-2xs">
+                  <span className="block text-xs font-black text-[#2D4505]">Bonus Crackers</span>
+                  <span className="text-[11px] text-gray-500 font-medium">Extra Festive Hamper</span>
+                </div>
+                <div className="bg-white/80 border border-[#A1CB35]/30 rounded-2xl p-3 shadow-2xs">
+                  <span className="block text-xs font-black text-[#2D4505]">Digital Passbook</span>
+                  <span className="text-[11px] text-gray-500 font-medium">Online Receipt &amp; Tracking</span>
+                </div>
               </div>
             </div>
-          </div>
-        ) : (
-          <>
-            {/* If user has purchased/pending schemes: show quick passbook banner */}
-            {userSubscriptions.length > 0 && (
-              <div className="mb-8 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-100/70 border border-emerald-300 rounded-3xl p-5 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold shadow-sm shrink-0">
-                    <CheckCircle2 className="w-6 h-6" />
+
+            {/* Right: Interactive Savings Calculator Widget */}
+            <div className="lg:col-span-5 bg-white border-2 border-[#A1CB35]/50 rounded-3xl p-6 sm:p-7 shadow-xl space-y-5">
+              <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-[#A1CB35] text-gray-950 flex items-center justify-center font-bold">
+                    <Calculator className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-extrabold text-emerald-950">
-                      You Have {userSubscriptions.length} Enrolled Chit Application{userSubscriptions.length > 1 ? "s" : ""}
-                    </h3>
-                    <p className="text-xs text-emerald-700 font-medium mt-0.5">
-                      View your digital passbook, payment schedule, installment progress, and download official receipts.
-                    </p>
+                    <h3 className="text-sm font-black text-gray-950">Chit Savings Calculator</h3>
+                    <p className="text-[11px] text-gray-500 font-medium">Simulate returns &amp; bonus hampers</p>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setShowPurchasedModal(true)}
-                  className="bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs px-5 py-2.5 rounded-2xl transition-all shadow-md flex items-center gap-1.5 cursor-pointer shrink-0 active:scale-95"
-                >
-                  <span>Open Digital Passbook</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            )}
-
-            {/* Main Content Layout: Multi-Scheme Registration Form (5 Cols) + Scheme Cards (7 Cols) */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              {/* Left Column: Enhanced Multi-Scheme Enrollment Form (5 Cols) */}
-              <div ref={formRef} className="lg:col-span-5 bg-white border border-gray-200 rounded-3xl p-6 sm:p-7 shadow-md space-y-6 lg:sticky lg:top-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider bg-amber-100 text-amber-900 px-3 py-1 rounded-full inline-block mb-2">
-                    Multiple Persons / Bulk Enrollment
-                  </span>
-                  <h2 className="text-xl font-extrabold text-gray-900">
-                    Enroll in Chit Scheme
-                  </h2>
-                  <p className="text-xs text-gray-500 font-medium mt-1">
-                    Select one or multiple schemes with custom person counts in a single application!
-                  </p>
-                </div>
-
-                <form onSubmit={handleInitiateSubmit} className="space-y-5">
-                  {/* STEP 1: CUSTOMER INFORMATION */}
-                  <div className="space-y-3 bg-gray-50/70 p-4 rounded-2xl border border-gray-200/80">
-                    <div className="font-extrabold text-[#7A1416] text-xs uppercase tracking-wider flex items-center gap-1.5">
-                      <User className="w-3.5 h-3.5" />
-                      <span>Step 1: Customer Information</span>
-                    </div>
-
-                    {/* Full Name */}
-                    <div className="space-y-1">
-                      <label className="block text-[11px] font-bold text-gray-700 uppercase">
-                        Full Name *
-                      </label>
-                      <div className="relative">
-                        <User className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                        <input
-                          type="text"
-                          name="name"
-                          placeholder="Enter your full name"
-                          value={formData.name}
-                          onChange={handleInputChange}
-                          className="w-full text-xs font-semibold p-2.5 pl-8 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    {/* Mobile Number */}
-                    <div className="space-y-1">
-                      <div className="flex justify-between items-center">
-                        <label className="block text-[11px] font-bold text-gray-700 uppercase">
-                          Mobile Number *
-                        </label>
-                        {userPhone && (
-                          <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                            ✓ Verified Account Phone
-                          </span>
-                        )}
-                      </div>
-                      <div className="relative flex items-center">
-                        <div className="absolute left-3 font-bold text-xs text-gray-500">
-                          +91
-                        </div>
-                        <input
-                          type="tel"
-                          name="phone"
-                          placeholder="10-digit mobile"
-                          value={formData.phone}
-                          onChange={handleInputChange}
-                          maxLength={10}
-                          readOnly={Boolean(userPhone)}
-                          className={`w-full text-xs font-bold p-2.5 pl-11 rounded-xl outline-none border ${
-                            userPhone
-                              ? "bg-gray-100 text-gray-700 border-gray-300 cursor-not-allowed select-none"
-                              : "bg-white border-gray-300"
-                          }`}
-                          required
-                        />
-                      </div>
-                    </div>
-
-                {/* Email & Location Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  <div className="space-y-1">
-                    <label className="block text-[11px] font-bold text-gray-700 uppercase">
-                      Email ID
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="Email (optional)"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="block text-[11px] font-bold text-gray-700 uppercase">
-                      Location *
-                    </label>
-                    <input
-                      type="text"
-                      name="location"
-                      placeholder="City/District"
-                      value={formData.location}
-                      onChange={handleInputChange}
-                      className="w-full text-xs font-medium p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none"
-                      required
-                    />
-                  </div>
-                </div>
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#2D4505] bg-[#F4F9EA] px-2.5 py-1 rounded-full border border-[#A1CB35]/40">
+                  10 Months
+                </span>
               </div>
 
-              {/* STEP 2: SELECT SCHEMES & PERSON COUNTS (MULTI-SCHEME SELECTOR) */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="font-extrabold text-[#7A1416] text-xs uppercase tracking-wider flex items-center gap-1.5">
-                    <Gift className="w-3.5 h-3.5" />
-                    <span>Step 2: Choose Schemes & Persons ({selectedSchemes.length} Selected)</span>
-                  </div>
-                  {selectedSchemes.length > 0 && (
-                    <span className="text-[11px] text-gray-500 font-bold">
-                      Total Persons: <strong className="text-amber-900 font-extrabold">{totalPersons}</strong>
-                    </span>
-                  )}
-                </div>
-
-                <p className="text-[11px] text-gray-500 font-medium">
-                  Select 1 or more schemes below. You can enroll multiple persons under each scheme:
-                </p>
-
-                {/* List all available schemes with individual select/person count controls */}
-                <div className="space-y-3">
-                  {schemes.map((sch) => {
-                    const selectedIndex = selectedSchemes.findIndex(s => s.schemeName === sch.title);
-                    const isSelected = selectedIndex > -1;
-                    const selectedItem = isSelected ? selectedSchemes[selectedIndex] : null;
-                    const count = selectedItem ? selectedItem.personCount : 1;
-                    const monthlySubtotal = sch.monthlyAmount * count;
-                    const grandSubtotal = monthlySubtotal * (sch.totalMonths || 10);
-
-                    return (
-                      <div
-                        key={sch.id}
-                        className={`rounded-2xl p-3.5 border-2 transition-all space-y-2.5 ${
-                          isSelected
-                            ? "bg-amber-50/50 border-[#7A1416] shadow-sm ring-1 ring-[#7A1416]/20"
-                            : "bg-white border-gray-200 hover:border-amber-300"
+              {/* Scheme Selection Pills / Selector */}
+              <div className="space-y-2">
+                <label className="text-[11px] font-extrabold uppercase text-gray-700 tracking-wider">
+                  Select Scheme Rate:
+                </label>
+                {schemes.length > 0 ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {schemes.slice(0, 6).map((s) => (
+                      <button
+                        key={s.id}
+                        type="button"
+                        onClick={() => setCalcSchemeId(s.id)}
+                        className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                          (calcSchemeId === s.id || (!calcSchemeId && schemes[0]?.id === s.id))
+                            ? "bg-[#A1CB35] text-gray-950 font-black border-[#8FB82B] shadow-2xs"
+                            : "bg-[#F7FBEF]/50 hover:bg-[#F4F9EA] text-gray-800 font-bold border-gray-200"
                         }`}
                       >
-                        {/* Header Row: Title & Toggle Button */}
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${
-                                isSelected ? "bg-[#7A1416] text-white" : "border-2 border-gray-300 text-transparent"
-                              }`}>
-                                ✓
-                              </span>
-                              <h4 className="text-xs font-black text-[#2A1B54] truncate" title={sch.title}>
-                                {sch.title}
-                              </h4>
-                            </div>
-                            <div className="text-[11px] text-gray-500 font-medium pl-6 mt-0.5">
-                              ₹{sch.monthlyAmount.toLocaleString()} / person / mo • {sch.totalMonths || 10} Months
-                            </div>
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (isSelected) {
-                                handleRemoveScheme(selectedIndex);
-                              } else {
-                                handleAddScheme(sch.title);
-                              }
-                            }}
-                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 ${
-                              isSelected
-                                ? "bg-rose-100 hover:bg-rose-200 text-rose-700"
-                                : "bg-[#7A1416] hover:bg-[#900000] text-white shadow-2xs"
-                            }`}
-                          >
-                            {isSelected ? "Remove ✕" : "+ Select"}
-                          </button>
-                        </div>
-
-                        {/* If Selected: Person Count Stepper & Calculation */}
-                        {isSelected && (
-                          <div className="bg-white border border-amber-200 rounded-xl p-2.5 space-y-2 shadow-2xs">
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs font-bold text-amber-950 flex items-center gap-1">
-                                <Users className="w-3.5 h-3.5 text-[#7A1416]" />
-                                <span>Person Count:</span>
-                              </span>
-
-                              <div className="flex items-center gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => handlePersonCountChange(selectedIndex, count - 1)}
-                                  disabled={count <= 1}
-                                  className="w-7 h-7 bg-gray-100 hover:bg-gray-200 disabled:opacity-40 border border-gray-300 rounded-lg flex items-center justify-center font-bold text-gray-700 cursor-pointer shadow-2xs"
-                                >
-                                  <Minus className="w-3.5 h-3.5" />
-                                </button>
-                                <input
-                                  type="number"
-                                  min={1}
-                                  value={count}
-                                  onChange={(e) => handlePersonCountChange(selectedIndex, parseInt(e.target.value, 10) || 1)}
-                                  className="w-14 text-center font-black text-xs p-1 bg-white border border-gray-300 rounded-lg outline-none focus:ring-1 focus:ring-[#7A1416]"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => handlePersonCountChange(selectedIndex, count + 1)}
-                                  className="w-7 h-7 bg-[#7A1416] hover:bg-[#900000] text-white rounded-lg flex items-center justify-center font-bold cursor-pointer shadow-2xs"
-                                >
-                                  <Plus className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center justify-between text-[11px] pt-1.5 border-t border-gray-100">
-                              <span className="text-gray-500 font-medium">
-                                Monthly: <strong className="text-emerald-700 font-extrabold">₹{monthlySubtotal.toLocaleString()}</strong> ({count}p × ₹{sch.monthlyAmount.toLocaleString()})
-                              </span>
-                              <span className="text-gray-500 font-medium">
-                                Total: <strong className="text-[#2A1B54] font-extrabold">₹{grandSubtotal.toLocaleString()}</strong>
-                              </span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
+                        <div className="text-xs truncate">{s.title}</div>
+                        <div className="text-[11px] opacity-80">₹{s.monthlyAmount.toLocaleString()}/mo</div>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-xs text-gray-500 bg-gray-50 p-2.5 rounded-xl">No active schemes loaded</div>
+                )}
               </div>
 
-              {/* STEP 3: APPLICATION SUMMARY */}
-              {selectedSchemes.length > 0 ? (
-                <div className="bg-amber-50/90 border border-amber-300/80 rounded-2xl p-4 space-y-2.5 text-xs">
-                  <div className="font-extrabold text-amber-950 uppercase tracking-wider text-[11px] border-b border-amber-200 pb-1 flex justify-between items-center">
-                    <span>Application Summary</span>
-                    <span className="bg-amber-200 text-amber-900 px-2 py-0.5 rounded font-black text-[10px]">
-                      {totalPersons} Total Person(s)
+              {/* Person Stepper */}
+              {(() => {
+                const currentCalcScheme = schemes.find(s => s.id === calcSchemeId) || schemes[0];
+                const calcMonthlyPerPerson = currentCalcScheme?.monthlyAmount || 1000;
+                const calcDurationMonths = currentCalcScheme?.totalMonths || 10;
+                const calcMonthlyTotal = calcMonthlyPerPerson * calcPersons;
+                const calcTotalMaturity = calcMonthlyTotal * calcDurationMonths;
+
+                return (
+                  <>
+                    <div className="flex items-center justify-between bg-[#F7FBEF]/70 p-3 rounded-2xl border border-[#A1CB35]/30">
+                      <div>
+                        <span className="text-xs font-extrabold text-gray-900 block">Number of Persons:</span>
+                        <span className="text-[11px] text-gray-500 font-medium">Bulk savings for family &amp; friends</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setCalcPersons(Math.max(1, calcPersons - 1))}
+                          disabled={calcPersons <= 1}
+                          className="w-8 h-8 rounded-xl bg-white border border-gray-300 disabled:opacity-40 font-bold text-gray-700 flex items-center justify-center hover:bg-gray-100 cursor-pointer shadow-2xs"
+                        >
+                          <Minus className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="w-8 text-center font-black text-sm text-gray-950">
+                          {calcPersons}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setCalcPersons(calcPersons + 1)}
+                          className="w-8 h-8 rounded-xl bg-[#A1CB35] hover:bg-[#8FB82B] font-bold text-gray-950 flex items-center justify-center cursor-pointer shadow-2xs"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Calculated Results Grid */}
+                    <div className="grid grid-cols-2 gap-3 pt-1">
+                      <div className="bg-[#F4F9EA] p-3.5 rounded-2xl border border-[#A1CB35]/40 space-y-0.5">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-gray-500 block">
+                          Monthly Deposit
+                        </span>
+                        <span className="text-lg font-black text-[#2D4505]">
+                          ₹{calcMonthlyTotal.toLocaleString()}
+                        </span>
+                        <span className="text-[10px] text-gray-500 block">
+                          ({calcPersons}p × ₹{calcMonthlyPerPerson.toLocaleString()})
+                        </span>
+                      </div>
+
+                      <div className="bg-gray-950 text-white p-3.5 rounded-2xl space-y-0.5 shadow-md">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-[#A1CB35] block">
+                          10-Month Maturity
+                        </span>
+                        <span className="text-lg font-black text-white">
+                          ₹{calcTotalMaturity.toLocaleString()}
+                        </span>
+                        <span className="text-[10px] text-gray-400 block">
+                          + Guaranteed Bonus Cracker Box
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Quick CTA */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!currentCalcScheme) return;
+                        const existingIdx = selectedSchemes.findIndex(s => s.schemeName === currentCalcScheme.title);
+                        if (existingIdx > -1) {
+                          handlePersonCountChange(existingIdx, calcPersons);
+                        } else {
+                          setSelectedSchemes(prev => [
+                            ...prev,
+                            {
+                              schemeId: currentCalcScheme.id,
+                              schemeName: currentCalcScheme.title,
+                              monthlyAmount: currentCalcScheme.monthlyAmount,
+                              totalMonths: currentCalcScheme.totalMonths || 10,
+                              dueDateDay: currentCalcScheme.dueDateDay || 10,
+                              personCount: calcPersons
+                            }
+                          ]);
+                        }
+                        setIsEnrollmentDrawerOpen(true);
+                        toast.success(`Selected ${currentCalcScheme.title} (${calcPersons} Person${calcPersons > 1 ? 's' : ''})`);
+                      }}
+                      className="w-full bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black text-xs py-3.5 px-4 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-95 uppercase tracking-wider"
+                    >
+                      <Sparkles className="w-4 h-4 text-gray-950" />
+                      <span>Quick Enroll with This Scheme →</span>
+                    </button>
+                  </>
+                );
+              })()}
+            </div>
+          </div>
+        </section>
+
+        {/* PROMOTIONAL OFFERS & BANNERS */}
+        {bannerImages.length > 0 && (
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-black text-gray-950 flex items-center gap-2">
+                  <Gift className="w-5 h-5 text-[#35520D]" />
+                  <span>Diwali Bonus Gift Hampers &amp; Catalog</span>
+                </h3>
+                <p className="text-xs text-gray-500 font-medium mt-0.5">
+                  Exclusive gifts, free crackers packages, and bonus rewards bundled with each scheme
+                </p>
+              </div>
+              <span className="text-xs text-gray-400 font-semibold hidden sm:inline">
+                Click any poster to zoom
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {bannerImages.map((banner) => (
+                <div
+                  key={banner.id}
+                  onClick={() => setActiveZoomImage(banner)}
+                  className="group relative overflow-hidden rounded-3xl border-2 border-[#A1CB35]/30 bg-white shadow-2xs hover:border-[#A1CB35] hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col"
+                >
+                  <div className="aspect-[16/10] w-full overflow-hidden bg-gray-100 flex items-center justify-center">
+                    <img
+                      src={banner.url}
+                      alt={banner.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="p-4 bg-white flex items-center justify-between gap-3 border-t border-gray-100">
+                    <div>
+                      <span className="font-black text-gray-900 text-xs line-clamp-1">
+                        {banner.title}
+                      </span>
+                      {banner.monthlyAmount ? (
+                        <span className="text-[11px] font-bold text-[#2D4505]">
+                          ₹{banner.monthlyAmount.toLocaleString()} / month
+                        </span>
+                      ) : (
+                        <span className="text-[11px] text-gray-400">Diwali Gift Offer</span>
+                      )}
+                    </div>
+                    <span className="text-[10px] font-black text-gray-900 bg-[#A1CB35] px-2.5 py-1 rounded-full border border-[#8FB82B] shadow-2xs shrink-0">
+                      View 🔍
                     </span>
                   </div>
-
-                  <div className="space-y-1 text-[11px]">
-                    {selectedSchemes.map((s, idx) => (
-                      <div key={idx} className="flex justify-between text-gray-700">
-                        <span>{s.schemeName} ({s.personCount}p × ₹{s.monthlyAmount.toLocaleString()}):</span>
-                        <strong className="text-gray-900 font-mono">₹{(s.monthlyAmount * s.personCount).toLocaleString()}/mo</strong>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="pt-2 border-t border-amber-300/80 flex items-center justify-between">
-                    <span className="font-extrabold text-gray-800 text-xs">Combined Monthly Payment:</span>
-                    <strong className="text-emerald-700 text-base font-black">
-                      ₹{combinedMonthlyAmount.toLocaleString()} / month
-                    </strong>
-                  </div>
-
-                  <div className="flex items-center justify-between text-[11px] text-gray-600">
-                    <span>Combined Scheme Total:</span>
-                    <strong className="text-[#2A1B54] font-black">₹{combinedGrandTotal.toLocaleString()}</strong>
-                  </div>
                 </div>
-              ) : (
-                <div className="bg-gray-50 border border-gray-200 rounded-2xl p-3.5 text-center text-gray-500 text-xs font-medium">
-                  Select 1 or more schemes above to calculate monthly installment.
-                </div>
-              )}
+              ))}
+            </div>
+          </section>
+        )}
 
-              {/* STEP 4: SUBMIT BUTTON */}
-              <button
-                type="submit"
-                disabled={isSubmitting || selectedSchemes.length === 0}
-                className="w-full bg-[#7A1416] hover:bg-[#900000] text-white font-extrabold text-xs py-3.5 px-6 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] disabled:opacity-50"
-              >
-                <ShieldCheck className="w-4 h-4 text-amber-300" />
-                <span>
-                  {isSubmitting
-                    ? "Submitting Application..."
-                    : selectedSchemes.length === 0
-                    ? "Please Select at Least 1 Scheme"
-                    : `Submit Application (₹${combinedMonthlyAmount.toLocaleString()} / mo for ${totalPersons} person${totalPersons > 1 ? "s" : ""})`}
-                </span>
-              </button>
-            </form>
+        {/* 3-COLUMN AVAILABLE SCHEMES GRID */}
+        <section className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-200/80 pb-4">
+            <div>
+              <h3 className="text-2xl font-black text-gray-950 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-[#35520D]" />
+                <span>Available Chit Schemes ({schemes.length})</span>
+              </h3>
+              <p className="text-xs text-gray-500 font-medium mt-0.5">
+                Choose one or multiple schemes. Adjust person counts per plan to match your savings goal.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 text-xs font-bold text-gray-600 bg-white px-3.5 py-1.5 rounded-full border border-gray-200 shadow-2xs">
+              <Clock className="w-3.5 h-3.5 text-[#35520D]" />
+              <span>Standard 10-Month Tenures</span>
+            </div>
           </div>
 
-          {/* Right Column: Promotional Banners & Dynamic Scheme Cards (7 Cols) */}
-          <div className="lg:col-span-7 space-y-6">
-              {/* Promotional Offer Banner Images */}
-              {bannerImages.length > 0 && (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-extrabold text-[#2A1B54] uppercase tracking-wide flex items-center gap-2">
-                      <Gift className="w-4 h-4 text-[#7A1416]" />
-                      <span>Promotional Chit Offers &amp; Gift Schemes</span>
-                    </h3>
-                    <span className="text-[11px] text-gray-400 font-medium">Click banner to zoom</span>
-                  </div>
+          {schemes.length === 0 ? (
+            <div className="bg-white rounded-3xl p-12 border-2 border-dashed border-gray-200 text-center space-y-3">
+              <div className="w-14 h-14 rounded-2xl bg-[#F7FBEF] text-[#35520D] mx-auto flex items-center justify-center border border-[#A1CB35]/30 shadow-2xs">
+                <Sparkles className="w-7 h-7" />
+              </div>
+              <h4 className="font-extrabold text-gray-950 text-lg">New Chit Schemes Opening Soon!</h4>
+              <p className="text-xs text-gray-500 max-w-md mx-auto leading-relaxed">
+                Currently all scheme batches are finalizing. New savings schemes for Diwali 2026 will be available for registration shortly.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+              {schemes.map((sch) => {
+                const isSelected = selectedSchemes.some(s => s.schemeName === sch.title);
+                const selectedItem = selectedSchemes.find(s => s.schemeName === sch.title);
+                const currentCount = getCardCount(sch.id, sch.title);
+                const cardMonthlyTotal = sch.monthlyAmount * currentCount;
+                const cardMaturityTotal = cardMonthlyTotal * (sch.totalMonths || 10);
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {bannerImages.map((banner) => (
-                      <div
-                        key={banner.id}
-                        onClick={() => setActiveZoomImage(banner)}
-                        className="group relative overflow-hidden rounded-2xl border-2 border-amber-200/90 bg-white shadow-2xs hover:shadow-lg transition-all duration-300 cursor-pointer flex flex-col"
-                      >
-                        <div className="aspect-[16/10] w-full overflow-hidden bg-gray-50 flex items-center justify-center">
-                          <img
-                            src={banner.url}
-                            alt={banner.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            loading="lazy"
-                          />
-                        </div>
-                        <div className="h-10 px-3.5 bg-white border-t border-gray-100 flex items-center justify-between gap-2">
-                          <span className="font-extrabold text-[#2A1B54] text-xs truncate flex-1" title={banner.title}>
-                            {banner.title}
+                return (
+                  <div
+                    key={sch.id}
+                    className={`bg-white rounded-3xl p-6 border-2 transition-all duration-300 flex flex-col justify-between group shadow-sm ${
+                      isSelected
+                        ? "border-[#A1CB35] bg-[#F7FBEF]/50 ring-4 ring-[#A1CB35]/20 shadow-md"
+                        : "border-gray-200 hover:border-[#A1CB35] hover:shadow-xl"
+                    }`}
+                  >
+                    <div>
+                      {/* Top Badges */}
+                      <div className="flex items-center justify-between gap-2 mb-4">
+                        <span className="bg-[#F4F9EA] text-[#2D4505] border border-[#A1CB35]/40 font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">
+                          {sch.totalMonths || 10} Months Plan
+                        </span>
+                        {isSelected ? (
+                          <span className="bg-[#A1CB35] text-gray-950 font-black text-[10px] px-3 py-1 rounded-full inline-flex items-center gap-1 border border-[#8FB82B] shadow-2xs">
+                            <Check className="w-3.5 h-3.5 stroke-[3]" /> Added ({selectedItem?.personCount} Person{selectedItem && selectedItem.personCount > 1 ? 's' : ''})
                           </span>
-                          <span className="text-[10px] font-bold text-[#7A1416] bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200 shrink-0">
-                            Zoom 🔍
+                        ) : (
+                          <span className="text-[11px] font-bold text-gray-400 group-hover:text-[#2D4505] transition-colors">
+                            Open for Enrollment
                           </span>
-                        </div>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
 
-              {/* Dynamic Active Schemes Cards */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-extrabold text-[#2A1B54] uppercase tracking-wide flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-amber-600" />
-                    <span>Available Chit Schemes ({schemes.length})</span>
-                  </h3>
-                  <span className="text-[11px] text-gray-500 font-medium">Click a scheme card to add or enroll</span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
-                  {schemes.length === 0 ? (
-                    <div className="col-span-full bg-white rounded-3xl p-8 border-2 border-dashed border-gray-200 text-center space-y-3">
-                      <div className="w-12 h-12 rounded-2xl bg-amber-50 text-[#7A1416] mx-auto flex items-center justify-center border border-amber-200 shadow-2xs">
-                        <Sparkles className="w-6 h-6" />
-                      </div>
-                      <h4 className="font-extrabold text-[#2A1B54] text-base">New Schemes Launching Soon!</h4>
-                      <p className="text-xs text-gray-500 max-w-md mx-auto leading-relaxed">
-                        Currently there are no active chit schemes open for registration. New savings schemes will be announced shortly.
+                      {/* Title & Description */}
+                      <h4 className="text-lg font-black text-gray-950 group-hover:text-[#2D4505] transition-colors line-clamp-1" title={sch.title}>
+                        {sch.title}
+                      </h4>
+                      <p className="text-xs text-gray-500 font-medium mt-1 line-clamp-2 min-h-[2.5rem]">
+                        {sch.description || "Join our monthly savings scheme & unlock exclusive Diwali bonus perks!"}
                       </p>
-                    </div>
-                  ) : (
-                    schemes.map((sch) => {
-                      const isSelected = selectedSchemes.some(s => s.schemeName === sch.title);
-                      const selectedItem = selectedSchemes.find(s => s.schemeName === sch.title);
 
-                      return (
-                        <div
-                          key={sch.id}
-                          onClick={() => handleAddScheme(sch.title)}
-                          className={`bg-white rounded-3xl p-5 border-2 transition-all shadow-2xs cursor-pointer flex flex-col h-full group ${
-                            isSelected
-                              ? "border-[#7A1416] bg-amber-50/20 shadow-md ring-2 ring-[#7A1416]/10"
-                              : "border-gray-200 hover:border-[#7A1416] hover:shadow-md"
-                          }`}
-                        >
-                          {/* Header Badge Row - Fixed Height */}
-                          <div className="flex items-center justify-between gap-2 h-7 mb-3">
-                            <span className="bg-amber-100 text-amber-900 font-extrabold text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wider inline-flex items-center gap-1">
-                              {sch.totalMonths || 10} Months Plan
-                            </span>
-                            {isSelected ? (
-                              <span className="bg-emerald-100 text-emerald-800 font-extrabold text-[10px] px-2.5 py-1 rounded-full inline-flex items-center gap-1 border border-emerald-300 shrink-0">
-                                <Check className="w-3 h-3 stroke-[3]" /> Added ({selectedItem?.personCount}p)
-                              </span>
-                            ) : (
-                              <span className="text-[10px] font-bold text-gray-400 group-hover:text-[#7A1416] transition-colors shrink-0">
-                                + Click to Add
-                              </span>
-                            )}
-                          </div>
+                      {/* Pricing Focus */}
+                      <div className="my-5 p-4 rounded-2xl bg-gradient-to-br from-[#F4F9EA] to-white border border-[#A1CB35]/40">
+                        <div className="text-[10px] font-extrabold uppercase tracking-wider text-gray-500">
+                          Monthly Installment
+                        </div>
+                        <div className="flex items-baseline gap-1 mt-1">
+                          <span className="text-3xl font-black text-gray-950">
+                            ₹{sch.monthlyAmount.toLocaleString()}
+                          </span>
+                          <span className="text-xs font-semibold text-gray-500">
+                            / person / mo
+                          </span>
+                        </div>
+                      </div>
 
-                          {/* Title & Description - Fixed Heights for Pixel-Perfect Horizontal Alignment */}
-                          <div className="mb-4">
-                            <h4
-                              className="text-base font-extrabold text-[#2A1B54] group-hover:text-[#7A1416] transition-colors line-clamp-2 h-12 flex items-center leading-snug"
-                              title={sch.title}
-                            >
-                              {sch.title}
-                            </h4>
-                            <p
-                              className="text-xs text-gray-500 font-medium mt-1 line-clamp-2 h-9 flex items-center leading-relaxed"
-                              title={sch.description}
-                            >
-                              {sch.description || "Join our monthly savings scheme & unlock exclusive Diwali bonus perks!"}
-                            </p>
-                          </div>
-
-                          {/* Specification Table - Uniform Row Heights */}
-                          <div className="bg-gray-50/90 rounded-2xl p-3.5 border border-gray-100 text-xs space-y-2 mb-4">
-                            <div className="flex justify-between items-center h-5">
-                              <span className="text-gray-500 font-medium">Monthly Installment:</span>
-                              <strong className="text-emerald-700 font-black text-sm">
-                                ₹{sch.monthlyAmount.toLocaleString()} <span className="text-[10px] font-normal text-gray-500">/ person</span>
-                              </strong>
-                            </div>
-                            <div className="flex justify-between items-center h-5">
-                              <span className="text-gray-500 font-medium">Total Duration:</span>
-                              <strong className="text-gray-900 font-bold">{sch.totalMonths || 10} Months</strong>
-                            </div>
-                            <div className="flex justify-between items-center h-5">
-                              <span className="text-gray-500 font-medium">Due Day:</span>
-                              <strong className="text-gray-900 font-bold">Before {sch.dueDateDay || 10}th of month</strong>
-                            </div>
-                            <div className="flex justify-between items-center pt-2 border-t border-gray-200/80 h-7">
-                              <span className="text-gray-600 font-bold text-[11px] uppercase tracking-tight">Total Scheme Value:</span>
-                              <strong className="text-[#2A1B54] font-black text-sm">
-                                ₹{(sch.monthlyAmount * (sch.totalMonths || 10)).toLocaleString()}
-                              </strong>
-                            </div>
-                          </div>
-
-                          {/* Action Button - Anchored to Bottom */}
+                      {/* Inline Person Stepper */}
+                      <div className="flex items-center justify-between bg-gray-50/80 p-3 rounded-2xl border border-gray-200/80 mb-4">
+                        <span className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
+                          <Users className="w-3.5 h-3.5 text-[#35520D]" />
+                          <span>Persons:</span>
+                        </span>
+                        <div className="flex items-center gap-2">
                           <button
                             type="button"
-                            className={`mt-auto w-full h-11 rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer ${
-                              isSelected
-                                ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
-                                : "bg-[#7A1416] hover:bg-[#5C0F11] text-white shadow-sm group-hover:scale-[1.01]"
-                            }`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              updateCardCount(sch, -1);
+                            }}
+                            disabled={currentCount <= 1}
+                            className="w-7 h-7 bg-white hover:bg-gray-100 disabled:opacity-40 border border-gray-300 rounded-lg flex items-center justify-center font-bold text-gray-700 cursor-pointer shadow-2xs"
                           >
-                            {isSelected ? (
-                              <>
-                                <Check className="w-4 h-4 stroke-[3]" />
-                                <span>Scheme Selected ({selectedItem?.personCount}p)</span>
-                              </>
-                            ) : (
-                              <>
-                                <Plus className="w-4 h-4 stroke-[2.5]" />
-                                <span>Select &amp; Enroll</span>
-                              </>
-                            )}
+                            <Minus className="w-3 h-3" />
+                          </button>
+                          <span className="w-6 text-center font-black text-xs text-gray-900">
+                            {currentCount}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              updateCardCount(sch, 1);
+                            }}
+                            className="w-7 h-7 bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black rounded-lg flex items-center justify-center cursor-pointer shadow-2xs"
+                          >
+                            <Plus className="w-3 h-3" />
                           </button>
                         </div>
-                      );
-                    })
-                  )}
+                      </div>
+
+                      {/* Specification Details */}
+                      <div className="space-y-2 text-xs border-t border-gray-100 pt-3 mb-5">
+                        <div className="flex justify-between items-center text-gray-600">
+                          <span>Tenure:</span>
+                          <strong className="text-gray-900 font-bold">{sch.totalMonths || 10} Months</strong>
+                        </div>
+                        <div className="flex justify-between items-center text-gray-600">
+                          <span>Payment Due:</span>
+                          <strong className="text-gray-900 font-bold">Before {sch.dueDateDay || 10}th of month</strong>
+                        </div>
+                        <div className="flex justify-between items-center text-gray-600">
+                          <span>Subtotal for {currentCount} Person{currentCount > 1 ? 's' : ''}:</span>
+                          <strong className="text-[#2D4505] font-black">₹{cardMonthlyTotal.toLocaleString()} / mo</strong>
+                        </div>
+                        <div className="flex justify-between items-center pt-2 border-t border-dashed border-gray-200">
+                          <span className="font-extrabold text-gray-900">10-Month Maturity:</span>
+                          <strong className="text-gray-950 font-black text-sm">₹{cardMaturityTotal.toLocaleString()}</strong>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleCardToggle(sch)}
+                        className={`h-11 rounded-2xl font-black text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                          isSelected
+                            ? "bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200"
+                            : "bg-white hover:bg-gray-100 text-gray-800 border border-gray-300"
+                        }`}
+                      >
+                        {isSelected ? (
+                          <>
+                            <X className="w-3.5 h-3.5" />
+                            <span>Remove</span>
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="w-3.5 h-3.5" />
+                            <span>Select</span>
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleEnrollDirectly(sch)}
+                        className="h-11 rounded-2xl bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-1 cursor-pointer active:scale-95"
+                      >
+                        <span>Enroll Now →</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
+
+        {/* BOTTOM STICKY FLOATING SUMMARY BAR */}
+        {selectedSchemes.length > 0 && (
+          <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[94%] max-w-4xl z-40 bg-gray-950/95 backdrop-blur-md text-white rounded-3xl p-4 sm:p-5 shadow-2xl border border-white/15 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-bottom duration-300">
+            <div className="flex items-center gap-3.5 w-full sm:w-auto">
+              <div className="w-12 h-12 rounded-2xl bg-[#A1CB35] text-gray-950 flex items-center justify-center font-black shrink-0 shadow-sm">
+                <Gift className="w-6 h-6" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-[#A1CB35]">
+                    {selectedSchemes.length} Scheme{selectedSchemes.length > 1 ? "s" : ""} Selected
+                  </span>
+                  <span className="text-gray-500">•</span>
+                  <span className="text-xs text-gray-300 font-bold">
+                    {totalPersons} Total Person{totalPersons > 1 ? "s" : ""}
+                  </span>
+                </div>
+                <div className="text-lg sm:text-xl font-extrabold text-white truncate">
+                  ₹{combinedMonthlyAmount.toLocaleString()} <span className="text-xs font-normal text-gray-400">/ month</span>
+                  <span className="hidden sm:inline text-xs text-gray-400 font-normal ml-3">
+                    (10-Mo Total: ₹{combinedGrandTotal.toLocaleString()})
+                  </span>
                 </div>
               </div>
             </div>
+
+            <div className="flex items-center gap-2.5 w-full sm:w-auto shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsEnrollmentDrawerOpen(true)}
+                className="w-full sm:w-auto bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black text-xs sm:text-sm px-6 py-3 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer active:scale-95 uppercase tracking-wider"
+              >
+                <span>Proceed to Application</span>
+                <ArrowRight className="w-4 h-4 stroke-[3]" />
+              </button>
+            </div>
           </div>
-        </>
+        )}
+
+        {/* SLIDE-OVER ENROLLMENT DRAWER (SHEET) */}
+        <Sheet open={isEnrollmentDrawerOpen} onOpenChange={setIsEnrollmentDrawerOpen}>
+          <SheetContent side="right" className="w-full sm:max-w-xl p-0 flex flex-col bg-white border-l border-gray-200">
+            <div className="p-6 border-b border-gray-100 bg-[#F7FBEF]">
+              <SheetHeader>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[10px] font-black uppercase tracking-wider bg-[#A1CB35] text-gray-950 px-2.5 py-0.5 rounded-full border border-[#8FB82B]">
+                    Application Form
+                  </span>
+                  <span className="text-xs text-gray-600 font-semibold">• Diwali 2026</span>
+                </div>
+                <SheetTitle className="text-2xl font-black text-gray-950">
+                  Chit Scheme Enrollment
+                </SheetTitle>
+                <SheetDescription className="text-xs text-gray-600 font-medium">
+                  Review selected schemes, enter your verified mobile number, and submit your registration.
+                </SheetDescription>
+              </SheetHeader>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              {/* Account / Verification Banner */}
+              {!isUserLoggedIn && (
+                <div className="bg-[#F4F9EA] border border-[#A1CB35]/50 rounded-2xl p-4 flex items-center justify-between gap-3">
+                  <div className="space-y-0.5">
+                    <span className="text-xs font-black text-[#2D4505] block">Have an existing account?</span>
+                    <span className="text-[11px] text-gray-600">Login with your mobile number to auto-fill details.</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={openLoginModal}
+                    className="bg-white hover:bg-gray-100 text-[#35520D] border border-[#A1CB35] font-black text-xs px-3.5 py-2 rounded-xl shrink-0 cursor-pointer shadow-2xs"
+                  >
+                    Login
+                  </button>
+                </div>
+              )}
+
+              <form onSubmit={handleInitiateSubmit} className="space-y-6">
+                {/* STEP 1: CUSTOMER INFORMATION */}
+                <div className="space-y-3 bg-[#F7FBEF]/60 p-4 rounded-2xl border border-[#A1CB35]/30">
+                  <div className="font-extrabold text-[#35520D] text-xs uppercase tracking-wider flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5" />
+                    <span>Step 1: Customer Details</span>
+                  </div>
+
+                  {/* Full Name */}
+                  <div className="space-y-1">
+                    <label className="block text-[11px] font-bold text-gray-700 uppercase">
+                      Full Name *
+                    </label>
+                    <div className="relative">
+                      <User className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <input
+                        type="text"
+                        name="name"
+                        placeholder="Enter your full name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        className="w-full text-xs font-semibold p-2.5 pl-8 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Mobile Number */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center">
+                      <label className="block text-[11px] font-bold text-gray-700 uppercase">
+                        Mobile Number *
+                      </label>
+                      {userPhone && (
+                        <span className="text-[10px] text-[#2D4505] font-bold bg-[#A1CB35]/20 px-2 py-0.5 rounded border border-[#A1CB35]/40">
+                          ✓ Verified WhatsApp
+                        </span>
+                      )}
+                    </div>
+                    <div className="relative flex items-center">
+                      <div className="absolute left-3 font-bold text-xs text-gray-500">
+                        +91
+                      </div>
+                      <input
+                        type="tel"
+                        name="phone"
+                        placeholder="10-digit mobile number"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        maxLength={10}
+                        readOnly={Boolean(userPhone)}
+                        className={`w-full text-xs font-bold p-2.5 pl-11 rounded-xl outline-none border ${
+                          userPhone
+                            ? "bg-gray-100 text-gray-700 border-gray-300 cursor-not-allowed select-none"
+                            : "bg-white border-gray-300 focus:border-[#A1CB35]"
+                        }`}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Email & Location */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div className="space-y-1">
+                      <label className="block text-[11px] font-bold text-gray-700 uppercase">
+                        Email ID
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        placeholder="Email (optional)"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="block text-[11px] font-bold text-gray-700 uppercase">
+                        Location / City *
+                      </label>
+                      <input
+                        type="text"
+                        name="location"
+                        placeholder="City / District"
+                        value={formData.location}
+                        onChange={handleInputChange}
+                        className="w-full text-xs font-medium p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* STEP 2: SELECTED SCHEMES REVIEW */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="font-extrabold text-[#35520D] text-xs uppercase tracking-wider flex items-center gap-1.5">
+                      <Gift className="w-3.5 h-3.5" />
+                      <span>Step 2: Selected Schemes ({selectedSchemes.length})</span>
+                    </div>
+                    <span className="text-[11px] text-gray-500 font-bold">
+                      Total Persons: <strong className="text-[#2D4505] font-extrabold">{totalPersons}</strong>
+                    </span>
+                  </div>
+
+                  {selectedSchemes.length === 0 ? (
+                    <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center space-y-2">
+                      <p className="text-xs text-amber-900 font-medium">
+                        No schemes selected yet. Please select at least 1 scheme from the catalogue.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setIsEnrollmentDrawerOpen(false)}
+                        className="text-xs font-black text-[#2D4505] underline decoration-[#A1CB35] cursor-pointer"
+                      >
+                        Browse Schemes Catalogue →
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2.5">
+                      {selectedSchemes.map((s, idx) => {
+                        const subMonthly = s.monthlyAmount * (s.personCount || 1);
+
+                        return (
+                          <div
+                            key={idx}
+                            className="bg-[#F7FBEF] border border-[#A1CB35]/40 rounded-2xl p-3.5 space-y-2.5"
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <div>
+                                <h5 className="text-xs font-black text-gray-950">{s.schemeName}</h5>
+                                <span className="text-[11px] text-gray-500 font-medium">
+                                  ₹{s.monthlyAmount.toLocaleString()} / person / mo • {s.totalMonths || 10} Mos
+                                </span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveScheme(idx)}
+                                className="text-rose-600 hover:text-rose-800 p-1 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
+                                title="Remove Scheme"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+
+                            <div className="flex items-center justify-between border-t border-[#A1CB35]/20 pt-2 text-xs">
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[11px] font-bold text-gray-600">Persons:</span>
+                                <div className="flex items-center gap-1.5">
+                                  <button
+                                    type="button"
+                                    onClick={() => handlePersonCountChange(idx, s.personCount - 1)}
+                                    disabled={s.personCount <= 1}
+                                    className="w-6 h-6 rounded-md bg-white border border-gray-300 disabled:opacity-40 font-bold text-gray-700 flex items-center justify-center cursor-pointer shadow-2xs"
+                                  >
+                                    <Minus className="w-3 h-3" />
+                                  </button>
+                                  <span className="w-6 text-center font-black text-xs text-gray-950">
+                                    {s.personCount}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handlePersonCountChange(idx, s.personCount + 1)}
+                                    className="w-6 h-6 rounded-md bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black flex items-center justify-center cursor-pointer shadow-2xs"
+                                  >
+                                    <Plus className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <span className="text-[11px] font-black text-[#2D4505]">
+                                  ₹{subMonthly.toLocaleString()} / mo
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* STEP 3: FINANCIAL SUMMARY */}
+                {selectedSchemes.length > 0 && (
+                  <div className="bg-gray-950 text-white rounded-2xl p-4 space-y-2.5 text-xs">
+                    <div className="font-extrabold uppercase tracking-wider text-[11px] border-b border-white/10 pb-1.5 flex justify-between items-center text-[#A1CB35]">
+                      <span>Application Financial Summary</span>
+                      <span className="bg-white/10 text-white px-2 py-0.5 rounded font-black text-[10px]">
+                        {totalPersons} Person{totalPersons > 1 ? "s" : ""}
+                      </span>
+                    </div>
+
+                    <div className="space-y-1 text-gray-300 text-[11px]">
+                      <div className="flex justify-between">
+                        <span>Combined Monthly Payable:</span>
+                        <strong className="text-white font-mono text-xs">₹{combinedMonthlyAmount.toLocaleString()} / mo</strong>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Standard Tenure:</span>
+                        <span className="text-white">10 Months</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Total 10-Month Maturity:</span>
+                        <strong className="text-[#A1CB35] font-mono text-xs">₹{combinedGrandTotal.toLocaleString()}</strong>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* STEP 4: SUBMIT CTA */}
+                <button
+                  type="submit"
+                  disabled={isSubmitting || selectedSchemes.length === 0}
+                  className="w-full bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black text-xs py-4 px-6 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] disabled:opacity-50 uppercase tracking-wider"
+                >
+                  <ShieldCheck className="w-4 h-4 text-gray-950" />
+                  <span>
+                    {isSubmitting
+                      ? "Submitting Application..."
+                      : selectedSchemes.length === 0
+                      ? "Select at Least 1 Scheme"
+                      : `Submit Application (₹${combinedMonthlyAmount.toLocaleString()} / mo)`}
+                  </span>
+                </button>
+              </form>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </main>
       )}
-    </main>
 
       {/* CONFIRMATION DIALOG BEFORE SUBMISSION */}
       {showConfirmModal && (
         <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
           <DialogContent className="max-w-md p-6 bg-white rounded-3xl space-y-4 font-sans">
             <DialogHeader className="space-y-1 text-center">
-              <div className="w-14 h-14 rounded-full bg-amber-100 text-[#7A1416] mx-auto flex items-center justify-center border-4 border-amber-50">
+              <div className="w-14 h-14 rounded-full bg-[#F7FBEF] text-[#35520D] mx-auto flex items-center justify-center border-4 border-[#A1CB35]/30">
                 <Gift className="w-7 h-7 stroke-[2.5]" />
               </div>
-              <DialogTitle className="text-xl font-extrabold text-gray-900">
+              <DialogTitle className="text-xl font-extrabold text-gray-950">
                 Confirm Chit Scheme Application
               </DialogTitle>
               <DialogDescription className="text-xs text-gray-600 font-medium">
@@ -941,29 +1274,29 @@ const ChitScheme: React.FC = () => {
               </DialogDescription>
             </DialogHeader>
 
-            <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4 text-xs space-y-2.5">
+            <div className="bg-[#F7FBEF]/60 border border-[#A1CB35]/30 rounded-2xl p-4 text-xs space-y-2.5">
               <div className="flex justify-between">
-                <span className="text-gray-500 font-medium">Customer:</span>
-                <strong className="text-gray-900 font-bold">{formData.name} ({formData.phone})</strong>
+                <span className="text-gray-600 font-medium">Customer:</span>
+                <strong className="text-gray-950 font-bold">{formData.name} ({formData.phone})</strong>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500 font-medium">Location:</span>
+                <span className="text-gray-600 font-medium">Location:</span>
                 <span className="text-gray-800 font-semibold">{formData.location}</span>
               </div>
-              <div className="border-t border-gray-200 pt-2 space-y-1">
-                <span className="text-[11px] font-extrabold text-[#7A1416] uppercase block">
+              <div className="border-t border-[#A1CB35]/20 pt-2 space-y-1">
+                <span className="text-[11px] font-black text-[#2D4505] uppercase block">
                   Enrolled Schemes ({selectedSchemes.length}):
                 </span>
                 {selectedSchemes.map((s, idx) => (
                   <div key={idx} className="flex justify-between text-gray-700">
                     <span>• {s.schemeName} ({s.personCount} Person{s.personCount > 1 ? "s" : ""}):</span>
-                    <strong className="text-gray-900">₹{(s.monthlyAmount * s.personCount).toLocaleString()}/mo</strong>
+                    <strong className="text-gray-950">₹{(s.monthlyAmount * s.personCount).toLocaleString()}/mo</strong>
                   </div>
                 ))}
               </div>
-              <div className="border-t border-gray-200 pt-2 flex justify-between items-center">
-                <span className="font-extrabold text-gray-800">Total Monthly Payment:</span>
-                <strong className="text-emerald-700 text-sm font-black">₹{combinedMonthlyAmount.toLocaleString()} / mo</strong>
+              <div className="border-t border-[#A1CB35]/20 pt-2 flex justify-between items-center">
+                <span className="font-extrabold text-gray-900">Total Monthly Payment:</span>
+                <strong className="text-[#2D4505] text-sm font-black">₹{combinedMonthlyAmount.toLocaleString()} / mo</strong>
               </div>
             </div>
 
@@ -971,7 +1304,7 @@ const ChitScheme: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowConfirmModal(false)}
-                className="py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold cursor-pointer"
+                className="py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-xl text-xs font-bold cursor-pointer transition-all"
               >
                 Back / Edit
               </button>
@@ -979,7 +1312,7 @@ const ChitScheme: React.FC = () => {
                 type="button"
                 onClick={handleConfirmSubmit}
                 disabled={isSubmitting}
-                className="py-2.5 bg-[#7A1416] hover:bg-[#900000] text-white rounded-xl text-xs font-bold cursor-pointer transition-all shadow-md disabled:opacity-50"
+                className="py-2.5 bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 rounded-xl text-xs font-black cursor-pointer transition-all shadow-md border border-[#8FB82B]/60 disabled:opacity-50"
               >
                 {isSubmitting ? "Submitting..." : "Confirm & Submit"}
               </button>
@@ -992,35 +1325,35 @@ const ChitScheme: React.FC = () => {
       {showSuccessModal && (
         <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
           <DialogContent className="max-w-md p-6 bg-white rounded-3xl text-center space-y-4 font-sans">
-            <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center border-4 border-emerald-50">
+            <div className="w-16 h-16 rounded-full bg-[#F7FBEF] text-[#35520D] mx-auto flex items-center justify-center border-4 border-[#A1CB35]/30">
               <CheckCircle2 className="w-10 h-10 stroke-[2.5]" />
             </div>
 
             <DialogHeader className="space-y-1 text-center">
-              <DialogTitle className="text-xl font-bold text-gray-900">
+              <DialogTitle className="text-xl font-black text-gray-950">
                 Application Submitted! 🎉
               </DialogTitle>
               <DialogDescription className="text-xs text-gray-600 font-medium">
-                Thank you <strong className="text-gray-900">{submittedData?.name}</strong>. Your application has been registered successfully!
+                Thank you <strong className="text-gray-950">{submittedData?.name}</strong>. Your application has been registered successfully!
               </DialogDescription>
             </DialogHeader>
 
-            <div className="bg-gray-50 border border-gray-200/80 rounded-2xl p-4 text-left text-xs space-y-2">
+            <div className="bg-[#F7FBEF]/60 border border-[#A1CB35]/30 rounded-2xl p-4 text-left text-xs space-y-2">
               <div className="flex justify-between">
-                <span className="text-gray-500 font-medium">Application No:</span>
-                <span className="font-mono font-bold text-[#7A1416]">{submittedData?.applicationNumber || "Registered"}</span>
+                <span className="text-gray-600 font-medium">Application No:</span>
+                <span className="font-mono font-black text-[#2D4505]">{submittedData?.applicationNumber || "Registered"}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500 font-medium">Total Persons:</span>
-                <span className="font-bold text-gray-900">{submittedData?.totalPersons || totalPersons} Person(s)</span>
+                <span className="text-gray-600 font-medium">Total Persons:</span>
+                <span className="font-bold text-gray-950">{submittedData?.totalPersons || totalPersons} Person(s)</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500 font-medium">Combined Monthly:</span>
-                <span className="font-extrabold text-emerald-700">₹{(submittedData?.combinedMonthlyAmount || combinedMonthlyAmount).toLocaleString()} / month</span>
+                <span className="text-gray-600 font-medium">Combined Monthly:</span>
+                <span className="font-black text-[#2D4505]">₹{(submittedData?.combinedMonthlyAmount || combinedMonthlyAmount).toLocaleString()} / month</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500 font-medium">Status:</span>
-                <span className="bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full font-bold text-[11px]">
+                <span className="text-gray-600 font-medium">Status:</span>
+                <span className="bg-[#F7FBEF] text-[#2D4505] border border-[#A1CB35]/50 px-2.5 py-0.5 rounded-full font-black text-[11px]">
                   Pending Admin Approval
                 </span>
               </div>
@@ -1031,7 +1364,7 @@ const ChitScheme: React.FC = () => {
                 setShowSuccessModal(false);
                 setShowPurchasedModal(true);
               }}
-              className="w-full bg-[#7A1416] hover:bg-[#900000] text-white font-bold py-3 rounded-2xl text-xs transition-all shadow-md cursor-pointer"
+              className="w-full bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black py-3 rounded-2xl text-xs transition-all shadow-md border border-[#8FB82B]/60 cursor-pointer"
             >
               View My Digital Passbook
             </button>
@@ -1040,7 +1373,7 @@ const ChitScheme: React.FC = () => {
       )}
 
       {/* CUSTOMER DIGITAL PASSBOOK & PURCHASED SCHEMES MODAL */}
-      {showPurchasedModal && (
+      {showPurchasedModal && isUserLoggedIn && (
         <Dialog open={showPurchasedModal} onOpenChange={(open) => {
           setShowPurchasedModal(open);
           if (!open) {
@@ -1053,8 +1386,8 @@ const ChitScheme: React.FC = () => {
               /* VIEW 1: LIST OF ENROLLED SCHEMES */
               <div className="space-y-5">
                 <DialogHeader className="border-b border-gray-100 pb-4">
-                  <DialogTitle className="text-xl font-extrabold text-[#2A1B54] flex items-center gap-2">
-                    <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+                  <DialogTitle className="text-xl font-extrabold text-[#1F2937] flex items-center gap-2">
+                    <CheckCircle2 className="w-6 h-6 text-[#35520D]" />
                     My Digital Chit Passbook ({userSubscriptions.length} Applications)
                   </DialogTitle>
                   <DialogDescription className="text-xs text-gray-600 font-medium">
@@ -1128,58 +1461,58 @@ const ChitScheme: React.FC = () => {
                     const appRemainingBalance = Math.max(0, appCombinedGrand - appTotalPaid);
 
                     return (
-                      <div key={sub._id || sub.id || sIdx} className="border-2 border-gray-200/90 rounded-3xl p-5 bg-white space-y-4 shadow-2xs">
+                      <div key={sub._id || sub.id || sIdx} className="border-2 border-[#A1CB35]/30 rounded-3xl p-5 bg-white space-y-4 shadow-2xs">
                         {/* Application Header Bar */}
                         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-3">
                           <div>
-                            <span className="font-mono text-xs font-extrabold text-[#7A1416]">
+                            <span className="font-mono text-xs font-black text-[#2D4505]">
                               {sub.applicationNumber || `Application #${String(sub._id || sub.id).slice(-6)}`}
                             </span>
                             <span className="text-[11px] text-gray-500 ml-2">
                               Applied: {sub.createdAt ? new Date(sub.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Recent'}
                             </span>
                           </div>
-                          <span className={`px-2.5 py-0.5 rounded-full font-extrabold text-[11px] ${
+                          <span className={`px-2.5 py-0.5 rounded-full font-black text-[11px] ${
                             currentApproval === "Approved"
-                              ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                              ? "bg-[#F7FBEF] text-[#2D4505] border border-[#A1CB35]"
                               : currentApproval === "Rejected"
                               ? "bg-rose-100 text-rose-800 border border-rose-300"
-                              : "bg-amber-100 text-amber-800 border border-amber-300"
+                              : "bg-[#F7FBEF] text-[#2D4505] border border-[#A1CB35]/40"
                           }`}>
                             {currentApproval === "Approved" ? "Approved" : currentApproval === "Rejected" ? "Rejected" : "Pending Approval"}
                           </span>
                         </div>
 
                         {/* Combined Application Financial Summary Banner */}
-                        <div className="bg-amber-50/80 border border-amber-200/90 rounded-2xl p-3.5 space-y-2.5">
+                        <div className="bg-[#F7FBEF] border border-[#A1CB35]/30 rounded-2xl p-3.5 space-y-2.5">
                           <div className="flex flex-wrap items-center justify-between gap-2">
-                            <div className="flex items-center gap-1.5 text-xs font-black text-amber-950 uppercase tracking-wide">
-                              <Sparkles className="w-3.5 h-3.5 text-[#7A1416]" />
+                            <div className="flex items-center gap-1.5 text-xs font-black text-gray-950 uppercase tracking-wide">
+                              <Sparkles className="w-3.5 h-3.5 text-[#35520D]" />
                               <span>Combined Financial Summary</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className="bg-amber-200 text-amber-900 font-extrabold text-[11px] px-2.5 py-0.5 rounded-full">
+                              <span className="bg-white text-[#2D4505] border border-[#A1CB35]/40 font-black text-[11px] px-2.5 py-0.5 rounded-full">
                                 {enrolledSchemes.length} Scheme{enrolledSchemes.length > 1 ? 's' : ''} Selected
                               </span>
-                              <span className="bg-[#7A1416] text-white font-black text-[11px] px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                              <span className="bg-[#A1CB35] text-gray-950 font-black text-[11px] px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-[#8FB82B]">
                                 <Users className="w-3 h-3" />
                                 <span>{appTotalPersons} Total Person(s)</span>
                               </span>
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs bg-white p-3 rounded-xl border border-amber-200/60 shadow-2xs">
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs bg-white p-3 rounded-xl border border-[#A1CB35]/30 shadow-2xs">
                             <div>
                               <span className="text-gray-500 text-[10px] block font-medium">Combined Monthly</span>
-                              <strong className="text-emerald-700 text-xs sm:text-sm font-black">₹{appCombinedMonthly.toLocaleString()} / mo</strong>
+                              <strong className="text-[#2D4505] text-xs sm:text-sm font-black">₹{appCombinedMonthly.toLocaleString()} / mo</strong>
                             </div>
                             <div>
                               <span className="text-gray-500 text-[10px] block font-medium">Grand Scheme Total</span>
-                              <strong className="text-[#2A1B54] text-xs sm:text-sm font-black">₹{appCombinedGrand.toLocaleString()}</strong>
+                              <strong className="text-[#1F2937] text-xs sm:text-sm font-black">₹{appCombinedGrand.toLocaleString()}</strong>
                             </div>
                             <div>
                               <span className="text-gray-500 text-[10px] block font-medium">Total Paid Till Date</span>
-                              <strong className="text-emerald-700 text-xs sm:text-sm font-black">₹{appTotalPaid.toLocaleString()}</strong>
+                              <strong className="text-[#2D4505] text-xs sm:text-sm font-black">₹{appTotalPaid.toLocaleString()}</strong>
                             </div>
                             <div>
                               <span className="text-gray-500 text-[10px] block font-medium">Remaining Balance</span>
@@ -1189,13 +1522,13 @@ const ChitScheme: React.FC = () => {
                         </div>
 
                         {/* Item-wise Chit Calculation Formula Banner (User Request: 300 x 5 = 1500, 500 x 3 = 1500, etc.) */}
-                        <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-300 rounded-2xl p-3.5 space-y-2.5 shadow-2xs">
-                          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200 pb-2">
+                        <div className="bg-[#F7FBEF] border border-[#A1CB35]/40 rounded-2xl p-3.5 space-y-2.5 shadow-2xs">
+                          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#A1CB35]/25 pb-2">
                             <div className="flex items-center gap-1.5">
-                              <span className="bg-[#7A1416] text-white p-1 rounded-md">
+                              <span className="bg-[#A1CB35] text-gray-950 p-1 rounded-md">
                                 <Receipt className="w-3.5 h-3.5" />
                               </span>
-                              <span className="text-xs font-black uppercase text-[#7A1416] tracking-wide">
+                              <span className="text-xs font-black uppercase text-[#2D4505] tracking-wide">
                                 Chits Calculation Formula Breakdown
                               </span>
                             </div>
@@ -1210,13 +1543,13 @@ const ChitScheme: React.FC = () => {
                               const count = schItem.personCount || 1;
                               const subTot = schItem.totalMonthlyAmount || (rate * count);
                               return (
-                                <div key={idx} className="bg-white border border-amber-200 rounded-xl p-2.5 flex items-center justify-between shadow-2xs">
+                                <div key={idx} className="bg-white border border-[#A1CB35]/30 rounded-xl p-2.5 flex items-center justify-between shadow-2xs">
                                   <div>
-                                    <div className="text-xs font-black text-[#2A1B54] truncate max-w-[120px]">{schItem.schemeName}</div>
+                                    <div className="text-xs font-black text-[#1F2937] truncate max-w-[120px]">{schItem.schemeName}</div>
                                     <div className="text-[10px] text-gray-500 font-medium">₹{rate} / person</div>
                                   </div>
                                   <div className="text-right">
-                                    <div className="font-mono text-xs font-black text-[#7A1416] bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                                    <div className="font-mono text-xs font-black text-[#2D4505] bg-[#F7FBEF] px-2 py-0.5 rounded border border-[#A1CB35]/40">
                                       {rate} × {count} = ₹{subTot.toLocaleString()}
                                     </div>
                                     <div className="text-[10px] text-gray-500 mt-0.5">{count} Person{count > 1 ? 's' : ''}</div>
@@ -1226,10 +1559,10 @@ const ChitScheme: React.FC = () => {
                             })}
                           </div>
 
-                          <div className="bg-white/90 border border-amber-300 rounded-xl p-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+                          <div className="bg-white/90 border border-[#A1CB35]/30 rounded-xl p-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
                             <div className="font-mono font-bold text-gray-800 text-[11px]">
                               <span className="text-gray-500 font-sans">Summary Calculation: </span>
-                              <span className="text-[#7A1416] font-black">
+                              <span className="text-[#2D4505] font-black">
                                 {enrolledSchemes.map(s => {
                                   const rate = s.monthlyAmountPerPerson || s.monthlyAmount || 0;
                                   const count = s.personCount || 1;
@@ -1239,10 +1572,10 @@ const ChitScheme: React.FC = () => {
                             </div>
                             <div className="flex items-center gap-4">
                               <div className="font-bold text-gray-700">
-                                Total Persons: <span className="font-black text-[#7A1416] text-sm">{appTotalPersons}</span>
+                                Total Persons: <span className="font-black text-[#2D4505] text-sm">{appTotalPersons}</span>
                               </div>
                               <div className="font-bold text-gray-700">
-                                Monthly Payable: <span className="font-black text-emerald-700 text-sm">₹{appCombinedMonthly.toLocaleString()}</span>
+                                Monthly Payable: <span className="font-black text-[#2D4505] text-sm">₹{appCombinedMonthly.toLocaleString()}</span>
                               </div>
                             </div>
                           </div>
@@ -1250,8 +1583,8 @@ const ChitScheme: React.FC = () => {
 
                         {/* Enrolled Schemes under this Application */}
                         <div className="space-y-2">
-                          <h4 className="text-xs font-black text-[#2A1B54] uppercase tracking-wide flex items-center gap-1.5">
-                            <Gift className="w-3.5 h-3.5 text-[#7A1416]" />
+                          <h4 className="text-xs font-black text-[#1F2937] uppercase tracking-wide flex items-center gap-1.5">
+                            <Gift className="w-3.5 h-3.5 text-[#35520D]" />
                             <span>Enrolled Scheme Details ({enrolledSchemes.length})</span>
                           </h4>
 
@@ -1265,14 +1598,14 @@ const ChitScheme: React.FC = () => {
                               return (
                                 <div
                                   key={schItem._id || schIdx}
-                                  className="bg-gray-50/90 border border-gray-200/90 rounded-2xl p-4 flex flex-col justify-between space-y-3"
+                                  className="bg-[#F7FBEF]/40 border border-[#A1CB35]/30 rounded-2xl p-4 flex flex-col justify-between space-y-3"
                                 >
                                   <div className="space-y-2">
                                     <div className="flex items-start justify-between gap-2">
-                                      <h4 className="font-extrabold text-[#2A1B54] text-sm">
+                                      <h4 className="font-extrabold text-[#1F2937] text-sm">
                                         {schItem.schemeName}
                                       </h4>
-                                      <span className="bg-amber-100 text-amber-900 font-extrabold text-[11px] px-2.5 py-0.5 rounded-full border border-amber-200">
+                                      <span className="bg-[#F7FBEF] text-[#2D4505] font-black text-[11px] px-2.5 py-0.5 rounded-full border border-[#A1CB35]/40">
                                         {schItem.personCount} Person(s)
                                       </span>
                                     </div>
@@ -1284,7 +1617,7 @@ const ChitScheme: React.FC = () => {
                                       </div>
                                       <div className="flex justify-between">
                                         <span className="text-gray-500 font-medium">Scheme Monthly Total:</span>
-                                        <strong className="text-emerald-700 font-extrabold">₹{schItem.totalMonthlyAmount?.toLocaleString()}</strong>
+                                        <strong className="text-[#2D4505] font-black">₹{schItem.totalMonthlyAmount?.toLocaleString()}</strong>
                                       </div>
                                       <div className="flex justify-between">
                                         <span className="text-gray-500 font-medium">Duration:</span>
@@ -1292,7 +1625,7 @@ const ChitScheme: React.FC = () => {
                                       </div>
                                       <div className="flex justify-between">
                                         <span className="text-gray-500 font-medium">Scheme Grand Total:</span>
-                                        <strong className="text-[#2A1B54] font-extrabold">₹{schItem.totalSchemeAmount?.toLocaleString()}</strong>
+                                        <strong className="text-[#1F2937] font-extrabold">₹{schItem.totalSchemeAmount?.toLocaleString()}</strong>
                                       </div>
                                       <div className="flex justify-between border-t border-gray-100 pt-1">
                                         <span className="text-gray-500 font-medium">Installment Progress:</span>
@@ -1301,7 +1634,7 @@ const ChitScheme: React.FC = () => {
                                       <div className="flex justify-between">
                                         <span className="text-gray-500 font-medium">Paid / Remaining:</span>
                                         <span className="text-xs font-bold">
-                                          <span className="text-emerald-700">₹{schItem.paidAmount?.toLocaleString()}</span>
+                                          <span className="text-[#2D4505]">₹{schItem.paidAmount?.toLocaleString()}</span>
                                           <span className="text-gray-400 mx-1">/</span>
                                           <span className="text-rose-700">₹{schItem.remainingAmount?.toLocaleString()}</span>
                                         </span>
@@ -1316,7 +1649,7 @@ const ChitScheme: React.FC = () => {
                                       </div>
                                       <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
                                         <div
-                                          className="bg-[#7A1416] h-2 rounded-full transition-all duration-500"
+                                          className="bg-[#A1CB35] h-2 rounded-full transition-all duration-500"
                                           style={{ width: `${progressPercent}%` }}
                                         />
                                       </div>
@@ -1329,7 +1662,7 @@ const ChitScheme: React.FC = () => {
                                       setSelectedPassbookSub(sub);
                                       setSelectedPassbookScheme(schItem);
                                     }}
-                                    className="w-full py-2.5 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-2xs bg-[#7A1416] hover:bg-[#900000] text-white"
+                                    className="w-full py-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-2xs bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 border border-[#8FB82B]/50"
                                   >
                                     <span>{isApproved ? "View Scheme Passbook & Receipts" : "View Scheme Schedule Preview"}</span>
                                     <ChevronRight className="w-3.5 h-3.5" />
@@ -1373,17 +1706,17 @@ const ChitScheme: React.FC = () => {
                             <ArrowLeft className="w-4 h-4" />
                             <span>Back to Enrolled Schemes</span>
                           </button>
-                          <span className={`px-3 py-1 rounded-full font-extrabold text-xs border ${
-                            isApproved ? "bg-emerald-100 text-emerald-800 border-emerald-300" : "bg-amber-100 text-amber-800 border-amber-300"
+                          <span className={`px-3 py-1 rounded-full font-black text-xs border ${
+                            isApproved ? "bg-[#F7FBEF] text-[#2D4505] border-[#A1CB35]" : "bg-[#F7FBEF] text-[#2D4505] border-[#A1CB35]/40"
                           }`}>
                             {isApproved ? "Active Scheme" : "Pending Verification"}
                           </span>
                         </div>
-                        <DialogTitle className="text-xl font-extrabold text-[#2A1B54] mt-2">
+                        <DialogTitle className="text-xl font-extrabold text-[#1F2937] mt-2">
                           {sch.schemeName} — Passbook Schedule
                         </DialogTitle>
                         <DialogDescription className="text-xs text-gray-600 font-medium">
-                          Enrolled for <strong className="text-amber-900">{personCount} Person(s)</strong> • Amount / Person: <strong className="text-gray-900">₹{monthlyPerPerson.toLocaleString()}</strong> • Expected Monthly: <strong className="text-emerald-700">₹{monthlyTotal.toLocaleString()}</strong> • Scheme Total: <strong className="text-[#2A1B54]">₹{grandTotal.toLocaleString()}</strong> • Due: Before {dueDateDay}th
+                          Enrolled for <strong className="text-[#2D4505]">{personCount} Person(s)</strong> • Amount / Person: <strong className="text-gray-900">₹{monthlyPerPerson.toLocaleString()}</strong> • Expected Monthly: <strong className="text-[#2D4505]">₹{monthlyTotal.toLocaleString()}</strong> • Scheme Total: <strong className="text-[#1F2937]">₹{grandTotal.toLocaleString()}</strong> • Due: Before {dueDateDay}th
                         </DialogDescription>
 
                         {/* Scheme Switcher Tabs when multiple schemes are present */}
@@ -1397,15 +1730,15 @@ const ChitScheme: React.FC = () => {
                                   key={tIdx}
                                   type="button"
                                   onClick={() => setSelectedPassbookScheme(sTab)}
-                                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                                  className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 ${
                                     isTabActive
-                                      ? "bg-[#7A1416] text-white shadow-2xs"
+                                      ? "bg-[#A1CB35] text-gray-950 shadow-2xs border border-[#8FB82B]"
                                       : "bg-gray-100 hover:bg-gray-200 text-gray-700"
                                   }`}
                                 >
                                   <span>{sTab.schemeName}</span>
-                                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ${
-                                    isTabActive ? "bg-white/20 text-white" : "bg-amber-100 text-amber-900"
+                                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+                                    isTabActive ? "bg-white/40 text-gray-950" : "bg-[#F7FBEF] text-[#2D4505]"
                                   }`}>
                                     {sTab.personCount || 1}p
                                   </span>
@@ -1417,21 +1750,21 @@ const ChitScheme: React.FC = () => {
                       </DialogHeader>
 
                       {/* Chit Scheme Rate & Calculation Box for this Scheme */}
-                      <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+                      <div className="bg-[#F7FBEF] border border-[#A1CB35]/30 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 text-xs">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono font-bold text-[#7A1416] bg-white px-2 py-1 rounded border border-amber-200">
+                          <span className="font-mono font-black text-[#2D4505] bg-white px-2 py-1 rounded border border-[#A1CB35]/40">
                             {monthlyPerPerson} × {personCount} = ₹{monthlyTotal.toLocaleString()}
                           </span>
                           <span className="text-gray-600 font-medium">({personCount} Person{personCount > 1 ? 's' : ''} enrolled)</span>
                         </div>
                         <div className="text-gray-700 font-semibold">
-                          Monthly Installment: <strong className="text-emerald-700">₹{monthlyTotal.toLocaleString()}</strong>
+                          Monthly Installment: <strong className="text-[#2D4505] font-black">₹{monthlyTotal.toLocaleString()}</strong>
                         </div>
                       </div>
 
                       {!isApproved && (
-                        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 text-xs text-amber-900 flex items-start gap-2.5">
-                          <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                        <div className="bg-[#F7FBEF] border border-[#A1CB35]/40 rounded-2xl p-3.5 text-xs text-[#2D4505] flex items-start gap-2.5">
+                          <AlertCircle className="w-4 h-4 text-[#35520D] shrink-0 mt-0.5" />
                           <div>
                             <strong className="block font-bold">Application Pending Admin Approval</strong>
                             <span>Your chit scheme application is currently being verified by the store admin. Monthly payment tracking and official receipts will be activated upon approval. Below is your 10-month installment plan preview.</span>
@@ -1459,7 +1792,7 @@ const ChitScheme: React.FC = () => {
                               const paidDateStr = existingLog?.paidAt ? new Date(existingLog.paidAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
 
                               return (
-                                <tr key={mNum} className={`hover:bg-gray-50/80 ${isPaid ? 'bg-emerald-50/20' : ''}`}>
+                                <tr key={mNum} className={`hover:bg-[#F7FBEF]/40 ${isPaid ? 'bg-[#F7FBEF]/30' : ''}`}>
                                   <td className="p-3.5 font-bold text-gray-500 text-center">
                                     #{mNum}
                                   </td>
@@ -1469,13 +1802,13 @@ const ChitScheme: React.FC = () => {
                                   <td className="p-3.5 font-semibold text-gray-700">
                                     ₹{monthlyTotal.toLocaleString()}
                                   </td>
-                                  <td className="p-3.5 font-extrabold text-emerald-700">
+                                  <td className="p-3.5 font-black text-[#2D4505]">
                                     {isPaid ? `₹${(existingLog?.amount || monthlyTotal).toLocaleString()}` : "₹0"}
                                   </td>
                                   <td className="p-3.5">
                                     {isPaid ? (
-                                      <span className="bg-emerald-100 text-emerald-800 border border-emerald-300 font-extrabold text-[10px] px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
-                                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                      <span className="bg-[#F7FBEF] text-[#2D4505] border border-[#A1CB35]/50 font-black text-[10px] px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
+                                        <CheckCircle2 className="w-3 h-3 text-[#35520D]" />
                                         Paid ({paidDateStr})
                                       </span>
                                     ) : (
@@ -1490,8 +1823,8 @@ const ChitScheme: React.FC = () => {
                                         type="button"
                                         onClick={() => {
                                           setActiveReceipt({
-                                            receiptNumber: (existingLog?.receiptNumber ? existingLog.receiptNumber.replace(/^AB-CHIT-/i, "SY-CHIT-") : `SY-CHIT-000${mNum}`),
-                                            applicationNumber: (sub?.applicationNumber ? sub.applicationNumber.replace(/^AB-APP-/i, "SY-APP-") : `SY-APP-${String(sub?._id).slice(-6)}`),
+                                            receiptNumber: (existingLog?.receiptNumber ? existingLog.receiptNumber.replace(/^AB-CHIT-|^SY-CHIT-/i, "GPK-CHIT-") : `GPK-CHIT-000${mNum}`),
+                                            applicationNumber: (sub?.applicationNumber ? sub.applicationNumber.replace(/^AB-APP-|^SY-APP-/i, "GPK-APP-") : `GPK-APP-${String(sub?._id).slice(-6)}`),
                                             customerName: sub?.name || "Customer",
                                             phone: sub?.phone || "",
                                             email: sub?.email,
@@ -1530,7 +1863,7 @@ const ChitScheme: React.FC = () => {
                                             combinedMonthlyPayable: allSiblingSchemes.reduce((sum, s) => sum + (s.totalMonthlyAmount || ((s.monthlyAmountPerPerson || 0) * (s.personCount || 1))), 0)
                                           });
                                         }}
-                                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-lg font-bold text-[11px] inline-flex items-center gap-1 cursor-pointer transition-all shadow-2xs"
+                                        className="bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 px-2.5 py-1 rounded-lg font-black text-[11px] inline-flex items-center gap-1 cursor-pointer transition-all shadow-2xs border border-[#8FB82B]/60"
                                         title="View Official Payment Receipt"
                                       >
                                         <FileText className="w-3 h-3" />

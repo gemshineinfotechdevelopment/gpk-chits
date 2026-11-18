@@ -188,7 +188,7 @@ const AdminOrders = () => {
       dateSortOrder: options.dateSortOrder,
       startDate: options.startDate,
       endDate: options.endDate,
-      filenamePrefix: `SaiYogi_Orders_${statusFilter !== 'all' ? statusFilter : 'All'}`
+      filenamePrefix: `GPK_Orders_${statusFilter !== 'all' ? statusFilter : 'All'}`
     });
   };
 

@@ -159,12 +159,12 @@ const ProductCard = ({ product, categoryName, onCardClick, className, showDetail
             {/* Image Area */}
             <div className={cn("relative w-full overflow-hidden bg-[#FDFBF7] border-b border-amber-100/70", compact ? "h-24 p-1" : "aspect-square p-1.5 sm:p-3")}>
               <img
-                src={isOutOfStock ? '/saiyogi-logo-1.png' : (product.image || '/saiyogi-logo-1.png')}
+                src={isOutOfStock ? '/gpk-logo.svg' : (product.image || '/gpk-logo.svg')}
                 alt={product.name}
                 className="w-full h-full object-contain p-1 group-hover:scale-105 transition-transform duration-500 ease-out mix-blend-multiply"
                 loading="lazy"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/saiyogi-logo-1.png';
+                  (e.target as HTMLImageElement).src = '/gpk-logo.svg';
                 }}
               />
               <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -221,16 +221,16 @@ const ProductCard = ({ product, categoryName, onCardClick, className, showDetail
                   )}
                 </h3>
 
-                {/* Sai Yogi Verified Ribbon Pill — hidden in compact/wishlist */}
+                {/* GPK Verified Ribbon Pill — hidden in compact/wishlist */}
                 {!compact && (
                 <div className="my-1 text-left">
                   {product.isSaiYogiVerified !== false ? (
                     <div className="inline-flex items-center select-none shrink-0 shadow-xs rounded-md overflow-hidden border border-red-500/20">
                       <div className={cn("bg-gradient-to-r from-amber-400 to-amber-500 text-white font-black italic flex items-center justify-center leading-none", compact ? "text-[9px] px-1.5 py-0.5" : "text-[9px] sm:text-[11px] px-1.5 sm:px-2 py-0.5")}>
-                        SY
+                        GPK
                       </div>
                       <div className={cn("bg-gradient-to-r from-red-600 via-red-700 to-red-600 text-white font-black italic tracking-wide font-serif leading-none whitespace-nowrap flex items-center gap-1 justify-center", compact ? "text-[9px] px-1.5 py-0.5" : "text-[9px] sm:text-[11px] px-1.5 sm:px-2.5 py-0.5")}>
-                        <span>Sai Yogi Verified</span>
+                        <span>GPK Verified</span>
                         <CheckCircle2 className={cn("text-white fill-white/20", compact ? "w-2.5 h-2.5" : "w-2.5 h-2.5 sm:w-3 sm:h-3")} />
                       </div>
                     </div>
@@ -347,11 +347,11 @@ const ProductCard = ({ product, categoryName, onCardClick, className, showDetail
 
             <div className="w-full md:w-1/2 aspect-square md:aspect-auto bg-[#FDFBF7] p-4 md:p-8 flex items-center justify-center relative">
               <img
-                src={isOutOfStock ? '/saiyogi-logo-1.png' : (product.image || '/saiyogi-logo-1.png')}
+                src={isOutOfStock ? '/gpk-logo.svg' : (product.image || '/gpk-logo.svg')}
                 alt={product.name}
                 className="w-full h-full object-contain max-h-[350px] md:max-h-[400px] mix-blend-multiply"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/saiyogi-logo-1.png';
+                  (e.target as HTMLImageElement).src = '/gpk-logo.svg';
                 }}
               />
             </div>
@@ -364,7 +364,7 @@ const ProductCard = ({ product, categoryName, onCardClick, className, showDetail
                 {product.isSaiYogiVerified && (
                   <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-black px-2.5 py-0.5 rounded-full shadow-2xs">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 fill-emerald-100" />
-                    <span>Sai Yogi Verified</span>
+                    <span>GPK Verified</span>
                   </span>
                 )}
               </div>

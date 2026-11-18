@@ -54,7 +54,7 @@ interface SiteSettingsContextType {
 }
 
 const defaultSettings: SiteSettings = {
-  siteName: "Sai Yogi Crackers",
+  siteName: "GPK Crackers",
   siteDescription: "Premium crackers and fireworks store",
   discountPercent: 10,
   minimumPurchaseAmount: 500,
@@ -80,7 +80,7 @@ const defaultSettings: SiteSettings = {
     enableGuestCheckout: true,
     enableNotifications: true,
   },
-  news: "Welcome to Sai Yogi Crackers! Get the best deals on festival crackers here.",
+  news: "Welcome to GPK Crackers! Get the best deals on festival crackers here.",
   billing: {
     companyName: "",
     phone: "",

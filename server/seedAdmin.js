@@ -11,6 +11,7 @@ const seedAdmin = async () => {
     console.log('MongoDB Connected');
 
     const adminEmails = [
+      'admin@gpkcrackers.com',
       'admin@crackerhub.com',
       'cracker@saiyogi.com',
       process.env.ADMIN_EMAIL

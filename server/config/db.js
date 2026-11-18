@@ -6,6 +6,7 @@ import Category from '../models/Category.js';
 import Product from '../models/Product.js';
 import User from '../models/User.js';
 import ChitScheme from '../models/ChitScheme.js';
+import ChitSubscription from '../models/ChitSubscription.js';
 
 const autoSeedIfEmpty = async () => {
   try {
@@ -81,6 +82,13 @@ const autoSeedIfEmpty = async () => {
       await User.create([
         {
           name: 'Super Admin',
+          email: 'admin@gpkcrackers.com',
+          password: hashedPassword,
+          role: 'SUPER ADMIN',
+          isActive: true
+        },
+        {
+          name: 'Super Admin',
           email: 'admin@crackerhub.com',
           password: hashedPassword,
           role: 'SUPER ADMIN',
@@ -143,6 +151,56 @@ const autoSeedIfEmpty = async () => {
         logger.info(`Seeded default chit scheme: ${sch.title}`);
       }
     }
+
+    const subCount = await ChitSubscription.countDocuments();
+    if (subCount === 0) {
+      const sch1 = await ChitScheme.findOne({ title: "Diwali Special Savings Scheme 2026" });
+      const sch2 = await ChitScheme.findOne({ title: "Diwali Economy Savings Scheme" });
+
+      const sampleSub = {
+        name: "CK",
+        customerName: "CK",
+        phone: "9092548347",
+        mobileNumber: "9092548347",
+        location: "SVKC",
+        applicationNumber: "SY-APP-00001",
+        approvalStatus: "Pending",
+        status: "Pending",
+        totalPersons: 20,
+        combinedMonthlyAmount: 40000,
+        combinedGrandTotal: 400000,
+        totalPaidAmount: 0,
+        schemes: [
+          {
+            schemeId: sch1 ? sch1._id : null,
+            schemeName: "Diwali Special Savings Scheme 2026",
+            monthlyAmountPerPerson: 3000,
+            monthlyAmount: 3000,
+            personCount: 10,
+            totalMonthlyAmount: 30000,
+            durationMonths: 10,
+            totalSchemeAmount: 300000,
+            approvalStatus: "Pending",
+            status: "Pending"
+          },
+          {
+            schemeId: sch2 ? sch2._id : null,
+            schemeName: "Diwali Economy Savings Scheme",
+            monthlyAmountPerPerson: 1000,
+            monthlyAmount: 1000,
+            personCount: 10,
+            totalMonthlyAmount: 10000,
+            durationMonths: 10,
+            totalSchemeAmount: 100000,
+            approvalStatus: "Pending",
+            status: "Pending"
+          }
+        ]
+      };
+
+      await ChitSubscription.create(sampleSub);
+      logger.info('Sample customer application seeded for CK.');
+    }
   } catch (err) {
     logger.warn('Auto-seed check encountered warning:', err.message);
   }
@@ -181,17 +239,31 @@ const connectDB = async () => {
     logger.warn(`Local MongoDB (127.0.0.1:27017) not available: ${localError.message}`);
   }
 
-  // Fallback to In-Memory MongoDB Server for offline/standalone dev
+  // Persistent local MongoDB storage using MongoMemoryServer with dbPath on disk
   try {
-    logger.info('Starting fallback in-memory MongoDB Server...');
+    logger.info('Starting persistent local MongoDB Server...');
+    const path = await import('path');
+    const fs = await import('fs');
+    const { fileURLToPath } = await import('url');
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+    const dbDir = path.resolve(__dirname, '../data/db');
+    if (!fs.existsSync(dbDir)) {
+      fs.mkdirSync(dbDir, { recursive: true });
+    }
+
     const { MongoMemoryServer } = await import('mongodb-memory-server');
-    const mongoServer = await MongoMemoryServer.create();
+    const mongoServer = await MongoMemoryServer.create({
+      instance: {
+        dbPath: dbDir,
+        storageEngine: 'wiredTiger'
+      }
+    });
     const memoryUri = mongoServer.getUri();
     const conn = await mongoose.connect(memoryUri);
-    logger.info(`InMemory MongoDB Connected: ${conn.connection.host} / Database: ${conn.connection.name}`);
+    logger.info(`Persistent MongoDB Connected at ${dbDir}: ${conn.connection.host}`);
     await autoSeedIfEmpty();
   } catch (memError) {
-    logger.error('Failed to initialize in-memory MongoDB server:', memError.message);
+    logger.error('Failed to initialize persistent MongoDB server:', memError.message);
     process.exit(1);
   }
 };

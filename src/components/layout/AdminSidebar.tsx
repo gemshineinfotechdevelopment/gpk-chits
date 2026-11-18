@@ -1,4 +1,4 @@
-import companyLogo from "@/assets/saiyogi-logo-1.png";
+import companyLogo from "@/assets/gpk-logo.svg";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { LayoutDashboard, Package, FolderTree, ShoppingBag, Users, Settings, ArrowLeft, LogOut, Menu, Tag, BarChart3, Gift, FileText, Image } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -65,9 +65,12 @@ const AdminSidebar: React.FC<AdminSidebarProps> = () => {
       <div className={cn("p-4 shrink-0 flex flex-col gap-2", !isCollapsed && "p-6")}>
         <div className={cn("flex items-center", isCollapsed ? "justify-center" : "justify-between")}>
           {!isCollapsed && (
-            <Link to="/admin" className="flex items-center gap-2 overflow-hidden">
-              <img src={companyLogo} alt="Logo" className="h-8 object-contain shrink-0" />
-              <span className="font-display text-lg font-bold text-sidebar-primary whitespace-nowrap">Admin Panel</span>
+            <Link to="/admin" className="flex items-center gap-2.5 overflow-hidden">
+              <img src={companyLogo} alt="GPK Crackers" className="h-8 w-auto object-contain shrink-0" />
+              <div className="flex flex-col min-w-0">
+                <span className="font-display text-sm font-black text-sidebar-primary whitespace-nowrap leading-tight">GPK CRACKERS</span>
+                <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Admin Panel</span>
+              </div>
             </Link>
           )}
           <Button variant="ghost" size="icon" onClick={() => setIsCollapsed(!isCollapsed)} className="shrink-0 h-8 w-8 text-white hover:bg-sidebar-accent hover:text-sidebar-foreground">

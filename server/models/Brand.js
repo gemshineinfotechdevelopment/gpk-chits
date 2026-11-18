@@ -22,7 +22,7 @@ const brandSchema = new mongoose.Schema(
     logo: {
       type: String,
       trim: true,
-      default: '/saiyogi-logo-1.png',
+      default: '/gpk-logo.svg',
     },
     description: {
       type: String,

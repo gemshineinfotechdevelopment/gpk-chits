@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <defs>
+    <linearGradient id="gpkBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#B8E34D" />
+      <stop offset="50%" stop-color="#A1CB35" />
+      <stop offset="100%" stop-color="#7EA522" />
+    </linearGradient>
+    <linearGradient id="gpkDark" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1F2937" />
+      <stop offset="100%" stop-color="#111827" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.18" />
+    </filter>
+  </defs>
+
+  <!-- Background Card -->
+  <rect x="25" y="25" width="450" height="450" rx="90" fill="url(#gpkBg)" stroke="#8FB82B" stroke-width="10" filter="url(#shadow)" />
+
+  <!-- Inner Decorative Ring -->
+  <rect x="45" y="45" width="410" height="410" rx="75" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-dasharray="14 10" opacity="0.6" />
+
+  <!-- Sparks / Fireworks Icons -->
+  <path d="M 250 80 L 255 105 L 280 110 L 255 115 L 250 140 L 245 115 L 220 110 L 245 105 Z" fill="#FFFFFF" />
+  <path d="M 110 140 L 113 155 L 128 158 L 113 161 L 110 176 L 107 161 L 92 158 L 107 155 Z" fill="#FFFFFF" opacity="0.8" />
+  <path d="M 390 140 L 393 155 L 408 158 L 393 161 L 390 176 L 387 161 L 372 158 L 387 155 Z" fill="#FFFFFF" opacity="0.8" />
+
+  <!-- GPK Main Brand Text -->
+  <text x="250" y="275" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-size="140" font-weight="900" fill="url(#gpkDark)" text-anchor="middle" letter-spacing="4">GPK</text>
+
+  <!-- CRACKERS Badge Pill -->
+  <rect x="90" y="325" width="320" height="58" rx="29" fill="url(#gpkDark)" />
+  <text x="250" y="364" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-size="28" font-weight="900" fill="#A1CB35" text-anchor="middle" letter-spacing="8">CRACKERS</text>
+
+  <!-- Subtitle -->
+  <text x="250" y="420" font-family="Arial, sans-serif" font-size="16" font-weight="800" fill="#35520D" text-anchor="middle" letter-spacing="4">CHIT SCHEME • SIVAKASI</text>
+</svg>

@@ -1,10 +1,8 @@
-import companyLogo from "@/assets/saiyogi-logo-1.png";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ShoppingCart, Menu, X, User, Heart } from "lucide-react";
-import { useCart } from "@/context/CartContext";
-import { useWishlist } from "@/context/WishlistContext";
+import React from "react";
+import companyLogo from "@/assets/gpk-logo.svg";
+import { Link, useLocation } from "react-router-dom";
+import { User, LogIn, LogOut, PhoneCall, Sparkles, ArrowRight } from "lucide-react";
 import { useSiteSettings } from "@/context/SiteSettingsContext";
-import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 
 interface UserHeaderProps {
@@ -12,218 +10,117 @@ interface UserHeaderProps {
 }
 
 const UserHeader: React.FC<UserHeaderProps> = ({ isHidden = false }) => {
-  const { totalItems, setIsCartOpen } = useCart();
-  const { wishlistCount, setIsWishlistOpen } = useWishlist();
   const { settings } = useSiteSettings();
   const { isUserLoggedIn, userPhone, userName, openLoginModal, logoutUser } = useAuth();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const navigate = useNavigate();
   const location = useLocation();
 
-  const isActive = (path: string) => {
-    const currentPath = location.pathname;
-    const currentSearch = location.search;
-
-    if (path === '/') {
-      return currentPath === '/';
-    }
-    if (path === '/about-us') {
-      return currentPath === '/about-us' || currentPath === '/about';
-    }
-    if (path === '/catalog') {
-      return currentPath === '/catalog' || currentPath.startsWith('/product/');
-    }
-    if (path === '/chit-scheme') {
-      return currentPath === '/chit-scheme';
-    }
-    return currentPath === path;
-  };
-
-  const getLinkClass = (path: string) => {
-    const active = isActive(path);
-    return active
-      ? "text-[#A80000] border-b-2 border-[#A80000] pb-1 transition-colors font-extrabold"
-      : "text-gray-700 hover:text-[#A80000] pb-1 transition-colors font-bold";
-  };
-
-  const getMobileLinkClass = (path: string) => {
-    const active = isActive(path);
-    return active
-      ? "text-[#A80000] font-extrabold border-l-4 border-[#A80000] pl-2"
-      : "text-gray-700 hover:text-[#A80000] font-bold";
-  };
-
-  const isHomePage = location.pathname === "/";
-
-  const handleUserClick = () => {
-    openLoginModal();
-  };
+  const isChitSchemePage = location.pathname === "/chit-scheme";
+  const contactPhone = settings?.contact?.phone || settings?.billing?.whatsapp || "9876543210";
+  const cleanPhone = contactPhone.replace(/\D/g, "");
 
   return (
     <>
-      <header className={`fixed top-0 left-0 right-0 z-50 bg-white shadow-md border-b border-gray-100 transition-transform duration-300 w-full ${isHidden ? "-translate-y-full" : "translate-y-0"}`}>
-        {/* Top Announcement Bar */}
-        <div className="bg-[#A80000] text-[#FEF200] text-xs py-1.5 overflow-hidden relative z-50">
-          <div className="flex items-center justify-between container mx-auto px-4">
-            <div className="w-full overflow-hidden">
-              <div className="animate-top-announcement w-max whitespace-nowrap flex items-center gap-4 text-[11px] sm:text-xs font-black tracking-wider text-[#FEF200]">
-                <span>DIWALI 2026 CHIT SCHEME ENROLLMENT OPEN! | Save monthly and get bumper cracker gift packages! </span>
-                <span className="text-white">✦</span>
-                <span>DIWALI 2026 CHIT SCHEME ENROLLMENT OPEN! | Save monthly and get bumper cracker gift packages! </span>
-              </div>
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200/80 transition-transform duration-300 w-full shadow-2xs ${
+          isHidden ? "-translate-y-full" : "translate-y-0"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 md:h-[72px] flex items-center justify-between gap-4">
+          {/* Left: Brand Identity */}
+          <Link to="/chit-scheme" className="flex items-center gap-3 shrink-0 group">
+            <div className="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-gradient-to-br from-[#F4F9EA] to-white border border-[#A1CB35]/40 flex items-center justify-center p-1 shadow-2xs group-hover:scale-105 transition-transform">
+              <img
+                src={companyLogo}
+                alt="GPK Crackers"
+                className="w-full h-full object-contain"
+              />
             </div>
-          </div>
-        </div>
-
-        {/* Main Header & Navbar Row */}
-        <div className="container mx-auto px-4 py-2 flex items-center justify-between gap-4">
-          {/* Logo */}
-          <Link to="/chit-scheme" className="flex items-center shrink-0">
-            <img src={companyLogo} alt="Sai Yogi Crackers" className="h-14 md:h-16 scale-110 md:scale-125 origin-left object-contain transition-all duration-200" />
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2">
+                <span className="font-black text-lg md:text-xl tracking-tight text-gray-950 group-hover:text-[#35520D] transition-colors leading-none">
+                  GPK <span className="text-[#35520D]">CRACKERS</span>
+                </span>
+                <span className="hidden sm:inline-flex items-center gap-1 bg-[#F4F9EA] text-[#2D4505] text-[10px] font-black px-2.5 py-0.5 rounded-full border border-[#A1CB35]/40">
+                  Diwali 2026
+                </span>
+              </div>
+              <span className="text-[10px] md:text-[11px] font-bold text-gray-500 uppercase tracking-wider mt-0.5">
+                Monthly Chit Savings • Sivakasi
+              </span>
+            </div>
           </Link>
 
-          {/* Navigation Bar (Desktop) */}
-          <nav className="hidden md:flex items-center gap-5 lg:gap-7 text-[15px] font-medium tracking-wide">
-            {/*
-            <Link to="/" className={getLinkClass('/')}>
-              Home
-            </Link>
-            <Link to="/catalog" className={getLinkClass('/catalog')}>
-              All Products
-            </Link>
-            <Link to="/quick-enquiry" className={getLinkClass('/quick-enquiry') + " relative flex items-center gap-1"}>
-              Quick Enquiry
-              <span className="bg-[#DDAA55] text-white text-[8px] px-1 py-0.5 rounded animate-pulse absolute -right-6 -top-2 font-bold uppercase">NEW</span>
-            </Link>
-            <Link to="/price-list" className={getLinkClass('/price-list')}>
-              Price List
-            </Link>
-            */}
-            <Link to="/chit-scheme" className={getLinkClass('/chit-scheme')}>
-              Chit Scheme
-            </Link>
-            {/*
-            <Link to="/about-us" className={getLinkClass('/about-us')}>
-              About Us
-            </Link>
-            <Link to="/safety-tips" className={getLinkClass('/safety-tips')}>
-              Safety Tips
-            </Link>
-            <Link to="/contact" className={getLinkClass('/contact')}>
-              Contact Us
-            </Link>
-            */}
-          </nav>
+          {/* Right: Only Support, Login, and Chit Scheme */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            {/* Quick Contact / Support */}
+            {cleanPhone && (
+              <a
+                href={`https://wa.me/91${cleanPhone.slice(-10)}?text=Hello%20GPK%20Crackers,%20I%20have%20an%20enquiry%20regarding%20Diwali%20Chit%20Scheme`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 hover:border-[#A1CB35] text-gray-700 hover:text-[#35520D] text-xs font-bold transition-all bg-white shadow-2xs hover:shadow-xs"
+                title="Contact Customer Support"
+              >
+                <PhoneCall className="w-3.5 h-3.5 text-[#35520D]" />
+                <span>Support</span>
+              </a>
+            )}
 
-          {/* Right Corner Buttons: Login, Wishlist & Cart Logo Button */}
-          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-            {/* User Symbol Button / Phone Badge */}
-            <button
-              onClick={handleUserClick}
-              className={`p-2 sm:p-2.5 rounded-xl border transition-all flex items-center gap-1.5 shadow-md hover:scale-105 active:scale-95 cursor-pointer ${isUserLoggedIn
-                ? "bg-red-50 border-[#A80000] text-[#A80000] font-bold"
-                : "bg-gray-50 border-gray-200 text-gray-700 hover:text-[#A80000] hover:border-[#A80000]"
-                }`}
-              title={isUserLoggedIn ? `User Account (${userName && userName !== "Customer" ? userName : (userPhone ? `+91 ${userPhone}` : "")})` : "Login"}
-            >
-              <User className="h-5 w-5" />
-              {isUserLoggedIn && (
-                <span className="hidden lg:inline text-xs font-black tracking-tight">
-                  {userName && userName !== "Customer" ? userName : (userPhone ? `+91 ${userPhone}` : "Account")}
-                </span>
-              )}
-            </button>
+            {/* Customer Account Pill or Login Button */}
+            {isUserLoggedIn ? (
+              <div className="flex items-center gap-2 bg-[#F4F9EA] border border-[#A1CB35]/50 px-3 py-1.5 rounded-xl text-xs font-bold text-gray-900 shadow-2xs">
+                <div className="w-6 h-6 rounded-lg bg-[#A1CB35] text-gray-950 flex items-center justify-center font-black text-[11px] shrink-0">
+                  <User className="w-3.5 h-3.5" />
+                </div>
+                <div className="flex flex-col text-left max-w-[120px] sm:max-w-[160px]">
+                  <span className="text-[9px] text-gray-500 font-bold uppercase tracking-wider leading-none">
+                    Customer
+                  </span>
+                  <span className="font-black leading-tight text-[#2D4505] truncate">
+                    {userName && userName !== "Customer" ? userName : (userPhone ? `+91 ${userPhone}` : "Account")}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={logoutUser}
+                  title="Logout"
+                  className="text-gray-400 hover:text-rose-600 transition-colors ml-1 p-1 rounded-lg hover:bg-rose-50 cursor-pointer"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={openLoginModal}
+                className="bg-white hover:bg-[#F4F9EA] text-[#35520D] border border-[#A1CB35] px-3.5 py-2 rounded-xl text-xs font-black transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer active:scale-95"
+              >
+                <LogIn className="w-4 h-4 text-[#35520D]" />
+                <span>Login</span>
+              </button>
+            )}
 
-            {/*
-            <button
-              onClick={() => setIsWishlistOpen(true)}
-              className="relative p-2.5 bg-gray-50 hover:bg-red-50 border border-gray-200 hover:border-red-300 text-gray-700 hover:text-[#A80000] rounded-xl transition-all flex items-center justify-center shadow-md hover:scale-105 active:scale-95 cursor-pointer"
-              title="View Wishlist"
-            >
-              <Heart className={`h-5 w-5 ${wishlistCount > 0 ? "fill-[#A80000] text-[#A80000]" : ""}`} />
-              {wishlistCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-[#A80000] text-white text-[10px] font-black h-5 w-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
-                  {wishlistCount}
-                </span>
-              )}
-            </button>
-
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className="relative p-2.5 bg-[#A80000] hover:bg-red-800 text-white rounded-xl transition-all flex items-center justify-center shadow-md hover:scale-105 active:scale-95 cursor-pointer"
-              title="View Cart"
-            >
-              <ShoppingCart className="h-5 w-5 text-white" />
-              {totalItems > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-[#F4C542] text-[#1A1A1A] text-[10px] font-black h-5 w-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
-                  {totalItems}
-                </span>
-              )}
-            </button>
-            */}
-
-            {/* Mobile Menu Toggle */}
-            <button className="md:hidden p-2 text-gray-700" onClick={() => setMenuOpen(!menuOpen)}>
-              {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
+            {/* Chit Scheme */}
+            {!isChitSchemePage ? (
+              <Link
+                to="/chit-scheme"
+                className="bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black text-xs px-4 py-2.5 rounded-xl transition-all shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95 uppercase tracking-wider"
+              >
+                <span>Chit Scheme</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            ) : (
+              <div className="inline-flex items-center gap-1.5 bg-[#A1CB35] text-gray-950 font-black text-xs px-3.5 py-2 rounded-xl shadow-2xs uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Chit Scheme</span>
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Marquee Banner between Header and Content (Home Page Only) */}
-        {/*
-        {isHomePage && (
-          <div className="relative overflow-hidden bg-[#A80000] text-white py-2 border-y border-red-900 select-none z-[110]">
-            <div className="animate-top-marquee font-bold text-[10px] md:text-xs uppercase tracking-widest py-1">
-              <div className="flex gap-16 whitespace-nowrap">
-                <span>{settings?.news || "✨ Welcome to Sai Yogi Crackers - Sivakasi's Premium Fireworks at Wholesale Price! ✨"}</span>
-              </div>
-            </div>
-          </div>
-        )}
-        */}
       </header>
 
-      {/* Mobile Menu Drawer */}
-      <div className={`md:hidden fixed inset-0 z-[100] ${menuOpen ? "pointer-events-auto" : "pointer-events-none"}`}>
-        {/* Backdrop overlay */}
-        <div
-          className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${menuOpen ? "opacity-100" : "opacity-0"
-            }`}
-          onClick={() => setMenuOpen(false)}
-        />
-
-        {/* Drawer content */}
-        <div
-          className={`absolute top-0 left-0 h-full w-[85vw] max-w-[320px] bg-white shadow-2xl flex flex-col transition-transform duration-300 ease-in-out ${menuOpen ? "translate-x-0" : "-translate-x-full"
-            }`}
-        >
-          <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-            <img src={companyLogo} alt="Sai Yogi" className="h-14 object-contain" />
-            <button onClick={() => setMenuOpen(false)} className="p-2 text-gray-500 hover:text-black hover:bg-gray-200 rounded-full transition-colors">
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-          <nav className="flex flex-col gap-6 p-6 text-sm uppercase font-bold overflow-y-auto">
-            {/*
-            <Link to="/" onClick={() => setMenuOpen(false)} className={getMobileLinkClass('/')}>HOME</Link>
-            <Link to="/catalog" onClick={() => setMenuOpen(false)} className={getMobileLinkClass('/catalog')}>ALL PRODUCTS</Link>
-            <Link to="/quick-enquiry" onClick={() => setMenuOpen(false)} className={getMobileLinkClass('/quick-enquiry') + " flex items-center gap-2"}>
-              QUICK ENQUIRY <span className="bg-[#DDAA55] text-white text-[8px] px-1 py-0.5 rounded">NEW</span>
-            </Link>
-            <Link to="/price-list" onClick={() => setMenuOpen(false)} className={getMobileLinkClass('/price-list')}>Price List</Link>
-            */}
-            <Link to="/chit-scheme" onClick={() => setMenuOpen(false)} className={getMobileLinkClass('/chit-scheme')}>CHIT SCHEME</Link>
-            {/*
-            <Link to="/about-us" onClick={() => setMenuOpen(false)} className={getMobileLinkClass('/about-us')}>ABOUT US</Link>
-            <Link to="/safety-tips" onClick={() => setMenuOpen(false)} className={getMobileLinkClass('/safety-tips')}>SAFETY TIPS</Link>
-            <Link to="/contact" onClick={() => setMenuOpen(false)} className={getMobileLinkClass('/contact')}>CONTACT US</Link>
-            */}
-          </nav>
-        </div>
-      </div>
-
-      {/* Responsive layout spacer so fixed header doesn't cover top of page content */}
-      <div className={isHomePage ? "w-full shrink-0 h-[112px] md:h-[142px]" : "w-full shrink-0 h-[60px] md:h-[108px]"} />
+      {/* Clean Layout Spacer */}
+      <div className="w-full shrink-0 h-16 md:h-[72px]" />
     </>
   );
 };

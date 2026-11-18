@@ -254,7 +254,7 @@ export const downloadChitReceiptPDF = async (
   const html = `
     <div style="font-family: Arial, sans-serif; padding: 24px; max-width: 680px; background: #ffffff; color: #1e293b; border: 2px solid #7A1416; border-radius: 16px;">
       <div style="text-align: center; border-bottom: 2px solid #7A1416; padding-bottom: 12px; margin-bottom: 16px;">
-        <h1 style="color: #7A1416; margin: 0; font-size: 22px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">SAI YOGI CRACKERS</h1>
+        <h1 style="color: #7A1416; margin: 0; font-size: 22px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">GPK CRACKERS</h1>
         <p style="margin: 3px 0 0 0; font-size: 13px; font-weight: bold; color: #334155;">MONTHLY CHIT SCHEME PAYMENT RECEIPT & PASSBOOK STATEMENT</p>
         <p style="margin: 2px 0 0 0; font-size: 11px; color: #64748b;">Sattur, Virudhunagar District, Tamil Nadu • Mobile: +91 95859 75756</p>
       </div>
@@ -382,7 +382,7 @@ export const downloadChitReceiptPDF = async (
           <p style="margin: 2px 0 0 0;">This is an official computer generated receipt & passbook statement.</p>
         </div>
         <div style="text-align: center; border-top: 1px dashed #94a3b8; padding-top: 4px; width: 160px;">
-          <strong style="color: #7A1416;">Sai Yogi Crackers</strong><br/>
+          <strong style="color: #7A1416;">GPK Crackers</strong><br/>
           Authorized Signatory
         </div>
       </div>

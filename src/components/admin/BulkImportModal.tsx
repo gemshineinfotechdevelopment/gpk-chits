@@ -189,7 +189,7 @@ export const BulkImportModal: React.FC<BulkImportModalProps> = ({
               <FileSpreadsheet className="w-8 h-8 text-amber-700 shrink-0" />
               <div>
                 <h4 className="text-sm font-bold text-amber-900">Need the Excel Template?</h4>
-                <p className="text-xs text-amber-700">Download sample Excel file. Image column is optional (defaults to Sai Yogi logo).</p>
+                <p className="text-xs text-amber-700">Download sample Excel file. Image column is optional (defaults to GPK logo).</p>
               </div>
             </div>
             <Button

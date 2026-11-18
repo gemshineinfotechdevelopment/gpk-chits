@@ -46,7 +46,7 @@ const sanitizeProductForStorage = (product: Product): Product => {
     hasDiscount: product.hasDiscount !== undefined ? Boolean(product.hasDiscount) : true,
     netRate: product.netRate !== undefined ? Number(product.netRate) : undefined,
     displayNetRate: product.displayNetRate !== undefined ? Boolean(product.displayNetRate) : undefined,
-    image: product.image || "/saiyogi-logo-1.png",
+    image: product.image || "/gpk-logo.svg",
     storeStockPieces: product.storeStockPieces !== undefined ? Number(product.storeStockPieces) : (product.stock !== undefined ? Number(product.stock) : 999),
     stock: product.stock !== undefined ? Number(product.stock) : 999,
     code: product.code || "",

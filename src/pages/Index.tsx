@@ -247,7 +247,7 @@ const Index = () => {
               <div key={slideKey} className="absolute inset-0 w-full h-full animate-slide-left">
                 <img
                   src={heroImages[currentSlide]}
-                  alt={`Sai Yogi Crackers Banner ${currentSlide + 1}`}
+                  alt={`GPK Crackers Banner ${currentSlide + 1}`}
                   className={`w-full h-full object-cover filter brightness-105 transition-all duration-500 ${currentSlide === 0 ? "object-[center_15%]" : "object-center"
                     }`}
                 />
@@ -699,7 +699,7 @@ const Index = () => {
                 </h3>
               </div>
               <div className="relative border-4 border-[#F4C542] rounded-full bg-white flex flex-col items-center justify-center text-center w-24 h-24 shadow-[0_0_20px_rgba(244,197,66,0.3)] shrink-0 select-none overflow-hidden p-2">
-                <img src={settings?.logo || companyLogo} alt="Sai Yogi Crackers" className="w-full h-full object-contain" />
+                <img src={settings?.logo || companyLogo} alt="GPK Crackers" className="w-full h-full object-contain" />
               </div>
             </div>
 
@@ -714,7 +714,7 @@ const Index = () => {
                 </h3>
               </div>
               <div className="relative border-4 border-[#F4C542] rounded-full bg-white flex flex-col items-center justify-center text-center w-24 h-24 shadow-[0_0_20px_rgba(244,197,66,0.3)] shrink-0 select-none overflow-hidden p-2">
-                <img src={settings?.logo || companyLogo} alt="Sai Yogi Crackers" className="w-full h-full object-contain" />
+                <img src={settings?.logo || companyLogo} alt="GPK Crackers" className="w-full h-full object-contain" />
               </div>
             </div>
 
@@ -729,7 +729,7 @@ const Index = () => {
                 </h3>
               </div>
               <div className="relative border-4 border-white rounded-full bg-white flex flex-col items-center justify-center text-center w-24 h-24 shadow-lg shrink-0 select-none overflow-hidden p-2">
-                <img src={settings?.logo || companyLogo} alt="Sai Yogi Crackers" className="w-full h-full object-contain" />
+                <img src={settings?.logo || companyLogo} alt="GPK Crackers" className="w-full h-full object-contain" />
               </div>
             </div>
           </div>

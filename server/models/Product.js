@@ -24,7 +24,7 @@ const productSchema = new mongoose.Schema(
     },
     image: {
       type: String,
-      default: '/saiyogi-logo-1.png',
+      default: '/gpk-logo.svg',
       required: false
     },
     price: {

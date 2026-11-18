@@ -73,7 +73,7 @@ export const createOrder = async (req, res, next) => {
       throw new AppError('Missing required fields: name, phone, and delivery address', 400);
     }
 
-    const customerEmail = rawEmail?.trim() || `${customerPhone.replace(/\D/g, '') || 'customer'}@saiyogicrackers.com`;
+    const customerEmail = rawEmail?.trim() || `${customerPhone.replace(/\D/g, '') || 'customer'}@gpkcrackers.com`;
 
     let subtotal = 0;
     const itemsWithNames = [];

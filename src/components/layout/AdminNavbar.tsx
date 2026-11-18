@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import companyLogo from "@/assets/saiyogi-logo-1.png";
+import companyLogo from "@/assets/gpk-logo.svg";
 
 const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, href: "/admin" },
@@ -35,10 +35,12 @@ const AdminNavbar = () => {
   return (
     <nav className="lg:hidden sticky top-0 z-50 border-b border-border bg-sidebar">
       <div className="flex items-center justify-between p-4">
-        <Link to="/admin" className="flex items-center gap-3">
-          <img src={companyLogo} alt="Sai Yogi" className="h-14 object-contain" />
-          <span className="font-display font-bold text-sidebar-primary hidden sm:inline text-lg leading-none">Admin Panel</span>
-          <span className="font-display font-bold text-sidebar-primary sm:hidden text-lg leading-none">Admin</span>
+        <Link to="/admin" className="flex items-center gap-2.5">
+          <img src={companyLogo} alt="GPK Crackers" className="h-10 w-auto object-contain" />
+          <div className="flex flex-col">
+            <span className="font-display font-extrabold text-sidebar-primary text-base leading-tight">GPK CRACKERS</span>
+            <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Admin Panel</span>
+          </div>
         </Link>
 
         <button
@@ -64,9 +66,12 @@ const AdminNavbar = () => {
             }`}
         >
           <div className="p-4 border-b border-border flex justify-between items-center bg-sidebar-accent/50">
-            <div className="flex items-center gap-2">
-              <img src={companyLogo} alt="Sai Yogi" className="h-14 object-contain" />
-              <span className="font-display font-bold text-sidebar-primary">Admin</span>
+            <div className="flex items-center gap-2.5">
+              <img src={companyLogo} alt="GPK Crackers" className="h-10 w-auto object-contain" />
+              <div className="flex flex-col">
+                <span className="font-display font-extrabold text-sidebar-primary text-base leading-tight">GPK CRACKERS</span>
+                <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Admin</span>
+              </div>
             </div>
             <button onClick={() => setMenuOpen(false)} className="p-2 text-sidebar-foreground hover:text-white hover:bg-sidebar-accent rounded-full transition-colors">
               <X className="h-5 w-5" />

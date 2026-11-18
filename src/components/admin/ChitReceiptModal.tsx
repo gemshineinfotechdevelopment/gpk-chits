@@ -59,15 +59,15 @@ export const ChitReceiptModal: React.FC<ChitReceiptModalProps> = ({
 
   if (!receipt) return null;
 
-  const rawCompanyName = settings?.billing?.companyName || settings?.siteName || "SAI YOGI CRACKERS";
+  const rawCompanyName = settings?.billing?.companyName || settings?.siteName || "GPK CRACKERS";
   const isAvinaash = /avinaash|bala/i.test(rawCompanyName);
-  const companyName = isAvinaash ? "SAI YOGI CRACKERS" : (rawCompanyName || "SAI YOGI CRACKERS");
+  const companyName = isAvinaash ? "GPK CRACKERS" : (rawCompanyName || "GPK CRACKERS");
   const companyPhone = settings?.contact?.phone || "+91 95859 75756";
   const companyAddress = settings?.contact?.address || "Sattur, Virudhunagar District, Tamil Nadu - 626203";
-  const logoUrl = settings?.logo || "/saiyogi-logo-1.png";
+  const logoUrl = settings?.logo || "/gpk-logo.svg";
 
-  const formattedReceiptNo = (receipt.receiptNumber || "").replace(/^AB-CHIT-/i, "SY-CHIT-");
-  const formattedAppNo = (receipt.applicationNumber || "").replace(/^AB-APP-/i, "SY-APP-");
+  const formattedReceiptNo = (receipt.receiptNumber || "").replace(/^AB-CHIT-|^SY-CHIT-/i, "GPK-CHIT-");
+  const formattedAppNo = (receipt.applicationNumber || "").replace(/^AB-APP-|^SY-APP-/i, "GPK-APP-");
 
   const formattedDate = receipt.paymentDate
     ? new Date(receipt.paymentDate).toLocaleDateString("en-IN", {
@@ -322,7 +322,7 @@ export const ChitReceiptModal: React.FC<ChitReceiptModalProps> = ({
               type="button"
               onClick={handleDownloadPDF}
               disabled={isDownloading}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-sm disabled:opacity-50"
+              className="bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 text-xs font-black px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-sm border border-[#8FB82B]/60 disabled:opacity-50"
               title="Download PDF"
             >
               <Download className="w-3.5 h-3.5" />
@@ -348,7 +348,7 @@ export const ChitReceiptModal: React.FC<ChitReceiptModalProps> = ({
                 }}
               />
               <h1 className="text-xl sm:text-2xl font-black text-[#7A1416] uppercase tracking-wide">
-                SAI YOGI CRACKERS
+                GPK CRACKERS
               </h1>
             </div>
             <p className="text-xs font-bold text-gray-700 tracking-wider">
@@ -582,11 +582,11 @@ export const ChitReceiptModal: React.FC<ChitReceiptModalProps> = ({
           {/* Footer & Authorized Signatory */}
           <div className="flex items-end justify-between pt-3 border-t border-gray-200 text-[11px] text-gray-500 footer-section print-avoid-break">
             <div>
-              <p className="font-semibold text-gray-700 m-0">Thank you for saving with Sai Yogi Crackers!</p>
+              <p className="font-semibold text-gray-700 m-0">Thank you for saving with GPK Crackers!</p>
               <p className="text-[10px] text-gray-400 m-0">This is an authentic computer generated chit payment receipt.</p>
             </div>
             <div className="text-center border-t border-dashed border-gray-400 pt-1 w-44">
-              <strong className="text-[#7A1416] text-xs block">SAI YOGI CRACKERS</strong>
+              <strong className="text-[#7A1416] text-xs block">GPK CRACKERS</strong>
               <span className="text-[10px] text-gray-500">Authorized Signatory</span>
             </div>
           </div>

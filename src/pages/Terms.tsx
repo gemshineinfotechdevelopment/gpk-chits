@@ -107,7 +107,7 @@ const Terms: React.FC<TermsProps> = ({ defaultTab = "transport" }) => {
             {activeTab === "privacy" ? "Privacy Policy" : "Terms & Conditions"}
           </h1>
           <p className="text-gray-200 text-xs sm:text-sm max-w-2xl mx-auto leading-relaxed">
-            Please read these official terms, conditions, and transport policies carefully before placing your order with Sai Yogi Crackers.
+            Please read these official terms, conditions, and transport policies carefully before placing your order with GPK Crackers.
           </p>
         </div>
 
@@ -268,7 +268,7 @@ const Terms: React.FC<TermsProps> = ({ defaultTab = "transport" }) => {
                 Privacy Policy
               </h2>
               <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                How we protect and use your contact information at Sai Yogi Crackers.
+                How we protect and use your contact information at GPK Crackers.
               </p>
             </div>
 

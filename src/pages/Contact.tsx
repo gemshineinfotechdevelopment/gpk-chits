@@ -72,7 +72,7 @@ const Contact = () => {
               {/* Responsive Map iFrame */}
               <div className="w-full flex-1 min-h-[380px] md:min-h-[460px] rounded-2xl overflow-hidden border border-gray-200 shadow-inner relative bg-gray-100">
                 <iframe
-                  title="Sai Yogi Crackers Map Location"
+                  title="GPK Crackers Map Location"
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3110.7130149435898!2d77.81535597375743!3d9.439364682433059!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b06cffcd663a897%3A0xe2760844220366de!2sSai%20Yogi%20crackers!5e1!3m2!1sen!2sin!4v1786702640495!5m2!1sen!2sin"
                   width="100%"
                   height="100%"
@@ -106,7 +106,7 @@ const Contact = () => {
                     Physical Office &amp; Factory
                   </p>
                   <p className="text-xs font-black text-gray-900 uppercase">
-                    Sai Yogi Crackers
+                    GPK Crackers
                   </p>
                   <p className="text-xs text-gray-600 font-semibold mt-0.5 leading-relaxed">
                     3/1255/1B, Sri Ram Nagar, Paraipatti, Viswanatham, Sivakasi 626189

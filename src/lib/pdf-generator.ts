@@ -3,7 +3,7 @@
  * Uses HTML canvas to create a PDF-like document
  */
 
-import saiyogiLogo from "@/assets/saiyogi-logo-1.png";
+import gpkLogo from "@/assets/gpk-logo.svg";
 
 export interface OrderItem {
   productName: string;
@@ -395,8 +395,8 @@ function generateReceiptHTML(order: OrderData, copies: number = 1): string {
     pages.push({ rows: [], isLastPage: true, isFirstPage: true });
   }
 
-  const rawShopName = (order.companyName?.trim() || order.siteName?.trim()) ? (order.companyName || order.siteName) : 'SAI YOGI CRACKERS';
-  const shopName = /avinaash|bala/i.test(rawShopName) ? 'SAI YOGI CRACKERS' : rawShopName;
+  const rawShopName = (order.companyName?.trim() || order.siteName?.trim()) ? (order.companyName || order.siteName) : 'GPK CRACKERS';
+  const shopName = /avinaash|bala/i.test(rawShopName) ? 'GPK CRACKERS' : rawShopName;
   const shopPhone = (order.sitePhone && order.sitePhone.trim()) ? order.sitePhone : '+91 95859 75756';
   const shopAddress = (order.siteAddress && order.siteAddress.trim()) ? order.siteAddress : 'Sattur, Virudhunagar District, Tamil Nadu';
   const shopEmail = (order.siteEmail && order.siteEmail.trim()) ? order.siteEmail : 'contact@saiyogicrackers.com';
@@ -484,7 +484,7 @@ function generateReceiptHTML(order: OrderData, copies: number = 1): string {
                     <div style="font-size: 11px; font-weight: bold; color: #64748b; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Proforma Estimate</div>
                   </td>
                   <td valign="top" align="right">
-                    <img src="${saiyogiLogo}" style="height: 160px; width: auto; max-width: 350px; object-fit: contain;" />
+                    <img src="${gpkLogo}" style="height: 160px; width: auto; max-width: 350px; object-fit: contain;" />
                   </td>
                 </tr>
               </table>
@@ -522,7 +522,7 @@ function generateReceiptHTML(order: OrderData, copies: number = 1): string {
       return `
         <div class="page" style="position: relative;">
           <div class="watermark">
-            <img src="${saiyogiLogo}" />
+            <img src="${gpkLogo}" />
           </div>
           <div class="page-content">
             ${headerHTML}

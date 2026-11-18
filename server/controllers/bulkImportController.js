@@ -208,7 +208,7 @@ export const downloadTemplate = async (req, res) => {
         stock: 50,
         netRate: 1200,
         quantity: "1 Combo (45 Items)",
-        brand: "Sai Yogi Standard",
+        brand: "GPK Standard",
         crackerType: "Night Crackers",
         hasDiscount: "TRUE",
         displayNetRate: "FALSE",

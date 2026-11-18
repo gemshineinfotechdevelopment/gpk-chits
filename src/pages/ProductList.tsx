@@ -27,22 +27,22 @@ const ProductList = () => {
 
       const link = document.createElement('a');
       link.href = blobUrl;
-      link.download = 'Saiyogi Crackers Pricelist.pdf';
+      link.download = 'GPK Crackers Pricelist.pdf';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(blobUrl);
 
-      toast.success("Saiyogi Crackers Pricelist downloaded successfully!");
+      toast.success("GPK Crackers Pricelist downloaded successfully!");
     } catch (error) {
       console.error("Direct blob download failed, fallback to attachment link:", error);
       let fallbackUrl = settings.priceListPdf;
       if (fallbackUrl.includes('/upload/') && !fallbackUrl.includes('fl_attachment')) {
-        fallbackUrl = fallbackUrl.replace('/upload/', '/upload/fl_attachment:Saiyogi_Crackers_Pricelist/');
+        fallbackUrl = fallbackUrl.replace('/upload/', '/upload/fl_attachment:GPK_Crackers_Pricelist/');
       }
       const link = document.createElement('a');
       link.href = fallbackUrl;
-      link.download = 'Saiyogi Crackers Pricelist.pdf';
+      link.download = 'GPK Crackers Pricelist.pdf';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

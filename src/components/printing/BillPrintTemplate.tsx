@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import companyLogo from "@/assets/saiyogi-logo-1.png";
+import companyLogo from "@/assets/gpk-logo.svg";
 import { Settings } from "@/context/SettingsContext";
 
 interface BillItem {
@@ -48,8 +48,8 @@ interface BillPrintTemplateProps {
 }
 
 export const BillPrintTemplate: React.FC<BillPrintTemplateProps> = ({ data, settings }) => {
-    const rawBillingName = settings?.billing?.companyName || settings?.shopName || "SAI YOGI CRACKERS";
-    const shopDisplayName = /avinaash|bala/i.test(rawBillingName) ? "SAI YOGI CRACKERS" : rawBillingName;
+    const rawBillingName = settings?.billing?.companyName || settings?.shopName || "GPK CRACKERS";
+    const shopDisplayName = /avinaash|bala/i.test(rawBillingName) ? "GPK CRACKERS" : rawBillingName;
 
     useEffect(() => {
         if (data.customerName) {
@@ -188,7 +188,7 @@ export const BillPrintTemplate: React.FC<BillPrintTemplateProps> = ({ data, sett
                             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0 overflow-hidden opacity-[0.05]">
                                 <img src={settings?.logo || companyLogo} alt="Watermark Logo" className="w-[180px] h-[180px] object-contain mb-4 grayscale" />
                                 <div className="font-bold text-center tracking-wider text-5xl">
-                                    {settings?.shopName || "SAI YOGI CRACKERS"}
+                                    {settings?.shopName || "GPK CRACKERS"}
                                 </div>
                             </div>
 
