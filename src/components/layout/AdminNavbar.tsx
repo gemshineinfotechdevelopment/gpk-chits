@@ -38,8 +38,8 @@ const AdminNavbar = () => {
         <Link to="/admin" className="flex items-center gap-2.5">
           <img src={companyLogo} alt="GPK Crackers" className="h-10 w-auto object-contain" />
           <div className="flex flex-col">
-            <span className="font-display font-extrabold text-sidebar-primary text-base leading-tight">GPK CRACKERS</span>
-            <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Admin Panel</span>
+            <span className="font-display font-black text-[#A1CB35] text-base leading-tight">GPK CRACKERS</span>
+            <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Admin Panel</span>
           </div>
         </Link>
 
@@ -69,8 +69,8 @@ const AdminNavbar = () => {
             <div className="flex items-center gap-2.5">
               <img src={companyLogo} alt="GPK Crackers" className="h-10 w-auto object-contain" />
               <div className="flex flex-col">
-                <span className="font-display font-extrabold text-sidebar-primary text-base leading-tight">GPK CRACKERS</span>
-                <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Admin</span>
+                <span className="font-display font-black text-[#A1CB35] text-base leading-tight">GPK CRACKERS</span>
+                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Admin</span>
               </div>
             </div>
             <button onClick={() => setMenuOpen(false)} className="p-2 text-sidebar-foreground hover:text-white hover:bg-sidebar-accent rounded-full transition-colors">
@@ -88,10 +88,10 @@ const AdminNavbar = () => {
                   to={item.href}
                   onClick={() => setMenuOpen(false)}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                    "flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all",
                     isActive
-                      ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                      : "text-sidebar-foreground hover:bg-sidebar-accent"
+                      ? "bg-[#A1CB35] text-gray-950 font-black shadow-xs"
+                      : "text-gray-300 hover:text-white hover:bg-white/10"
                   )}
                 >
                   <Icon className="h-4 w-4" />
@@ -105,7 +105,7 @@ const AdminNavbar = () => {
             <Link
               to="/chit-scheme"
               onClick={() => setMenuOpen(false)}
-              className="flex items-center justify-center px-3 py-2.5 mb-3 rounded-lg text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
+              className="flex items-center justify-center px-3 py-2.5 mb-3 rounded-xl text-xs font-semibold text-gray-400 hover:text-[#A1CB35] hover:bg-white/10 transition-colors"
             >
               ← Back to Chit Scheme
             </Link>
@@ -116,7 +116,7 @@ const AdminNavbar = () => {
                 setMenuOpen(false);
               }}
               variant="default"
-              className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white border-none"
+              className="w-full flex items-center justify-center gap-2 bg-white/10 hover:bg-rose-500/20 text-gray-300 hover:text-rose-300 border border-white/10 text-xs font-bold rounded-xl"
             >
               <LogOut className="h-4 w-4" />
               Logout

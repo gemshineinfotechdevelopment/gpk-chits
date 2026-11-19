@@ -91,8 +91,8 @@ const App = () => (
                   {/* ── Block all other guessable admin entry paths → redirect to chit-scheme ── */}
                   <Route path="/admin-login" element={<Navigate to="/chit-scheme" replace />} />
                   <Route path="/admin-panel" element={<Navigate to="/chit-scheme" replace />} />
-                  <Route path="/admin/login" element={<Navigate to="/chit-scheme" replace />} />
-                  <Route path="/admin/dashboard" element={<Navigate to="/admin/chit-scheme" replace />} />
+                  <Route path="/admin/login" element={<Navigate to="/admin-dashboard-panel" replace />} />
+                  <Route path="/admin/dashboard" element={<Navigate to="/admin" replace />} />
 
                   {/* Admin root redirects directly to Chit Scheme */}
                   <Route
@@ -195,8 +195,8 @@ const App = () => (
                     }
                   />
                   */}
-                  {/* ── Catch-all: any invented /admin/* path not listed above → admin chit scheme ── */}
-                  <Route path="/admin/*" element={<Navigate to="/admin/chit-scheme" replace />} />
+                  {/* ── Catch-all: any invented /admin/* path not listed above → admin dashboard ── */}
+                  <Route path="/admin/*" element={<Navigate to="/admin" replace />} />
 
                   <Route path="*" element={<Navigate to="/chit-scheme" replace />} />
                 </Routes>

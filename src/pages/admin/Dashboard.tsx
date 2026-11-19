@@ -143,11 +143,11 @@ export const Dashboard: React.FC = () => {
           {/* Top Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 bg-white p-6 rounded-3xl border border-gray-200/80 shadow-2xs">
             <div>
-              <div className="flex items-center gap-2">
-                <span className="bg-amber-100 text-[#7A1416] p-2 rounded-xl">
+              <div className="flex items-center gap-2.5">
+                <span className="bg-[#F4F9EA] text-[#2D4505] p-2.5 rounded-2xl border border-[#A1CB35]/40 shadow-2xs">
                   <Gift className="w-5 h-5" />
                 </span>
-                <h1 className="font-display text-2xl font-black text-[#2A1B54]">
+                <h1 className="font-display text-2xl font-black text-gray-950">
                   Dashboard
                 </h1>
               </div>
@@ -163,13 +163,13 @@ export const Dashboard: React.FC = () => {
                 className="p-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-xl transition-all flex items-center gap-1.5 text-xs font-bold shadow-2xs cursor-pointer active:scale-95 disabled:opacity-50"
                 title="Refresh Dashboard"
               >
-                <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-[#7A1416]" : ""}`} />
+                <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-[#2D4505]" : ""}`} />
                 <span className="hidden sm:inline">Refresh</span>
               </button>
 
               <Link
                 to="/admin/chit-scheme"
-                className="bg-[#7A1416] hover:bg-[#5C0F11] text-white px-4 py-2.5 rounded-xl text-xs font-black transition-all shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95 uppercase tracking-wider"
+                className="bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 px-4 py-2.5 rounded-xl text-xs font-black transition-all shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95 uppercase tracking-wider"
               >
                 <Gift className="w-3.5 h-3.5" />
                 <span>Manage Schemes</span>
@@ -235,7 +235,7 @@ export const Dashboard: React.FC = () => {
                 </div>
               </div>
               <div>
-                <p className="text-xl sm:text-2xl font-black text-[#2A1B54] tracking-tight">
+                <p className="text-lg sm:text-2xl font-black text-gray-950 tracking-tight truncate">
                   ₹{totalCollectedSoFar.toLocaleString()}
                 </p>
                 <span className="text-[10px] text-emerald-600 font-semibold">Verified payments</span>
@@ -284,7 +284,7 @@ export const Dashboard: React.FC = () => {
                 <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">
                   Applications
                 </span>
-                <div className="w-8 h-8 rounded-xl bg-red-50 text-[#7A1416] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center">
                   <UserCheck className="w-4 h-4" />
                 </div>
               </div>
@@ -306,14 +306,14 @@ export const Dashboard: React.FC = () => {
             <div className="lg:col-span-7 space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Gift className="w-4 h-4 text-[#7A1416]" />
+                  <Gift className="w-4 h-4 text-[#2D4505]" />
                   <h2 className="font-extrabold text-sm sm:text-base text-gray-900 uppercase tracking-wide">
                     Chit Scheme Overview ({schemes.length})
                   </h2>
                 </div>
                 <Link
                   to="/admin/chit-scheme"
-                  className="text-xs text-[#7A1416] font-extrabold hover:underline flex items-center gap-1"
+                  className="text-xs text-[#2D4505] font-extrabold hover:underline flex items-center gap-1"
                 >
                   <span>Edit Schemes</span>
                   <ChevronRight className="w-3.5 h-3.5" />
@@ -340,7 +340,7 @@ export const Dashboard: React.FC = () => {
                         </span>
                       </div>
 
-                      <h3 className="font-extrabold text-sm text-[#2A1B54] line-clamp-1" title={sch.title || sch.schemeName}>
+                      <h3 className="font-extrabold text-sm text-gray-950 line-clamp-1" title={sch.title || sch.schemeName}>
                         {sch.title || sch.schemeName}
                       </h3>
                       <p className="text-xs text-gray-500 font-medium line-clamp-2 mt-0.5">
@@ -359,7 +359,7 @@ export const Dashboard: React.FC = () => {
                       </div>
                       <div className="flex justify-between pt-1 border-t border-gray-200">
                         <span className="text-gray-600 font-bold">Monthly Intake:</span>
-                        <strong className="text-[#2A1B54] font-black">₹{sch.expectedIntake.toLocaleString()}</strong>
+                        <strong className="text-gray-950 font-black">₹{sch.expectedIntake.toLocaleString()}</strong>
                       </div>
                     </div>
                   </div>
@@ -371,14 +371,14 @@ export const Dashboard: React.FC = () => {
             <div className="lg:col-span-5 space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-[#7A1416]" />
-                  <h2 className="font-extrabold text-sm sm:text-base text-gray-900 uppercase tracking-wide">
+                  <Users className="w-4 h-4 text-[#2D4505]" />
+                  <h2 className="font-extrabold text-sm sm:text-base text-gray-950 uppercase tracking-wide">
                     Recent Applications
                   </h2>
                 </div>
                 <Link
                   to="/admin/chit-scheme"
-                  className="text-xs text-[#7A1416] font-extrabold hover:underline flex items-center gap-1"
+                  className="text-xs text-[#2D4505] font-extrabold hover:underline flex items-center gap-1"
                 >
                   <span>View All</span>
                   <ChevronRight className="w-3.5 h-3.5" />
@@ -402,7 +402,7 @@ export const Dashboard: React.FC = () => {
                       <div key={sub._id || sub.id} className="py-3 flex items-center justify-between gap-3 first:pt-1 last:pb-1">
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
-                            <h4 className="text-xs font-black text-[#2A1B54] truncate">
+                            <h4 className="text-xs font-black text-gray-950 truncate">
                               {sub.name || sub.customerName || "Customer"}
                             </h4>
                             <span className={`text-[9px] font-black px-2 py-0.5 rounded-full shrink-0 ${
@@ -426,7 +426,7 @@ export const Dashboard: React.FC = () => {
                           </div>
                           <Link
                             to="/admin/chit-scheme"
-                            className="text-[10px] text-[#7A1416] font-bold hover:underline"
+                            className="text-[10px] text-[#2D4505] font-bold hover:underline"
                           >
                             Details →
                           </Link>
@@ -441,13 +441,13 @@ export const Dashboard: React.FC = () => {
               <div className="grid grid-cols-2 gap-3 pt-2">
                 <Link
                   to="/admin/chit-scheme"
-                  className="bg-white hover:bg-amber-50/50 border border-gray-200 hover:border-amber-300 rounded-2xl p-3.5 transition-all flex items-center gap-2.5 shadow-2xs group"
+                  className="bg-white hover:bg-[#F4F9EA]/50 border border-gray-200 hover:border-[#A1CB35]/40 rounded-2xl p-3.5 transition-all flex items-center gap-2.5 shadow-2xs group"
                 >
-                  <div className="w-9 h-9 rounded-xl bg-amber-100 text-[#7A1416] flex items-center justify-center font-bold shrink-0">
+                  <div className="w-9 h-9 rounded-xl bg-[#F4F9EA] text-[#2D4505] border border-[#A1CB35]/30 flex items-center justify-center font-bold shrink-0">
                     <CheckCircle2 className="w-5 h-5" />
                   </div>
                   <div>
-                    <h5 className="text-xs font-extrabold text-gray-900 group-hover:text-[#7A1416]">
+                    <h5 className="text-xs font-extrabold text-gray-900 group-hover:text-[#2D4505]">
                       Approvals
                     </h5>
                     <p className="text-[10px] text-gray-400 font-medium">Verify requests</p>
@@ -457,13 +457,13 @@ export const Dashboard: React.FC = () => {
                 <Link
                   to="/chit-scheme"
                   target="_blank"
-                  className="bg-white hover:bg-red-50/50 border border-gray-200 hover:border-red-300 rounded-2xl p-3.5 transition-all flex items-center gap-2.5 shadow-2xs group"
+                  className="bg-white hover:bg-[#F4F9EA]/50 border border-gray-200 hover:border-[#A1CB35]/40 rounded-2xl p-3.5 transition-all flex items-center gap-2.5 shadow-2xs group"
                 >
-                  <div className="w-9 h-9 rounded-xl bg-red-100 text-[#7A1416] flex items-center justify-center font-bold shrink-0">
+                  <div className="w-9 h-9 rounded-xl bg-[#F4F9EA] text-[#2D4505] border border-[#A1CB35]/30 flex items-center justify-center font-bold shrink-0">
                     <Sparkles className="w-5 h-5" />
                   </div>
                   <div>
-                    <h5 className="text-xs font-extrabold text-gray-900 group-hover:text-[#7A1416]">
+                    <h5 className="text-xs font-extrabold text-gray-900 group-hover:text-[#2D4505]">
                       Store View
                     </h5>
                     <p className="text-[10px] text-gray-400 font-medium">Customer portal</p>

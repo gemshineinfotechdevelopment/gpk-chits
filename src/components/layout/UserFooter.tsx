@@ -1,201 +1,247 @@
+import React from "react";
 import companyLogo from "@/assets/gpk-logo.svg";
 import { Link } from "react-router-dom";
 import { useSiteSettings } from "@/context/SiteSettingsContext";
-import { Facebook, Instagram, Youtube, ShieldCheck, Tag, Truck, CreditCard, HeadphonesIcon } from "lucide-react";
+import {
+  Facebook,
+  Instagram,
+  Youtube,
+  ShieldCheck,
+  MapPin,
+  Phone,
+  Mail,
+  Sparkles,
+  Gift,
+  Clock,
+  MessageCircle,
+} from "lucide-react";
 
-const UserFooter = () => {
+const UserFooter: React.FC = () => {
   const { settings } = useSiteSettings();
 
-  const socialIcons = {
-    facebook: <Facebook className="h-5 w-5" />,
-    instagram: <Instagram className="h-5 w-5" />,
-    youtube: <Youtube className="h-5 w-5" />,
-  };
+  const contactPhone = settings?.contact?.phone || settings?.billing?.whatsapp || "+91 94880 73004";
+  const cleanPhone = contactPhone.replace(/\D/g, "");
+
+  const socialLinks = [
+    {
+      name: "Facebook",
+      icon: <Facebook className="w-4 h-4" />,
+      url: settings?.socialLinks?.facebook,
+    },
+    {
+      name: "Instagram",
+      icon: <Instagram className="w-4 h-4" />,
+      url: settings?.socialLinks?.instagram,
+    },
+    {
+      name: "YouTube",
+      icon: <Youtube className="w-4 h-4" />,
+      url: settings?.socialLinks?.youtube,
+    },
+  ];
 
   return (
-    <footer className="mt-auto font-body flex flex-col">
-      {/* Features Bar */}
-      {/*
-      <div className="bg-white py-4 md:py-8 border-t border-b border-gray-200">
-        <div className="container mx-auto px-3 sm:px-4">
-          <div className="grid grid-cols-3 gap-2 md:gap-6 text-center divide-x divide-gray-200">
-            <div className="flex flex-col items-center justify-center gap-1.5 px-2">
-              <Tag className="h-6 w-6 md:h-8 md:w-8 text-[#A80000]" />
-              <h4 className="font-bold text-xs md:text-sm text-gray-800 leading-tight">Best Price &amp; Discounts</h4>
-              <p className="text-[10px] text-gray-500 hidden md:block">Direct from Sivakasi</p>
+    <footer className="mt-auto bg-white border-t border-gray-200/80 font-sans text-gray-800">
+      {/* Top Value Strip */}
+      <div className="bg-[#F8FAF2] border-b border-[#A1CB35]/25 py-4 px-4 sm:px-8">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 text-center sm:text-left">
+          <div className="flex items-center justify-center sm:justify-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-white border border-[#A1CB35]/40 flex items-center justify-center text-[#35520D] shadow-2xs shrink-0">
+              <Sparkles className="w-5 h-5" />
             </div>
-            <div className="flex flex-col items-center justify-center gap-1.5 px-2 md:pl-6">
-              <Truck className="h-6 w-6 md:h-8 md:w-8 text-[#A80000]" />
-              <h4 className="font-bold text-xs md:text-sm text-gray-800 leading-tight">Fast Shipping</h4>
-              <p className="text-[10px] text-gray-500 hidden md:block">Pan India delivery</p>
+            <div>
+              <h5 className="text-xs font-black text-gray-950">10-Month Fixed Savings</h5>
+              <p className="text-[11px] text-gray-500 font-medium">Predictable, stress-free monthly installments</p>
             </div>
-            <div className="flex flex-col items-center justify-center gap-1.5 px-2 md:pl-6">
-              <HeadphonesIcon className="h-6 w-6 md:h-8 md:w-8 text-[#A80000]" />
-              <h4 className="font-bold text-xs md:text-sm text-gray-800 leading-tight">Customer Support</h4>
-              <p className="text-[10px] text-gray-500 hidden md:block">24/7 dedicated support</p>
+          </div>
+
+          <div className="flex items-center justify-center sm:justify-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-white border border-[#A1CB35]/40 flex items-center justify-center text-[#35520D] shadow-2xs shrink-0">
+              <Gift className="w-5 h-5" />
+            </div>
+            <div>
+              <h5 className="text-xs font-black text-gray-950">Guaranteed Bonus Fireworks</h5>
+              <p className="text-[11px] text-gray-500 font-medium">Exclusive Diwali cracker gift hampers included</p>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-center sm:justify-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-white border border-[#A1CB35]/40 flex items-center justify-center text-[#35520D] shadow-2xs shrink-0">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <h5 className="text-xs font-black text-gray-950">Direct Factory Sivakasi</h5>
+              <p className="text-[11px] text-gray-500 font-medium">Licensed &amp; 100% verified factory supply</p>
             </div>
           </div>
         </div>
       </div>
-      */}
 
-      {/* Main Footer */}
-      <div className="bg-white border-t border-gray-200 text-gray-800">
-        <div className="container mx-auto px-4 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-          {/* About Section */}
-          <div>
-            <div className="flex flex-col items-start mb-4">
-              <div className="flex items-center gap-3">
-                <img src={companyLogo} alt="GPK Crackers Logo" className="h-16 w-auto object-contain" />
-                <div className="flex flex-col">
-                  <span className="font-black text-xl tracking-tight text-gray-900 leading-none">
-                    GPK <span className="text-[#35520D]">CRACKERS</span>
-                  </span>
-                  <span className="text-[10px] font-extrabold text-[#35520D] uppercase tracking-widest mt-1">
-                    Premium Fireworks &amp; Chit Scheme
-                  </span>
-                </div>
+      {/* Main Footer Content: Balanced 3-Column Layout */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12">
+          {/* Column 1: Brand & Bio (5 cols) */}
+          <div className="md:col-span-5 space-y-4">
+            <Link to="/chit-scheme" className="flex items-center gap-3 group w-max">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#F4F9EA] to-white border border-[#A1CB35]/50 flex items-center justify-center p-1.5 shadow-2xs group-hover:scale-105 transition-transform">
+                <img src={companyLogo} alt="GPK Crackers" className="w-full h-full object-contain" />
               </div>
-            </div>
-            <p className="text-xs text-gray-600 leading-relaxed mb-6">
-              {settings.siteDescription || "Premium crackers and fireworks store based in Sivakasi. We offer the best quality crackers at wholesale prices for all your celebrations."}
-            </p>
-            {/* Social Links */}
-            <div className="flex gap-3">
-              {(Object.entries(socialIcons) as [string, React.ReactNode][]).map(([platform, icon]) => {
-                const rawUrl = settings.socialLinks?.[platform as keyof typeof settings.socialLinks];
-                const formattedUrl = rawUrl && rawUrl.trim()
-                  ? (rawUrl.trim().startsWith('http://') || rawUrl.trim().startsWith('https://')
-                    ? rawUrl.trim()
-                    : `https://${rawUrl.trim()}`)
-                  : '';
+              <div className="flex flex-col">
+                <span className="font-black text-xl tracking-tight text-gray-950 group-hover:text-[#35520D] transition-colors leading-none">
+                  GPK <span className="text-[#35520D]">CRACKERS</span>
+                </span>
+                <span className="text-[10px] font-extrabold text-[#35520D] uppercase tracking-widest mt-1">
+                  Diwali 2026 Chit Scheme • Sivakasi
+                </span>
+              </div>
+            </Link>
 
-                if (formattedUrl) {
-                  return (
-                    <a
-                      key={platform}
-                      href={formattedUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title={platform.charAt(0).toUpperCase() + platform.slice(1)}
-                      className="w-8 h-8 flex items-center justify-center bg-[#A1CB35] rounded-lg text-gray-950 font-bold hover:bg-[#8FB82B] transition-colors duration-200 shadow-xs"
-                    >
-                      {icon}
-                    </a>
-                  );
-                }
+            <p className="text-xs text-gray-600 leading-relaxed font-medium max-w-sm">
+              {settings?.siteDescription ||
+                "Sivakasi's trusted fireworks monthly chit savings portal. Plan ahead for a memorable Diwali with guaranteed cracker bundles, zero hidden fees, and transparent online passbooks."}
+            </p>
+
+            {/* Social Links */}
+            <div className="flex items-center gap-2 pt-1">
+              {socialLinks.map((item) => {
+                const url = item.url && item.url.trim().length > 0 ? item.url : null;
+                if (!url) return null;
                 return (
-                  <span
-                    key={platform}
-                    title={`${platform.charAt(0).toUpperCase() + platform.slice(1)} (not set)`}
-                    className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-lg text-gray-400 cursor-default"
+                  <a
+                    key={item.name}
+                    href={url.startsWith("http") ? url : `https://${url}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={item.name}
+                    className="w-9 h-9 rounded-xl bg-white border border-gray-200 hover:border-[#A1CB35] hover:bg-[#F4F9EA] text-gray-700 hover:text-[#35520D] flex items-center justify-center transition-all shadow-2xs hover:shadow-xs"
                   >
-                    {icon}
-                  </span>
+                    {item.icon}
+                  </a>
                 );
               })}
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h4 className="font-bold text-gray-900 mb-6 text-sm uppercase tracking-wider">Quick Links</h4>
-            <nav className="flex flex-col gap-3 text-xs text-gray-600 font-semibold">
-              <Link to="/chit-scheme" className="hover:text-[#35520D] transition-colors duration-200">
-                Chit Scheme
-              </Link>
-              {/*
-              <Link to="/" className="hover:text-[#35520D] transition-colors duration-200">
-                Home
-              </Link>
-              <Link to="/about-us" className="hover:text-[#35520D] transition-colors duration-200">
-                About Us
-              </Link>
-              <Link to="/privacy-policy" className="hover:text-[#35520D] transition-colors duration-200">
-                Privacy Policy
-              </Link>
-              <Link to="/terms" className="hover:text-[#35520D] transition-colors duration-200">
-                Terms & Conditions
-              </Link>
-              */}
-            </nav>
+          {/* Column 2: Chit Scheme Features & Highlights (3 cols) */}
+          <div className="md:col-span-3 space-y-3">
+            <h4 className="text-xs font-black uppercase tracking-wider text-gray-950 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-[#35520D]" />
+              <span>Chit Scheme</span>
+            </h4>
+            <ul className="space-y-2 text-xs text-gray-600 font-medium">
+              <li>
+                <Link
+                  to="/chit-scheme"
+                  className="hover:text-[#35520D] font-bold text-gray-900 transition-colors inline-flex items-center gap-1"
+                >
+                  <span>→ Available Chit Schemes</span>
+                </Link>
+              </li>
+              <li className="flex items-center gap-1.5 text-gray-500">
+                <Clock className="w-3.5 h-3.5 text-[#35520D] shrink-0" />
+                <span>10-Month Installments</span>
+              </li>
+              <li className="flex items-center gap-1.5 text-gray-500">
+                <Gift className="w-3.5 h-3.5 text-[#35520D] shrink-0" />
+                <span>Bonus Gift Hampers</span>
+              </li>
+              <li className="flex items-center gap-1.5 text-gray-500">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#35520D] shrink-0" />
+                <span>Verified WhatsApp Login</span>
+              </li>
+            </ul>
           </div>
 
-          {/* Customer Service */}
-          {/*
-          <div>
-            <h4 className="font-bold text-gray-900 mb-6 text-sm uppercase tracking-wider">Customer Service</h4>
-            <nav className="flex flex-col gap-3 text-xs text-gray-600 font-semibold">
-              <Link to="/my-account" className="hover:text-[#35520D] cursor-pointer transition-colors duration-200">
-                My Account
-              </Link>
-              <Link to="/contact" className="hover:text-[#35520D] cursor-pointer transition-colors duration-200">
-                Returns/Exchange
-              </Link>
-            </nav>
-          </div>
-          */}
+          {/* Column 3: Factory Address & Direct Support (4 cols) */}
+          <div className="md:col-span-4 space-y-3">
+            <h4 className="text-xs font-black uppercase tracking-wider text-gray-950 flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-[#35520D]" />
+              <span>Factory &amp; Support</span>
+            </h4>
 
-          {/* Contact Us */}
-          <div>
-            <h4 className="font-bold text-gray-900 mb-6 text-sm uppercase tracking-wider">Factory &amp; Contact Info</h4>
-            <div className="flex flex-col gap-3 text-xs text-gray-600 font-semibold mb-4 leading-relaxed">
-              <span>📍 {settings.contact?.address || "Aanoor & Co, Sivakasi Crackers Main Market, Sivakasi - 626123, Tamil Nadu."}</span>
-              <span>🏢 GST Registration: <b>33CAFPR4172K1ZG</b></span>
-              <div className="flex flex-col gap-1 mt-2">
-                {settings.contact?.phone && (
-                  <a href={`tel:${settings.contact.phone.replace(/[^0-9+]/g, '')}`} className="flex items-center gap-2 border border-gray-200 bg-white px-3 py-1.5 rounded-lg text-[#35520D] font-bold hover:bg-[#A1CB35]/15 hover:border-[#A1CB35] transition-colors w-max shadow-2xs">
-                    📞 {settings.contact.phone}
-                  </a>
-                )}
-                {settings.contact?.phone2 && (
-                  <a href={`tel:${settings.contact.phone2.replace(/[^0-9+]/g, '')}`} className="flex items-center gap-2 border border-gray-200 bg-white px-3 py-1.5 rounded-lg text-[#35520D] font-bold hover:bg-[#A1CB35]/15 hover:border-[#A1CB35] transition-colors w-max shadow-2xs">
-                    📞 {settings.contact.phone2}
-                  </a>
-                )}
-                {settings.contact?.email && (
-                  <a href={`mailto:${settings.contact.email}`} className="hover:text-[#35520D] transition-colors mt-2">
-                    ✉️ {settings.contact.email}
-                  </a>
-                )}
+            <div className="space-y-2.5 text-xs text-gray-600 font-medium">
+              <div className="flex items-start gap-2">
+                <MapPin className="w-4 h-4 text-[#35520D] shrink-0 mt-0.5" />
+                <span>
+                  {settings?.contact?.address ||
+                    "GPK Crackers, Sivakasi Main Road, Sivakasi - 626123, Virudhunagar Dist., Tamil Nadu."}
+                </span>
               </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Legal Disclaimer Bar */}
-        {/*
-        <div className="bg-[#e2e2e2] py-3 text-[11px] text-gray-600 border-t border-gray-300">
-          <div className="container mx-auto px-4 text-center font-medium leading-normal">
-            <b>Supreme Court Order Compliance:</b> As per the 2018 Supreme Court directive, online selling of firecrackers is strictly prohibited. This portal functions solely as a digital catalog & price estimator. All deliveries are strictly handled through licensed offline transport partners.
-          </div>
-        </div>
-        */}
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-[#35520D] shrink-0" />
+                <span>
+                  GST Registration: <strong className="text-gray-900 font-bold">33CAFPR4172K1ZG</strong>
+                </span>
+              </div>
 
-        {/* Bottom bar */}
-        <div className="bg-[#EBEBEB] border-t border-gray-300 py-4">
-          <div className="container mx-auto px-4 flex flex-col sm:flex-row justify-between items-center text-[10px] text-gray-500 uppercase tracking-widest font-semibold gap-2 text-center sm:text-left">
-            <div>
-              © 2026 {settings.siteName || "GPK Crackers"}. All rights reserved.
+              {cleanPhone && (
+                <div className="pt-1 flex flex-wrap gap-2">
+                  <a
+                    href={`https://wa.me/91${cleanPhone.slice(-10)}?text=Hello%20GPK%20Crackers`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black px-3.5 py-2 rounded-xl text-xs transition-all shadow-2xs hover:shadow-sm"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5 fill-current" />
+                    <span>WhatsApp Enquiry</span>
+                  </a>
+
+                  <a
+                    href={`tel:${cleanPhone}`}
+                    className="inline-flex items-center gap-1.5 bg-white border border-gray-200 hover:border-[#A1CB35] text-gray-900 font-bold px-3.5 py-2 rounded-xl text-xs transition-all shadow-2xs hover:shadow-xs"
+                  >
+                    <Phone className="w-3.5 h-3.5 text-[#35520D]" />
+                    <span>{contactPhone}</span>
+                  </a>
+                </div>
+              )}
+
+              {settings?.contact?.email && (
+                <div className="flex items-center gap-2 pt-0.5">
+                  <Mail className="w-4 h-4 text-[#35520D] shrink-0" />
+                  <a
+                    href={`mailto:${settings.contact.email}`}
+                    className="hover:text-[#35520D] transition-colors font-medium"
+                  >
+                    {settings.contact.email}
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Floating WhatsApp - Right Bottom */}
-      <a
-        href={`https://wa.me/${(settings.contact?.phone || "+919488073004").replace(/[^0-9]/g, "")}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-20 right-[42px] xs:right-[48px] sm:bottom-8 sm:right-6 bg-[#25D366] text-white p-3.5 sm:px-4 sm:py-3.5 rounded-full shadow-[0_0_20px_rgba(37,211,102,0.6)] hover:shadow-[0_0_30px_rgba(37,211,102,0.9)] hover:scale-110 active:scale-95 transition-all duration-300 z-50 flex items-center gap-2 group"
-      >
-        <svg className="w-7 h-7 sm:w-6 sm:h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
-        </svg>
-        <span className="hidden sm:inline max-w-0 overflow-hidden group-hover:max-w-[150px] transition-all duration-500 ease-in-out font-black text-xs uppercase tracking-wider whitespace-nowrap">
-          Chat & Inquiry
-        </span>
-      </a>
+      {/* Copyright Bar */}
+      <div className="bg-[#111827] text-gray-400 border-t border-gray-800 py-4 px-4 sm:px-8">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] font-medium text-center sm:text-left">
+          <div>
+            © 2026 <strong className="text-white font-bold">{settings?.siteName || "GPK Crackers"}</strong>. All rights reserved.
+          </div>
+          <div className="flex items-center gap-4 text-gray-500 text-[10px] uppercase tracking-wider">
+            <span>Sivakasi Licensed Manufacturer</span>
+            <span>•</span>
+            <span className="text-[#A1CB35]">Diwali 2026 Chit Scheme</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Floating WhatsApp Help Button (cleanly positioned) */}
+      {cleanPhone && (
+        <a
+          href={`https://wa.me/91${cleanPhone.slice(-10)}?text=Hello%20GPK%20Crackers,%20I%20have%20an%20enquiry%20regarding%20Diwali%20Chit%20Scheme`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed bottom-6 right-6 z-40 bg-[#25D366] hover:bg-[#20ba59] text-white p-3.5 rounded-full shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group cursor-pointer"
+          title="Chat with GPK Crackers on WhatsApp"
+        >
+          <MessageCircle className="w-6 h-6 fill-current" />
+          <span className="hidden sm:inline max-w-0 overflow-hidden group-hover:max-w-[140px] transition-all duration-300 ease-in-out font-black text-xs uppercase tracking-wider whitespace-nowrap">
+            WhatsApp Help
+          </span>
+        </a>
+      )}
     </footer>
   );
 };

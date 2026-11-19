@@ -68,8 +68,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = () => {
             <Link to="/admin" className="flex items-center gap-2.5 overflow-hidden">
               <img src={companyLogo} alt="GPK Crackers" className="h-8 w-auto object-contain shrink-0" />
               <div className="flex flex-col min-w-0">
-                <span className="font-display text-sm font-black text-sidebar-primary whitespace-nowrap leading-tight">GPK CRACKERS</span>
-                <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Admin Panel</span>
+                <span className="font-display text-sm font-black text-[#A1CB35] whitespace-nowrap leading-tight">GPK CRACKERS</span>
+                <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Admin Panel</span>
               </div>
             </Link>
           )}
@@ -78,12 +78,12 @@ const AdminSidebar: React.FC<AdminSidebarProps> = () => {
           </Button>
         </div>
         {!isCollapsed ? (
-          <Link to="/chit-scheme" className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors mt-1">
+          <Link to="/chit-scheme" className="flex items-center gap-1 text-xs text-gray-400 hover:text-[#A1CB35] transition-colors mt-1 font-medium">
             <ArrowLeft className="h-3 w-3 shrink-0" /> Back to Chit Scheme
           </Link>
         ) : (
           <Link to="/chit-scheme" className="flex items-center justify-center mt-1" title="Back to Chit Scheme">
-            <ArrowLeft className="h-4 w-4 text-muted-foreground hover:text-primary transition-colors" />
+            <ArrowLeft className="h-4 w-4 text-gray-400 hover:text-[#A1CB35] transition-colors" />
           </Link>
         )}
       </div>
@@ -101,14 +101,14 @@ const AdminSidebar: React.FC<AdminSidebarProps> = () => {
               to={item.href}
               title={isCollapsed ? item.label : undefined}
               className={cn(
-                "flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                "flex items-center px-3 py-2.5 rounded-xl text-xs font-bold transition-all",
                 isCollapsed ? "justify-center" : "gap-3",
                 isActive
-                  ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent"
+                  ? "bg-[#A1CB35] text-gray-950 font-black shadow-xs"
+                  : "text-gray-300 hover:text-white hover:bg-white/10"
               )}
             >
-              <item.icon className="h-5 w-5 shrink-0" />
+              <item.icon className="h-4 w-4 shrink-0" />
               {!isCollapsed && <span className="whitespace-nowrap">{item.label}</span>}
             </Link>
           );
@@ -119,10 +119,10 @@ const AdminSidebar: React.FC<AdminSidebarProps> = () => {
         <Button 
           onClick={handleLogout} 
           variant="default" 
-          className={cn("flex items-center justify-center bg-red-600 hover:bg-red-700 text-white border-none", isCollapsed ? "w-10 h-10 p-0" : "w-full gap-2")}
+          className={cn("flex items-center justify-center bg-white/10 hover:bg-rose-500/20 text-gray-300 hover:text-rose-300 border border-white/10 transition-colors font-bold text-xs rounded-xl", isCollapsed ? "w-10 h-10 p-0" : "w-full gap-2")}
           title={isCollapsed ? "Logout" : undefined}
         >
-          <LogOut className="h-5 w-5 shrink-0" />
+          <LogOut className="h-4 w-4 shrink-0" />
           {!isCollapsed && <span>Logout</span>}
         </Button>
       </div>

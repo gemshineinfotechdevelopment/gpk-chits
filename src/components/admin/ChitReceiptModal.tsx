@@ -296,7 +296,7 @@ export const ChitReceiptModal: React.FC<ChitReceiptModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl p-6 sm:p-7 bg-white rounded-3xl font-sans max-h-[95vh] overflow-y-auto space-y-4">
+      <DialogContent className="w-[95vw] sm:max-w-2xl p-4 sm:p-7 bg-white rounded-2xl sm:rounded-3xl font-sans max-h-[95vh] overflow-y-auto space-y-4">
         <DialogHeader className="border-b border-gray-100 pb-3 flex flex-row items-center justify-between">
           <div>
             <DialogTitle className="text-lg font-extrabold text-[#2A1B54] flex items-center gap-2">
@@ -334,7 +334,7 @@ export const ChitReceiptModal: React.FC<ChitReceiptModalProps> = ({
         {/* RECEIPT PAPER CONTAINER (Target for PDF & Print) */}
         <div
           ref={receiptRef}
-          className="bg-white border-2 border-[#7A1416] rounded-2xl p-6 text-gray-800 space-y-4 shadow-sm"
+          className="bg-white border-2 border-[#7A1416] rounded-xl sm:rounded-2xl p-4 sm:p-6 text-gray-800 space-y-4 shadow-sm"
         >
           {/* Header with Logo & Shop Info */}
           <div className="text-center border-b-2 border-[#7A1416] pb-3 space-y-1">

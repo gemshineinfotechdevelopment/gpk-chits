@@ -477,40 +477,40 @@ const ChitScheme: React.FC = () => {
           </div>
         </main>
       ) : (
-        <main className="flex-1 pb-28 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 space-y-12 pt-6">
+        <main className="flex-1 pb-32 sm:pb-28 max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8 space-y-6 sm:space-y-8 pt-4 sm:pt-6">
         {/* Top Header / Account Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white/90 backdrop-blur-sm p-4 sm:p-5 rounded-3xl border border-[#A1CB35]/30 shadow-2xs">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-[#A1CB35]/20 text-[#35520D] flex items-center justify-center border border-[#A1CB35]/40 shadow-2xs shrink-0">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-white/90 backdrop-blur-sm p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-[#A1CB35]/30 shadow-2xs">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-[#A1CB35]/20 text-[#35520D] flex items-center justify-center border border-[#A1CB35]/40 shadow-2xs shrink-0">
               <Gift className="w-5 h-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <span className="text-[10px] font-extrabold uppercase tracking-wider bg-[#A1CB35]/20 text-[#2D4505] px-2.5 py-0.5 rounded-full border border-[#A1CB35]/40">
                   Diwali 2026 Savings
                 </span>
                 <span className="text-xs font-semibold text-gray-500 hidden sm:inline">• 10 Months Fixed Scheme</span>
               </div>
-              <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight mt-0.5">
+              <h1 className="text-lg sm:text-2xl font-black text-gray-900 tracking-tight mt-0.5">
                 GPK Chit Scheme
               </h1>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex items-center justify-between sm:justify-start gap-2 sm:gap-2.5 w-full sm:w-auto">
             {isUserLoggedIn && (
-              <div className="flex items-center gap-2 bg-[#F4F9EA] border border-[#A1CB35]/40 text-[#2D4505] px-3.5 py-2 rounded-2xl text-xs font-bold shadow-2xs">
-                <CheckCircle2 className="w-4 h-4 text-[#35520D] shrink-0" />
-                <span><span className="text-gray-500 font-normal">Account:</span> <strong className="text-gray-950 font-bold">{userName || 'Customer'}</strong></span>
+              <div className="flex items-center gap-1.5 sm:gap-2 bg-[#F4F9EA] border border-[#A1CB35]/40 text-[#2D4505] px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl sm:rounded-2xl text-xs font-bold shadow-2xs">
+                <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#35520D] shrink-0" />
+                <span className="truncate max-w-[130px] sm:max-w-none"><span className="text-gray-500 font-normal hidden sm:inline">Account:</span> <strong className="text-gray-950 font-bold">{userName || 'Customer'}</strong></span>
               </div>
             )}
             {isUserLoggedIn && userSubscriptions.length > 0 && (
               <button
                 type="button"
                 onClick={() => setShowPurchasedModal(true)}
-                className="bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black px-4 py-2.5 rounded-2xl text-xs transition-all shadow-sm flex items-center gap-2 cursor-pointer active:scale-95"
+                className="bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black px-3 py-1.5 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs transition-all shadow-sm flex items-center gap-1.5 sm:gap-2 cursor-pointer active:scale-95 shrink-0"
               >
-                <FileText className="w-4 h-4 text-gray-950" />
+                <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-950" />
                 <span>My Passbook ({userSubscriptions.length})</span>
               </button>
             )}
@@ -526,249 +526,6 @@ const ChitScheme: React.FC = () => {
             )}
           </div>
         </div>
-
-        {/* HERO SECTION + INTERACTIVE SAVINGS CALCULATOR */}
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-[#F7FBEF] to-[#EBF5D4]/60 border border-[#A1CB35]/40 shadow-sm p-6 sm:p-10 lg:p-12">
-          {/* Subtle background decorative glow */}
-          <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#A1CB35]/15 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-[#A1CB35]/10 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            {/* Left Hero Pitch */}
-            <div className="lg:col-span-7 space-y-5">
-              <div className="inline-flex items-center gap-2 bg-white/90 border border-[#A1CB35]/50 px-3.5 py-1.5 rounded-full shadow-2xs">
-                <Sparkles className="w-4 h-4 text-[#35520D]" />
-                <span className="text-xs font-black text-[#2D4505] tracking-wide uppercase">
-                  Zero Burden Diwali Fireworks
-                </span>
-              </div>
-
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-950 tracking-tight leading-[1.15]">
-                Save small each month. <br className="hidden sm:inline" />
-                Celebrate grand this <span className="text-[#35520D] underline decoration-[#A1CB35] decoration-wavy underline-offset-8">Diwali</span>.
-              </h2>
-
-              <p className="text-sm sm:text-base text-gray-600 font-medium leading-relaxed max-w-xl">
-                Join our trusted GPK monthly chit scheme. Secure guaranteed premium crackers packages, earn generous festive bonus fireworks, and manage family bulk enrollments effortlessly.
-              </p>
-
-              {/* Trust Badges */}
-              <div className="grid grid-cols-3 gap-3 pt-2">
-                <div className="bg-white/80 border border-[#A1CB35]/30 rounded-2xl p-3 shadow-2xs">
-                  <span className="block text-xs font-black text-[#2D4505]">100% Guaranteed</span>
-                  <span className="text-[11px] text-gray-500 font-medium">Direct Factory Stock</span>
-                </div>
-                <div className="bg-white/80 border border-[#A1CB35]/30 rounded-2xl p-3 shadow-2xs">
-                  <span className="block text-xs font-black text-[#2D4505]">Bonus Crackers</span>
-                  <span className="text-[11px] text-gray-500 font-medium">Extra Festive Hamper</span>
-                </div>
-                <div className="bg-white/80 border border-[#A1CB35]/30 rounded-2xl p-3 shadow-2xs">
-                  <span className="block text-xs font-black text-[#2D4505]">Digital Passbook</span>
-                  <span className="text-[11px] text-gray-500 font-medium">Online Receipt &amp; Tracking</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Right: Interactive Savings Calculator Widget */}
-            <div className="lg:col-span-5 bg-white border-2 border-[#A1CB35]/50 rounded-3xl p-6 sm:p-7 shadow-xl space-y-5">
-              <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-[#A1CB35] text-gray-950 flex items-center justify-center font-bold">
-                    <Calculator className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-black text-gray-950">Chit Savings Calculator</h3>
-                    <p className="text-[11px] text-gray-500 font-medium">Simulate returns &amp; bonus hampers</p>
-                  </div>
-                </div>
-                <span className="text-[10px] font-black uppercase tracking-wider text-[#2D4505] bg-[#F4F9EA] px-2.5 py-1 rounded-full border border-[#A1CB35]/40">
-                  10 Months
-                </span>
-              </div>
-
-              {/* Scheme Selection Pills / Selector */}
-              <div className="space-y-2">
-                <label className="text-[11px] font-extrabold uppercase text-gray-700 tracking-wider">
-                  Select Scheme Rate:
-                </label>
-                {schemes.length > 0 ? (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {schemes.slice(0, 6).map((s) => (
-                      <button
-                        key={s.id}
-                        type="button"
-                        onClick={() => setCalcSchemeId(s.id)}
-                        className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
-                          (calcSchemeId === s.id || (!calcSchemeId && schemes[0]?.id === s.id))
-                            ? "bg-[#A1CB35] text-gray-950 font-black border-[#8FB82B] shadow-2xs"
-                            : "bg-[#F7FBEF]/50 hover:bg-[#F4F9EA] text-gray-800 font-bold border-gray-200"
-                        }`}
-                      >
-                        <div className="text-xs truncate">{s.title}</div>
-                        <div className="text-[11px] opacity-80">₹{s.monthlyAmount.toLocaleString()}/mo</div>
-                      </button>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-xs text-gray-500 bg-gray-50 p-2.5 rounded-xl">No active schemes loaded</div>
-                )}
-              </div>
-
-              {/* Person Stepper */}
-              {(() => {
-                const currentCalcScheme = schemes.find(s => s.id === calcSchemeId) || schemes[0];
-                const calcMonthlyPerPerson = currentCalcScheme?.monthlyAmount || 1000;
-                const calcDurationMonths = currentCalcScheme?.totalMonths || 10;
-                const calcMonthlyTotal = calcMonthlyPerPerson * calcPersons;
-                const calcTotalMaturity = calcMonthlyTotal * calcDurationMonths;
-
-                return (
-                  <>
-                    <div className="flex items-center justify-between bg-[#F7FBEF]/70 p-3 rounded-2xl border border-[#A1CB35]/30">
-                      <div>
-                        <span className="text-xs font-extrabold text-gray-900 block">Number of Persons:</span>
-                        <span className="text-[11px] text-gray-500 font-medium">Bulk savings for family &amp; friends</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setCalcPersons(Math.max(1, calcPersons - 1))}
-                          disabled={calcPersons <= 1}
-                          className="w-8 h-8 rounded-xl bg-white border border-gray-300 disabled:opacity-40 font-bold text-gray-700 flex items-center justify-center hover:bg-gray-100 cursor-pointer shadow-2xs"
-                        >
-                          <Minus className="w-3.5 h-3.5" />
-                        </button>
-                        <span className="w-8 text-center font-black text-sm text-gray-950">
-                          {calcPersons}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setCalcPersons(calcPersons + 1)}
-                          className="w-8 h-8 rounded-xl bg-[#A1CB35] hover:bg-[#8FB82B] font-bold text-gray-950 flex items-center justify-center cursor-pointer shadow-2xs"
-                        >
-                          <Plus className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Calculated Results Grid */}
-                    <div className="grid grid-cols-2 gap-3 pt-1">
-                      <div className="bg-[#F4F9EA] p-3.5 rounded-2xl border border-[#A1CB35]/40 space-y-0.5">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-gray-500 block">
-                          Monthly Deposit
-                        </span>
-                        <span className="text-lg font-black text-[#2D4505]">
-                          ₹{calcMonthlyTotal.toLocaleString()}
-                        </span>
-                        <span className="text-[10px] text-gray-500 block">
-                          ({calcPersons}p × ₹{calcMonthlyPerPerson.toLocaleString()})
-                        </span>
-                      </div>
-
-                      <div className="bg-gray-950 text-white p-3.5 rounded-2xl space-y-0.5 shadow-md">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-[#A1CB35] block">
-                          10-Month Maturity
-                        </span>
-                        <span className="text-lg font-black text-white">
-                          ₹{calcTotalMaturity.toLocaleString()}
-                        </span>
-                        <span className="text-[10px] text-gray-400 block">
-                          + Guaranteed Bonus Cracker Box
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Quick CTA */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (!currentCalcScheme) return;
-                        const existingIdx = selectedSchemes.findIndex(s => s.schemeName === currentCalcScheme.title);
-                        if (existingIdx > -1) {
-                          handlePersonCountChange(existingIdx, calcPersons);
-                        } else {
-                          setSelectedSchemes(prev => [
-                            ...prev,
-                            {
-                              schemeId: currentCalcScheme.id,
-                              schemeName: currentCalcScheme.title,
-                              monthlyAmount: currentCalcScheme.monthlyAmount,
-                              totalMonths: currentCalcScheme.totalMonths || 10,
-                              dueDateDay: currentCalcScheme.dueDateDay || 10,
-                              personCount: calcPersons
-                            }
-                          ]);
-                        }
-                        setIsEnrollmentDrawerOpen(true);
-                        toast.success(`Selected ${currentCalcScheme.title} (${calcPersons} Person${calcPersons > 1 ? 's' : ''})`);
-                      }}
-                      className="w-full bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black text-xs py-3.5 px-4 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-95 uppercase tracking-wider"
-                    >
-                      <Sparkles className="w-4 h-4 text-gray-950" />
-                      <span>Quick Enroll with This Scheme →</span>
-                    </button>
-                  </>
-                );
-              })()}
-            </div>
-          </div>
-        </section>
-
-        {/* PROMOTIONAL OFFERS & BANNERS */}
-        {bannerImages.length > 0 && (
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-black text-gray-950 flex items-center gap-2">
-                  <Gift className="w-5 h-5 text-[#35520D]" />
-                  <span>Diwali Bonus Gift Hampers &amp; Catalog</span>
-                </h3>
-                <p className="text-xs text-gray-500 font-medium mt-0.5">
-                  Exclusive gifts, free crackers packages, and bonus rewards bundled with each scheme
-                </p>
-              </div>
-              <span className="text-xs text-gray-400 font-semibold hidden sm:inline">
-                Click any poster to zoom
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {bannerImages.map((banner) => (
-                <div
-                  key={banner.id}
-                  onClick={() => setActiveZoomImage(banner)}
-                  className="group relative overflow-hidden rounded-3xl border-2 border-[#A1CB35]/30 bg-white shadow-2xs hover:border-[#A1CB35] hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col"
-                >
-                  <div className="aspect-[16/10] w-full overflow-hidden bg-gray-100 flex items-center justify-center">
-                    <img
-                      src={banner.url}
-                      alt={banner.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      loading="lazy"
-                    />
-                  </div>
-                  <div className="p-4 bg-white flex items-center justify-between gap-3 border-t border-gray-100">
-                    <div>
-                      <span className="font-black text-gray-900 text-xs line-clamp-1">
-                        {banner.title}
-                      </span>
-                      {banner.monthlyAmount ? (
-                        <span className="text-[11px] font-bold text-[#2D4505]">
-                          ₹{banner.monthlyAmount.toLocaleString()} / month
-                        </span>
-                      ) : (
-                        <span className="text-[11px] text-gray-400">Diwali Gift Offer</span>
-                      )}
-                    </div>
-                    <span className="text-[10px] font-black text-gray-900 bg-[#A1CB35] px-2.5 py-1 rounded-full border border-[#8FB82B] shadow-2xs shrink-0">
-                      View 🔍
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
 
         {/* 3-COLUMN AVAILABLE SCHEMES GRID */}
         <section className="space-y-6">
@@ -810,7 +567,7 @@ const ChitScheme: React.FC = () => {
                 return (
                   <div
                     key={sch.id}
-                    className={`bg-white rounded-3xl p-6 border-2 transition-all duration-300 flex flex-col justify-between group shadow-sm ${
+                    className={`bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border-2 transition-all duration-300 flex flex-col justify-between group shadow-sm ${
                       isSelected
                         ? "border-[#A1CB35] bg-[#F7FBEF]/50 ring-4 ring-[#A1CB35]/20 shadow-md"
                         : "border-gray-200 hover:border-[#A1CB35] hover:shadow-xl"
@@ -952,23 +709,23 @@ const ChitScheme: React.FC = () => {
 
         {/* BOTTOM STICKY FLOATING SUMMARY BAR */}
         {selectedSchemes.length > 0 && (
-          <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[94%] max-w-4xl z-40 bg-gray-950/95 backdrop-blur-md text-white rounded-3xl p-4 sm:p-5 shadow-2xl border border-white/15 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-bottom duration-300">
-            <div className="flex items-center gap-3.5 w-full sm:w-auto">
-              <div className="w-12 h-12 rounded-2xl bg-[#A1CB35] text-gray-950 flex items-center justify-center font-black shrink-0 shadow-sm">
-                <Gift className="w-6 h-6" />
+          <div className="fixed bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 w-[95%] max-w-4xl z-40 bg-gray-950/95 backdrop-blur-md text-white rounded-2xl sm:rounded-3xl p-3 sm:p-5 shadow-2xl border border-white/15 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 animate-in fade-in slide-in-from-bottom duration-300">
+            <div className="flex items-center gap-2.5 sm:gap-3.5 w-full sm:w-auto">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[#A1CB35] text-gray-950 flex items-center justify-center font-black shrink-0 shadow-sm">
+                <Gift className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-black uppercase tracking-wider text-[#A1CB35]">
-                    {selectedSchemes.length} Scheme{selectedSchemes.length > 1 ? "s" : ""} Selected
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-[#A1CB35]">
+                    {selectedSchemes.length} Scheme{selectedSchemes.length > 1 ? "s" : ""}
                   </span>
                   <span className="text-gray-500">•</span>
-                  <span className="text-xs text-gray-300 font-bold">
-                    {totalPersons} Total Person{totalPersons > 1 ? "s" : ""}
+                  <span className="text-[11px] sm:text-xs text-gray-300 font-bold truncate">
+                    {totalPersons} Person{totalPersons > 1 ? "s" : ""}
                   </span>
                 </div>
-                <div className="text-lg sm:text-xl font-extrabold text-white truncate">
-                  ₹{combinedMonthlyAmount.toLocaleString()} <span className="text-xs font-normal text-gray-400">/ month</span>
+                <div className="text-base sm:text-xl font-extrabold text-white truncate">
+                  ₹{combinedMonthlyAmount.toLocaleString()} <span className="text-xs font-normal text-gray-400">/ mo</span>
                   <span className="hidden sm:inline text-xs text-gray-400 font-normal ml-3">
                     (10-Mo Total: ₹{combinedGrandTotal.toLocaleString()})
                   </span>
@@ -980,7 +737,7 @@ const ChitScheme: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsEnrollmentDrawerOpen(true)}
-                className="w-full sm:w-auto bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black text-xs sm:text-sm px-6 py-3 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer active:scale-95 uppercase tracking-wider"
+                className="w-full sm:w-auto bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black text-xs sm:text-sm px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer active:scale-95 uppercase tracking-wider"
               >
                 <span>Proceed to Application</span>
                 <ArrowRight className="w-4 h-4 stroke-[3]" />
@@ -1560,13 +1317,13 @@ const ChitScheme: React.FC = () => {
                           </div>
 
                           <div className="bg-white/90 border border-[#A1CB35]/30 rounded-xl p-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
-                            <div className="font-mono font-bold text-gray-800 text-[11px]">
-                              <span className="text-gray-500 font-sans">Summary Calculation: </span>
+                            <div className="font-sans font-bold text-gray-800 text-[11px] tabular-nums">
+                              <span className="text-gray-500 font-medium">Summary Calculation: </span>
                               <span className="text-[#2D4505] font-black">
                                 {enrolledSchemes.map(s => {
                                   const rate = s.monthlyAmountPerPerson || s.monthlyAmount || 0;
                                   const count = s.personCount || 1;
-                                  return `${rate} × ${count} = ${rate * count}`;
+                                  return `₹${rate.toLocaleString()} × ${count} = ₹${(rate * count).toLocaleString()}`;
                                 }).join(" + ")}
                               </span>
                             </div>

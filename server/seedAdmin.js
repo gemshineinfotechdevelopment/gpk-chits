@@ -1,9 +1,16 @@
 import mongoose from 'mongoose';
 import bcryptjs from 'bcryptjs';
 import dotenv from 'dotenv';
+import dns from 'dns';
 import User from './models/User.js';
 
 dotenv.config();
+
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1']);
+} catch (e) {
+  // Ignore DNS set error
+}
 
 const seedAdmin = async () => {
   try {

@@ -43,14 +43,14 @@
     --spark: 48 100% 70%;
     --festival: 0 92% 58%;
 
-    --sidebar-background: 358 100% 15%;
-    --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 358 85% 52%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 358 100% 20%;
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 77 60% 50%;
+    --sidebar-primary-foreground: 220 26% 10%;
+    --sidebar-accent: 217 33% 18%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 358 100% 10%;
-    --sidebar-ring: 358 85% 52%;
+    --sidebar-border: 217 33% 18%;
+    --sidebar-ring: 77 60% 50%;
 
     --font-display: 'Google Sans', 'Product Sans', 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     --font-body: 'Google Sans', 'Product Sans', 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;

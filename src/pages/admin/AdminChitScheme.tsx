@@ -194,7 +194,7 @@ const AdminChitScheme: React.FC = () => {
     title: "",
     message: "",
     confirmText: "Confirm",
-    confirmColor: "bg-[#7A1416]",
+    confirmColor: "bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black",
     onConfirm: () => {}
   });
 
@@ -630,7 +630,7 @@ const AdminChitScheme: React.FC = () => {
       title: "Mark Payment as Pending",
       message: `Are you sure you want to mark the ${monthName} payment for ${sub.name || sub.customerName} as Pending?`,
       confirmText: "Mark as Pending",
-      confirmColor: "bg-amber-600 hover:bg-[#7A1416]",
+      confirmColor: "bg-amber-600 hover:bg-amber-700 text-white font-bold",
       onConfirm: async () => {
         try {
           toast.loading("Updating payment status...", { id: "pay-toast" });
@@ -754,9 +754,9 @@ const AdminChitScheme: React.FC = () => {
 
     // Create offscreen container for PDF receipt
     const html = `
-      <div style="font-family: Arial, sans-serif; padding: 24px; max-width: 680px; background: #ffffff; color: #1e293b; border: 2px solid #7A1416; border-radius: 16px;">
-        <div style="text-align: center; border-bottom: 2px solid #7A1416; padding-bottom: 12px; margin-bottom: 16px;">
-          <h1 style="color: #7A1416; margin: 0; font-size: 22px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">GPK CRACKERS</h1>
+      <div style="font-family: Arial, sans-serif; padding: 24px; max-width: 680px; background: #ffffff; color: #1e293b; border: 2px solid #2D4505; border-radius: 16px;">
+        <div style="text-align: center; border-bottom: 2px solid #2D4505; padding-bottom: 12px; margin-bottom: 16px;">
+          <h1 style="color: #2D4505; margin: 0; font-size: 22px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">GPK CRACKERS</h1>
           <p style="margin: 3px 0 0 0; font-size: 13px; font-weight: bold; color: #334155;">MONTHLY CHIT SCHEME PAYMENT RECEIPT & PASSBOOK STATEMENT</p>
           <p style="margin: 2px 0 0 0; font-size: 11px; color: #64748b;">Sattur, Virudhunagar District, Tamil Nadu • Mobile: +91 95859 75756</p>
         </div>
@@ -773,7 +773,7 @@ const AdminChitScheme: React.FC = () => {
         </div>
 
         <div style="margin-bottom: 16px; font-size: 12px;">
-          <div style="font-weight: bold; color: #7A1416; font-size: 13px; margin-bottom: 6px; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px;">Subscriber Details</div>
+          <div style="font-weight: bold; color: #2D4505; font-size: 13px; margin-bottom: 6px; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px;">Subscriber Details</div>
           <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
             <tr>
               <td style="padding: 3px 0; color: #64748b; width: 130px;">Customer Name:</td>
@@ -791,7 +791,7 @@ const AdminChitScheme: React.FC = () => {
         </div>
 
         <div style="margin-bottom: 16px; background: #fef2f2; border: 1px solid #fca5a5; padding: 10px 14px; border-radius: 10px; font-size: 12px;">
-          <div style="font-weight: bold; color: #7A1416; font-size: 13px; margin-bottom: 4px; text-transform: uppercase;">CURRENT PAYMENT RECEIVED</div>
+          <div style="font-weight: bold; color: #2D4505; font-size: 13px; margin-bottom: 4px; text-transform: uppercase;">CURRENT PAYMENT RECEIVED</div>
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <span><strong>Month:</strong> Month ${monthNumber} (${monthName})</span>
             <span><strong>Status:</strong> <strong style="color: ${statusBadgeColor};">${timingStatus}</strong></span>
@@ -804,7 +804,7 @@ const AdminChitScheme: React.FC = () => {
 
         <!-- PREVIOUS PAYMENT HISTORY TABLE -->
         <div style="margin-bottom: 16px;">
-          <div style="font-weight: bold; color: #7A1416; font-size: 13px; margin-bottom: 6px; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-weight: bold; color: #2D4505; font-size: 13px; margin-bottom: 6px; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
             <span>PAID HISTORY STATEMENT (Months 1 to ${monthNumber})</span>
             <span style="font-size: 11px; color: #047857; font-weight: bold;">Total Paid: ₹${totalPaidTillNow.toLocaleString()}</span>
           </div>
@@ -845,7 +845,7 @@ const AdminChitScheme: React.FC = () => {
             <p style="margin: 2px 0 0 0;">This is an official computer generated receipt & passbook statement.</p>
           </div>
           <div style="text-align: center; border-top: 1px dashed #94a3b8; padding-top: 4px; width: 160px;">
-            <strong style="color: #7A1416;">GPK Crackers</strong><br/>
+            <strong style="color: #2D4505;">GPK Crackers</strong><br/>
             Authorized Signatory
           </div>
         </div>
@@ -996,13 +996,13 @@ _GPK Crackers_`;
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-gray-200/90 shadow-2xs">
             <div>
               <div className="flex items-center gap-2">
-                <span className="bg-[#7A1416]/10 text-[#7A1416] px-3 py-1 rounded-full font-extrabold text-[11px] uppercase tracking-wider">
+                <span className="bg-[#F4F9EA] text-[#2D4505] border border-[#A1CB35]/40 px-3 py-1 rounded-full font-extrabold text-[11px] uppercase tracking-wider">
                   Admin Portal
                 </span>
                 <span className="text-xs text-gray-400 font-bold">•</span>
                 <span className="text-xs text-gray-500 font-semibold">GPK Crackers</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#2A1B54] mt-1">
+              <h1 className="text-xl sm:text-3xl font-extrabold text-gray-950 mt-1">
                 Chit Scheme Management
               </h1>
               <p className="text-xs text-gray-500 font-medium mt-0.5">
@@ -1010,14 +1010,14 @@ _GPK Crackers_`;
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap w-full sm:w-auto">
               <button
                 onClick={() => {
                   loadChitSchemes();
                   loadSubscriptions();
                   toast.success("Refreshed latest data!");
                 }}
-                className="p-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-300 text-gray-700 rounded-2xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                className="p-2 sm:p-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-300 text-gray-700 rounded-xl sm:rounded-2xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
                 title="Refresh Data"
               >
                 <RefreshCw className="w-4 h-4 text-gray-600" />
@@ -1025,17 +1025,17 @@ _GPK Crackers_`;
               </button>
               <button
                 onClick={() => setIsUploadImageModalOpen(true)}
-                className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-2xl text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer active:scale-95"
+                className="flex-1 sm:flex-none justify-center bg-amber-600 hover:bg-amber-700 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer active:scale-95"
               >
-                <ImageIcon className="w-4.5 h-4.5" />
-                <span>Upload Scheme Image</span>
+                <ImageIcon className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+                <span>Upload Image</span>
               </button>
               <button
                 onClick={() => setIsCreateModalOpen(true)}
-                className="bg-[#7A1416] hover:bg-[#900000] text-white px-4 py-2.5 rounded-2xl text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer active:scale-95"
+                className="flex-1 sm:flex-none justify-center bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black shadow-sm px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer active:scale-95"
               >
-                <Plus className="w-4.5 h-4.5" />
-                <span>Create New Scheme</span>
+                <Plus className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+                <span>Create Scheme</span>
               </button>
             </div>
           </div>
@@ -1043,7 +1043,7 @@ _GPK Crackers_`;
           {/* 4 Summary KPI Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div className="bg-white p-4 rounded-2xl border border-gray-200/90 shadow-2xs flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-purple-100 text-[#7A1416] flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-[#F4F9EA] text-[#2D4505] border border-[#A1CB35]/30 flex items-center justify-center shrink-0">
                 <FileText className="w-5 h-5 stroke-[2.5]" />
               </div>
               <div>
@@ -1087,8 +1087,8 @@ _GPK Crackers_`;
           <div className="bg-white rounded-3xl border border-gray-200/90 shadow-2xs p-6 space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-4">
               <div>
-                <h2 className="text-xl font-extrabold text-[#2A1B54] flex items-center gap-2">
-                  <Users className="w-5 h-5 text-[#7A1416]" />
+                <h2 className="text-xl font-extrabold text-gray-950 flex items-center gap-2">
+                  <Users className="w-5 h-5 text-[#2D4505]" />
                   <span>Customer Applications</span>
                   <span className="text-xs bg-purple-100 text-purple-900 font-black px-2.5 py-0.5 rounded-full">
                     {filteredSubscriptions.length}
@@ -1134,7 +1134,7 @@ _GPK Crackers_`;
                   placeholder="Search name, mobile, scheme..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-10 text-xs pl-9 pr-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-medium"
+                  className="w-full h-10 text-xs pl-9 pr-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-medium"
                 />
               </div>
 
@@ -1143,7 +1143,7 @@ _GPK Crackers_`;
                 <select
                   value={schemeFilter}
                   onChange={(e) => setSchemeFilter(e.target.value)}
-                  className="w-full h-10 text-xs px-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold text-gray-700 cursor-pointer"
+                  className="w-full h-10 text-xs px-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-semibold text-gray-700 cursor-pointer"
                 >
                   <option value="all">All Schemes ▼</option>
                   {schemes.map(s => (
@@ -1159,7 +1159,7 @@ _GPK Crackers_`;
                 <select
                   value={approvalFilter}
                   onChange={(e) => setApprovalFilter(e.target.value as any)}
-                  className="w-full h-10 text-xs px-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold text-gray-700 cursor-pointer"
+                  className="w-full h-10 text-xs px-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-semibold text-gray-700 cursor-pointer"
                 >
                   <option value="all">Approval: All ▼</option>
                   <option value="Pending">Pending</option>
@@ -1173,7 +1173,7 @@ _GPK Crackers_`;
                 <select
                   value={paymentFilter}
                   onChange={(e) => setPaymentFilter(e.target.value as any)}
-                  className="w-full h-10 text-xs px-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold text-gray-700 cursor-pointer"
+                  className="w-full h-10 text-xs px-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-semibold text-gray-700 cursor-pointer"
                 >
                   <option value="all">Payment: All ▼</option>
                   <option value="Paid">Payments Started (&gt;0)</option>
@@ -1186,7 +1186,7 @@ _GPK Crackers_`;
                 <select
                   value={dateSortOrder}
                   onChange={(e) => setDateSortOrder(e.target.value as any)}
-                  className="w-full h-10 text-xs px-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold text-gray-700 cursor-pointer"
+                  className="w-full h-10 text-xs px-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-semibold text-gray-700 cursor-pointer"
                   title="Date Sorting Option"
                 >
                   <option value="desc">Date: Newest First ⬇️</option>
@@ -1198,7 +1198,7 @@ _GPK Crackers_`;
             {/* Applications Table */}
             {loadingSubscriptions ? (
               <div className="py-12 text-center text-gray-400 font-medium text-xs flex flex-col items-center gap-2">
-                <Loader2 className="w-7 h-7 animate-spin text-[#7A1416]" />
+                <Loader2 className="w-7 h-7 animate-spin text-[#2D4505]" />
                 <span>Loading Customer Applications...</span>
               </div>
             ) : filteredSubscriptions.length === 0 ? (
@@ -1206,13 +1206,15 @@ _GPK Crackers_`;
                 No customer chit applications found matching filters.
               </div>
             ) : (
-              <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-2xs">
-                <table className="min-w-[1240px] w-full text-left border-collapse table-fixed">
+              <>
+                {/* Desktop View: Full Data Table (hidden on mobile, visible on md+) */}
+                <div className="hidden md:block overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-2xs">
+                  <table className="min-w-[1280px] w-full text-left border-collapse table-fixed">
                   <thead>
                     <tr className="bg-gray-100/90 text-gray-700 text-xs uppercase font-extrabold tracking-wider border-b border-gray-200 whitespace-nowrap">
                       <th className="p-4 w-[180px]">Customer &amp; App ID</th>
                       <th className="p-4 w-[150px]">Contact Info</th>
-                      <th className="p-4 w-[260px]">Selected Schemes</th>
+                      <th className="p-4 w-[300px]">Selected Schemes</th>
                       <th className="p-4 w-[100px] text-center">Total Persons</th>
                       <th className="p-4 w-[120px] text-right">Monthly Total</th>
                       <th className="p-4 w-[130px] text-right">Grand Total</th>
@@ -1244,7 +1246,7 @@ _GPK Crackers_`;
                             <button
                               type="button"
                               onClick={() => setSelectedSubscription(sub)}
-                              className="font-extrabold text-[#7A1416] hover:text-[#900000] hover:underline text-sm text-left truncate block max-w-full cursor-pointer"
+                              className="font-extrabold text-[#2D4505] hover:text-[#35520D] hover:underline text-sm text-left truncate block max-w-full cursor-pointer"
                               title={sub.name || sub.customerName || 'Customer'}
                             >
                               {sub.name || sub.customerName || 'Customer'}
@@ -1274,28 +1276,37 @@ _GPK Crackers_`;
                           {/* Column 3: Selected Schemes & Formula Calculation */}
                           <td className="p-4 align-middle">
                             {enrolledSchemes ? (
-                              <div className="space-y-1">
+                              <div className="space-y-1.5">
                                 <div className="flex items-center gap-1.5">
-                                  <span className="bg-amber-100 text-amber-900 font-black text-[10px] px-2 py-0.5 rounded shrink-0">
+                                  <span className="bg-amber-50 text-amber-900 border border-amber-200/80 font-bold text-[10px] px-2 py-0.5 rounded-md shrink-0">
                                     {schemeCount} Scheme{schemeCount > 1 ? 's' : ''}
                                   </span>
-                                  <span className="bg-rose-50 text-[#7A1416] border border-rose-200 font-extrabold text-[10px] px-2 py-0.5 rounded shrink-0">
-                                    {personsCount} Persons
+                                  <span className="bg-[#F4F9EA] text-[#2D4505] border border-[#A1CB35]/40 font-bold text-[10px] px-2 py-0.5 rounded-md shrink-0">
+                                    {personsCount} {personsCount > 1 ? 'Persons' : 'Person'}
                                   </span>
                                 </div>
-                                <div className="text-[11px] font-bold text-[#7A1416] font-mono leading-tight">
-                                  {enrolledSchemes.map(s => {
+                                <div className="space-y-1">
+                                  {enrolledSchemes.map((s, sIdx) => {
                                     const rate = s.monthlyAmountPerPerson || s.monthlyAmount || s.price || 0;
                                     const count = s.personCount || 1;
-                                    return `${rate} × ${count} = ₹${(rate * count).toLocaleString()}`;
-                                  }).join(" + ")}
-                                </div>
-                                <div className="text-[10px] text-gray-500 font-medium truncate" title={enrolledSchemes.map(s => `${s.schemeName} (${s.personCount || 1}p)`).join(", ")}>
-                                  {enrolledSchemes.map(s => `${s.schemeName} (${s.personCount || 1}p)`).join(", ")}
+                                    const lineTot = rate * count;
+                                    return (
+                                      <div key={sIdx} className="text-xs leading-snug">
+                                        <div className="font-semibold text-gray-900 truncate" title={s.schemeName}>
+                                          {s.schemeName}
+                                        </div>
+                                        <div className="text-[11px] text-gray-500 font-sans tabular-nums flex items-center gap-1.5">
+                                          <span className="font-medium text-gray-600">₹{rate.toLocaleString()} × {count} {count > 1 ? 'persons' : 'person'}</span>
+                                          <span className="text-gray-400">=</span>
+                                          <span className="font-bold text-[#2D4505]">₹{lineTot.toLocaleString()}</span>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
                                 </div>
                               </div>
                             ) : (
-                              <div className="font-extrabold text-[#2A1B54] text-xs">
+                              <div className="font-extrabold text-gray-950 text-xs">
                                 {sub.schemeName || 'Chit Scheme'}
                               </div>
                             )}
@@ -1304,7 +1315,7 @@ _GPK Crackers_`;
                           {/* Column 4: Total Persons */}
                           <td className="p-4 text-center align-middle">
                             <span className="bg-amber-50 border border-amber-200 text-amber-950 font-black px-2.5 py-1 rounded-xl text-xs inline-flex items-center gap-1">
-                              <Users className="w-3.5 h-3.5 text-[#7A1416]" />
+                              <Users className="w-3.5 h-3.5 text-[#2D4505]" />
                               <span>{personsCount}</span>
                             </span>
                           </td>
@@ -1319,7 +1330,7 @@ _GPK Crackers_`;
 
                           {/* Column 6: Grand Total & Paid */}
                           <td className="p-4 text-right align-middle">
-                            <div className="font-extrabold text-[#2A1B54]">
+                            <div className="font-extrabold text-gray-950">
                               ₹{grandTotal.toLocaleString()}
                             </div>
                             <div className="text-[11px] text-emerald-600 font-bold">
@@ -1378,15 +1389,185 @@ _GPK Crackers_`;
                   </tbody>
                 </table>
               </div>
-            )}
+
+              {/* Mobile View: Clean Card Layout for phones & small screens (< md) */}
+              <div className="block md:hidden space-y-3">
+                {filteredSubscriptions.map((sub, idx) => {
+                  const id = sub._id || sub.id || String(idx);
+                  const currentApproval = sub.approvalStatus || (sub.status === 'Paid' || sub.status === 'Approved' ? 'Approved' : (sub.status === 'Rejected' ? 'Rejected' : 'Pending'));
+                  const enrolledSchemes = (sub.schemes && sub.schemes.length > 0) ? sub.schemes : null;
+                  const schemeCount = enrolledSchemes ? enrolledSchemes.length : 1;
+                  const personsCount = enrolledSchemes 
+                    ? enrolledSchemes.reduce((sum, s) => sum + (s.personCount || 1), 0)
+                    : (sub.totalPersons || sub.personCount || 1);
+                  const monthlyTotal = enrolledSchemes
+                    ? enrolledSchemes.reduce((sum, s) => sum + (s.totalMonthlyAmount || ((s.monthlyAmountPerPerson || s.monthlyAmount || s.price || 0) * (s.personCount || 1))), 0)
+                    : (sub.combinedMonthlyAmount || sub.monthlyAmount || 0);
+                  const grandTotal = enrolledSchemes
+                    ? enrolledSchemes.reduce((sum, s) => sum + (s.totalSchemeAmount || ((s.totalMonthlyAmount || ((s.monthlyAmountPerPerson || s.monthlyAmount || s.price || 0) * (s.personCount || 1))) * (s.durationMonths || 10))), 0)
+                    : (sub.combinedGrandTotal || (monthlyTotal * 10));
+                  const paidAmount = sub.totalPaidAmount || 0;
+
+                  return (
+                    <div key={id} className="bg-white border border-gray-200 rounded-2xl p-4 shadow-2xs space-y-3 hover:border-[#A1CB35]/60 transition-all">
+                      {/* Top Bar: Name, App ID & Status */}
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedSubscription(sub)}
+                            className="font-extrabold text-[#2D4505] hover:text-[#35520D] hover:underline text-sm text-left truncate block max-w-full cursor-pointer"
+                          >
+                            {sub.name || sub.customerName || 'Customer'}
+                          </button>
+                          <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                            <span className="font-mono text-[10px] bg-purple-50 text-purple-900 border border-purple-200 px-1.5 py-0.5 rounded font-extrabold shrink-0">
+                              {sub.applicationNumber || `APP-${String(id).slice(-5)}`}
+                            </span>
+                            <span className="text-[10px] text-gray-400 font-medium">
+                              {sub.createdAt ? new Date(sub.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : 'Recent'}
+                            </span>
+                          </div>
+                        </div>
+                        <span className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase shrink-0 border ${
+                          currentApproval === 'Approved'
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                            : currentApproval === 'Pending'
+                            ? 'bg-amber-50 text-amber-900 border-amber-200'
+                            : 'bg-rose-50 text-rose-800 border-rose-200'
+                        }`}>
+                          {currentApproval}
+                        </span>
+                      </div>
+
+                      {/* Contact Info */}
+                      <div className="flex flex-wrap items-center justify-between gap-2 text-xs bg-gray-50/80 p-2.5 rounded-xl border border-gray-100">
+                        <a
+                          href={`tel:${sub.phone || sub.mobileNumber}`}
+                          className="font-mono font-bold text-gray-900 flex items-center gap-1.5 hover:text-[#35520D]"
+                        >
+                          <Phone className="w-3.5 h-3.5 text-gray-400" />
+                          <span>{sub.phone || sub.mobileNumber}</span>
+                        </a>
+                        {sub.location && (
+                          <div className="text-gray-500 text-[11px] flex items-center gap-1">
+                            <MapPin className="w-3.5 h-3.5 text-gray-400" />
+                            <span className="truncate max-w-[130px]">{sub.location}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Selected Schemes Breakdown */}
+                      {enrolledSchemes ? (
+                        <div className="space-y-1.5 bg-[#F4F9EA]/30 border border-[#A1CB35]/30 p-2.5 rounded-xl">
+                          <div className="flex items-center justify-between gap-1.5 text-[10px] font-bold text-gray-500">
+                            <span className="bg-amber-50 text-amber-900 px-2 py-0.5 rounded border border-amber-200">
+                              {schemeCount} Scheme{schemeCount > 1 ? 's' : ''}
+                            </span>
+                            <span className="text-[#2D4505] font-black">
+                              {personsCount} Total Persons
+                            </span>
+                          </div>
+                          <div className="space-y-1 pt-1 border-t border-gray-200/50">
+                            {enrolledSchemes.map((s, sIdx) => {
+                              const rate = s.monthlyAmountPerPerson || s.monthlyAmount || s.price || 0;
+                              const count = s.personCount || 1;
+                              const lineTot = rate * count;
+                              return (
+                                <div key={sIdx} className="text-xs">
+                                  <div className="font-semibold text-gray-900 truncate" title={s.schemeName}>
+                                    {s.schemeName}
+                                  </div>
+                                  <div className="text-[11px] text-gray-500 font-sans tabular-nums flex items-center gap-1">
+                                    <span>₹{rate.toLocaleString()} × {count} {count > 1 ? 'persons' : 'person'}</span>
+                                    <span className="text-gray-400">=</span>
+                                    <span className="font-bold text-[#2D4505]">₹{lineTot.toLocaleString()}</span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-xs font-bold text-gray-900 bg-gray-50 p-2 rounded-xl border border-gray-100">
+                          {sub.schemeName || 'Chit Scheme'} ({personsCount} Person{personsCount > 1 ? 's' : ''})
+                        </div>
+                      )}
+
+                      {/* Financial Totals */}
+                      <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-gray-100">
+                        <div className="bg-gray-50 p-2 rounded-xl">
+                          <div className="text-[10px] text-gray-400 font-medium">Monthly Payable</div>
+                          <div className="font-black text-emerald-700 text-sm">₹{monthlyTotal.toLocaleString()}</div>
+                        </div>
+                        <div className="bg-gray-50 p-2 rounded-xl text-right">
+                          <div className="text-[10px] text-gray-400 font-medium">10-Mo Grand Total</div>
+                          <div className="font-extrabold text-gray-900 text-xs">₹{grandTotal.toLocaleString()}</div>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100">
+                        <div className="flex items-center gap-1.5 flex-1">
+                          {currentApproval === 'Pending' && (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => handleApproveApplication(sub)}
+                                disabled={actionLoading === id}
+                                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1 cursor-pointer shadow-xs disabled:opacity-50"
+                              >
+                                {actionLoading === id ? (
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                ) : (
+                                  <Check className="w-3.5 h-3.5 stroke-[3]" />
+                                )}
+                                <span>Approve</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleRejectApplicationPrompt(sub)}
+                                className="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs p-2 rounded-xl transition-all cursor-pointer"
+                                title="Reject Application"
+                              >
+                                <X className="w-3.5 h-3.5 stroke-[3]" />
+                              </button>
+                            </>
+                          )}
+                          {currentApproval === 'Approved' && (
+                            <button
+                              type="button"
+                              onClick={() => setSelectedSubscription(sub)}
+                              className="flex-1 bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black text-xs py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                            >
+                              <FileText className="w-3.5 h-3.5" />
+                              <span>Passbook &amp; Payments</span>
+                            </button>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedSubscription(sub)}
+                          className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs py-2 px-3 rounded-xl transition-all cursor-pointer flex items-center gap-1 shrink-0"
+                        >
+                          <span>Details</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
           </div>
 
           {/* SECTION 2: SCHEMES MANAGEMENT TABLE / CARDS */}
           <div className="bg-white rounded-3xl border border-gray-200/90 shadow-2xs p-6 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
               <div>
-                <h2 className="text-xl font-extrabold text-[#2A1B54] flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-[#7A1416]" />
+                <h2 className="text-xl font-extrabold text-gray-950 flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-[#2D4505]" />
                   Available Schemes ({schemes.length})
                 </h2>
                 <p className="text-xs text-gray-500 font-medium mt-0.5">
@@ -1397,7 +1578,7 @@ _GPK Crackers_`;
 
             {loadingSchemes ? (
               <div className="py-12 text-center text-gray-400 font-medium text-xs flex flex-col items-center gap-2">
-                <Loader2 className="w-7 h-7 animate-spin text-[#7A1416]" />
+                <Loader2 className="w-7 h-7 animate-spin text-[#2D4505]" />
                 <span>Loading Chit Schemes...</span>
               </div>
             ) : schemes.length === 0 ? (
@@ -1457,7 +1638,7 @@ _GPK Crackers_`;
                           </div>
                           <div>
                             <span className="text-gray-500 text-[11px] block">Total Expected:</span>
-                            <strong className="text-[#7A1416] font-extrabold">₹{totalExpAmount.toLocaleString()}</strong>
+                            <strong className="text-[#2D4505] font-extrabold">₹{totalExpAmount.toLocaleString()}</strong>
                           </div>
                         </div>
 
@@ -1500,8 +1681,8 @@ _GPK Crackers_`;
           <div className="bg-white rounded-3xl border border-gray-200/90 shadow-2xs p-6 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
               <div>
-                <h2 className="text-xl font-extrabold text-[#2A1B54] flex items-center gap-2">
-                  <ImageIcon className="w-5 h-5 text-[#7A1416]" />
+                <h2 className="text-xl font-extrabold text-gray-950 flex items-center gap-2">
+                  <ImageIcon className="w-5 h-5 text-[#2D4505]" />
                   Chit Scheme Promotional Images ({schemes.filter(s => s.url).length})
                 </h2>
                 <p className="text-xs text-gray-500 font-medium mt-0.5">
@@ -1573,7 +1754,7 @@ _GPK Crackers_`;
                   {viewingScheme.status || 'Active'}
                 </span>
               </div>
-              <DialogTitle className="text-xl font-extrabold text-[#2A1B54] mt-1">
+              <DialogTitle className="text-xl font-extrabold text-gray-950 mt-1">
                 {viewingScheme.title || viewingScheme.schemeName}
               </DialogTitle>
               <DialogDescription className="text-xs text-gray-500">
@@ -1597,14 +1778,14 @@ _GPK Crackers_`;
               </div>
               <div>
                 <span className="text-gray-500 block text-[11px]">Total Expected:</span>
-                <strong className="text-[#7A1416] font-extrabold">₹{((viewingScheme.monthlyAmount || 0) * (viewingScheme.totalMonths || viewingScheme.numberOfMonths || 9)).toLocaleString()}</strong>
+                <strong className="text-[#2D4505] font-extrabold">₹{((viewingScheme.monthlyAmount || 0) * (viewingScheme.totalMonths || viewingScheme.numberOfMonths || 9)).toLocaleString()}</strong>
               </div>
             </div>
 
             {/* Auto Generated Schedule */}
             <div className="space-y-3">
               <h4 className="font-extrabold text-gray-900 text-xs uppercase tracking-wide flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-[#7A1416]" />
+                <Calendar className="w-4 h-4 text-[#2D4505]" />
                 Auto-Generated Monthly Schedule ({viewingScheme.totalMonths || viewingScheme.numberOfMonths || 9} Months)
               </h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs">
@@ -1626,7 +1807,7 @@ _GPK Crackers_`;
             {/* Enrolled Customers */}
             <div className="space-y-3 border-t border-gray-100 pt-4">
               <h4 className="font-extrabold text-gray-900 text-xs uppercase tracking-wide flex items-center gap-1.5">
-                <Users className="w-4 h-4 text-[#7A1416]" />
+                <Users className="w-4 h-4 text-[#2D4505]" />
                 Enrolled Customers
               </h4>
               {subscriptions.filter(s => s.schemeName === (viewingScheme.title || viewingScheme.schemeName)).length === 0 ? (
@@ -1672,8 +1853,8 @@ _GPK Crackers_`;
         <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
           <DialogContent className="sm:max-w-lg p-6 bg-white rounded-3xl font-sans max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-xl font-extrabold text-[#2A1B54] flex items-center gap-2">
-                <Plus className="w-5 h-5 text-[#7A1416]" />
+              <DialogTitle className="text-xl font-extrabold text-gray-950 flex items-center gap-2">
+                <Plus className="w-5 h-5 text-[#2D4505]" />
                 Create New Chit Scheme
               </DialogTitle>
               <DialogDescription className="text-xs text-gray-600">
@@ -1691,7 +1872,7 @@ _GPK Crackers_`;
                   placeholder="e.g. Diwali Special Savings Scheme 2026"
                   value={uploadTitle}
                   onChange={(e) => setUploadTitle(e.target.value)}
-                  className="w-full text-xs p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold"
+                  className="w-full text-xs p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-semibold"
                   required
                 />
               </div>
@@ -1706,7 +1887,7 @@ _GPK Crackers_`;
                     type="date"
                     value={uploadStartDate}
                     onChange={(e) => setUploadStartDate(e.target.value)}
-                    className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold"
+                    className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-semibold"
                     required
                   />
                 </div>
@@ -1722,7 +1903,7 @@ _GPK Crackers_`;
                     placeholder="e.g. 9"
                     value={uploadTotalMonths}
                     onChange={(e) => setUploadTotalMonths(e.target.value)}
-                    className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold"
+                    className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-semibold"
                     required
                   />
                 </div>
@@ -1737,7 +1918,7 @@ _GPK Crackers_`;
                     placeholder="e.g. 2000"
                     value={uploadMonthlyAmount}
                     onChange={(e) => setUploadMonthlyAmount(e.target.value)}
-                    className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold"
+                    className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-semibold"
                     required
                   />
                 </div>
@@ -1753,7 +1934,7 @@ _GPK Crackers_`;
                     placeholder="e.g. 10"
                     value={uploadDueDateDay}
                     onChange={(e) => setUploadDueDateDay(e.target.value)}
-                    className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold"
+                    className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-semibold"
                     required
                   />
                 </div>
@@ -1765,7 +1946,7 @@ _GPK Crackers_`;
                   <select
                     value={uploadStatus}
                     onChange={(e) => setUploadStatus(e.target.value as any)}
-                    className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold"
+                    className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-semibold"
                   >
                     <option value="Active">Active</option>
                     <option value="Upcoming">Upcoming</option>
@@ -1784,7 +1965,7 @@ _GPK Crackers_`;
                   placeholder="e.g. Save ₹2000/month for 9 months and get extra bonus!"
                   value={uploadDescription}
                   onChange={(e) => setUploadDescription(e.target.value)}
-                  className="w-full text-xs p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none resize-none"
+                  className="w-full text-xs p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none resize-none"
                 />
               </div>
 
@@ -1799,7 +1980,7 @@ _GPK Crackers_`;
                 <button
                   type="submit"
                   disabled={isUploading || !uploadTitle.trim()}
-                  className="px-5 py-2.5 bg-[#7A1416] hover:bg-[#900000] text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="px-5 py-2.5 bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black shadow-sm rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {isUploading ? (
                     <>
@@ -1824,8 +2005,8 @@ _GPK Crackers_`;
         <Dialog open={isUploadImageModalOpen} onOpenChange={setIsUploadImageModalOpen}>
           <DialogContent className="sm:max-w-lg p-6 bg-white rounded-3xl font-sans max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-xl font-extrabold text-[#2A1B54] flex items-center gap-2">
-                <ImageIcon className="w-5 h-5 text-[#7A1416]" />
+              <DialogTitle className="text-xl font-extrabold text-gray-950 flex items-center gap-2">
+                <ImageIcon className="w-5 h-5 text-[#2D4505]" />
                 Upload Chit Scheme Image / Banner
               </DialogTitle>
               <DialogDescription className="text-xs text-gray-600">
@@ -1846,7 +2027,7 @@ _GPK Crackers_`;
                         <span className="text-xs font-semibold text-gray-800 block truncate">
                           {uploadImageFile?.name || "Selected Image"}
                         </span>
-                        <label className="text-[11px] text-[#7A1416] hover:underline font-bold cursor-pointer inline-block mt-1">
+                        <label className="text-[11px] text-[#2D4505] hover:underline font-bold cursor-pointer inline-block mt-1">
                           Choose Different Image
                           <input
                             type="file"
@@ -1878,15 +2059,15 @@ _GPK Crackers_`;
                     </button>
                   </div>
                 ) : (
-                  <label className="border-2 border-dashed border-gray-300 hover:border-[#7A1416] rounded-2xl p-4 text-center transition-colors bg-gray-50 flex flex-col items-center justify-center gap-2 cursor-pointer">
-                    <div className="w-10 h-10 rounded-full bg-amber-100 text-[#7A1416] flex items-center justify-center">
+                  <label className="border-2 border-dashed border-gray-300 hover:border-[#A1CB35] rounded-2xl p-4 text-center transition-colors bg-gray-50 flex flex-col items-center justify-center gap-2 cursor-pointer">
+                    <div className="w-10 h-10 rounded-full bg-[#F4F9EA] text-[#2D4505] flex items-center justify-center">
                       <ImageIcon className="w-5 h-5" />
                     </div>
                     <div>
                       <span className="text-xs font-bold text-gray-800 block">Click to upload scheme image</span>
                       <span className="text-[11px] text-gray-500 font-medium">PNG, JPG, WEBP up to 10MB</span>
                     </div>
-                    <span className="bg-[#7A1416] text-white text-[11px] font-bold px-3 py-1 rounded-lg mt-1">
+                    <span className="bg-[#A1CB35] text-gray-950 font-bold text-[11px] font-bold px-3 py-1 rounded-lg mt-1">
                       Browse Files
                     </span>
                     <input
@@ -1920,7 +2101,7 @@ _GPK Crackers_`;
                 <button
                   type="submit"
                   disabled={isUploadingImage || !uploadImageFile}
-                  className="px-5 py-2.5 bg-[#7A1416] hover:bg-[#900000] text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="px-5 py-2.5 bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black shadow-sm rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {isUploadingImage ? (
                     <>
@@ -1945,7 +2126,7 @@ _GPK Crackers_`;
         <Dialog open={!!editingScheme} onOpenChange={() => setEditingScheme(null)}>
           <DialogContent className="sm:max-w-lg p-6 bg-white rounded-3xl font-sans max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-xl font-extrabold text-[#2A1B54]">
+              <DialogTitle className="text-xl font-extrabold text-gray-950">
                 Edit Chit Scheme
               </DialogTitle>
             </DialogHeader>
@@ -1959,7 +2140,7 @@ _GPK Crackers_`;
                   type="text"
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
-                  className="w-full text-xs p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold"
+                  className="w-full text-xs p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-semibold"
                   required
                 />
               </div>
@@ -1973,7 +2154,7 @@ _GPK Crackers_`;
                     type="date"
                     value={editStartDate}
                     onChange={(e) => setEditStartDate(e.target.value)}
-                    className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold"
+                    className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-semibold"
                   />
                 </div>
 
@@ -1985,7 +2166,7 @@ _GPK Crackers_`;
                     type="number"
                     value={editTotalMonths}
                     onChange={(e) => setEditTotalMonths(e.target.value)}
-                    className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold"
+                    className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-semibold"
                   />
                 </div>
 
@@ -1997,7 +2178,7 @@ _GPK Crackers_`;
                     type="number"
                     value={editMonthlyAmount}
                     onChange={(e) => setEditMonthlyAmount(e.target.value)}
-                    className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold"
+                    className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-semibold"
                   />
                 </div>
 
@@ -2009,7 +2190,7 @@ _GPK Crackers_`;
                     type="number"
                     value={editDueDateDay}
                     onChange={(e) => setEditDueDateDay(e.target.value)}
-                    className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold"
+                    className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-semibold"
                   />
                 </div>
 
@@ -2020,7 +2201,7 @@ _GPK Crackers_`;
                   <select
                     value={editStatus}
                     onChange={(e) => setEditStatus(e.target.value as any)}
-                    className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold"
+                    className="w-full text-xs p-2.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-semibold"
                   >
                     <option value="Active">Active</option>
                     <option value="Upcoming">Upcoming</option>
@@ -2042,7 +2223,7 @@ _GPK Crackers_`;
                         <span className="text-xs font-semibold text-gray-800 block truncate">
                           {editSelectedFile?.name || "Current Scheme Banner"}
                         </span>
-                        <label className="text-[11px] text-[#7A1416] hover:underline font-bold cursor-pointer inline-block mt-0.5">
+                        <label className="text-[11px] text-[#2D4505] hover:underline font-bold cursor-pointer inline-block mt-0.5">
                           Change Image
                           <input
                             type="file"
@@ -2063,12 +2244,12 @@ _GPK Crackers_`;
                     </button>
                   </div>
                 ) : (
-                  <label className="border-2 border-dashed border-gray-200 hover:border-[#7A1416]/50 rounded-2xl p-3.5 text-center transition-colors bg-gray-50 flex items-center justify-between cursor-pointer">
+                  <label className="border-2 border-dashed border-gray-200 hover:border-[#A1CB35]/50 rounded-2xl p-3.5 text-center transition-colors bg-gray-50 flex items-center justify-between cursor-pointer">
                     <div className="flex items-center gap-2">
-                      <ImageIcon className="w-5 h-5 text-[#7A1416]" />
+                      <ImageIcon className="w-5 h-5 text-[#2D4505]" />
                       <span className="text-xs font-bold text-gray-700">Upload Scheme Image</span>
                     </div>
-                    <span className="bg-[#7A1416] text-white text-[11px] font-bold px-3 py-1 rounded-lg">
+                    <span className="bg-[#A1CB35] text-gray-950 font-bold text-[11px] font-bold px-3 py-1 rounded-lg">
                       Browse File
                     </span>
                     <input
@@ -2089,7 +2270,7 @@ _GPK Crackers_`;
                   rows={2}
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
-                  className="w-full text-xs p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none resize-none"
+                  className="w-full text-xs p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none resize-none"
                 />
               </div>
 
@@ -2104,7 +2285,7 @@ _GPK Crackers_`;
                 <button
                   type="submit"
                   disabled={isSavingEdit}
-                  className="px-5 py-2.5 bg-[#7A1416] hover:bg-[#900000] text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="px-5 py-2.5 bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black shadow-sm rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {isSavingEdit ? (
                     <>
@@ -2127,7 +2308,7 @@ _GPK Crackers_`;
           setSelectedSubscription(null);
           setViewingSchemePassbook(null);
         }}>
-          <DialogContent className="max-w-5xl p-6 sm:p-8 bg-white rounded-3xl font-sans max-h-[92vh] overflow-y-auto space-y-6">
+          <DialogContent className="w-[95vw] sm:max-w-5xl p-4 sm:p-8 bg-white rounded-2xl sm:rounded-3xl font-sans max-h-[92vh] overflow-y-auto space-y-4 sm:space-y-6">
             {(() => {
               const sub = selectedSubscription;
               const currentApproval = sub.approvalStatus || (sub.status === 'Paid' || sub.status === 'Approved' ? 'Approved' : (sub.status === 'Rejected' ? 'Rejected' : 'Pending'));
@@ -2211,10 +2392,10 @@ _GPK Crackers_`;
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="bg-purple-100 text-[#7A1416] font-extrabold text-[10px] px-2.5 py-0.5 rounded-full uppercase">
+                          <span className="bg-[#F4F9EA] text-[#2D4505] border border-[#A1CB35]/30 font-extrabold text-[10px] px-2.5 py-0.5 rounded-full uppercase">
                             Application Details
                           </span>
-                          <span className="font-mono text-xs font-black text-[#7A1416] bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                          <span className="font-mono text-xs font-black text-[#2D4505] bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
                             {sub.applicationNumber || `APP-${String(sub._id || sub.id).slice(-5)}`}
                           </span>
                           <span className={`px-2 py-0.5 rounded-full font-extrabold text-[11px] ${
@@ -2224,7 +2405,7 @@ _GPK Crackers_`;
                             {currentApproval}
                           </span>
                         </div>
-                        <DialogTitle className="text-2xl font-extrabold text-[#2A1B54] mt-1">
+                        <DialogTitle className="text-2xl font-extrabold text-gray-950 mt-1">
                           {sub.name || sub.customerName}
                         </DialogTitle>
                       </div>
@@ -2280,10 +2461,10 @@ _GPK Crackers_`;
                   <div className="bg-amber-50/70 border border-amber-200/90 rounded-2xl p-4 space-y-3">
                     <div className="flex items-center justify-between">
                       <h3 className="text-xs font-black text-amber-950 uppercase tracking-wide flex items-center gap-1.5">
-                        <DollarSign className="w-4 h-4 text-[#7A1416]" />
+                        <DollarSign className="w-4 h-4 text-[#2D4505]" />
                         <span>Combined Application Financial Summary</span>
                       </h3>
-                      <span className="bg-[#7A1416] text-white font-extrabold text-xs px-3 py-1 rounded-full">
+                      <span className="bg-[#A1CB35] text-gray-950 font-bold font-extrabold text-xs px-3 py-1 rounded-full">
                         {totalPersons} Total Person(s) Enrolled
                       </span>
                     </div>
@@ -2295,7 +2476,7 @@ _GPK Crackers_`;
                       </div>
                       <div>
                         <span className="text-gray-500 text-[11px] block">Combined Grand Total</span>
-                        <strong className="text-[#2A1B54] text-sm font-black">₹{combinedGrand.toLocaleString()}</strong>
+                        <strong className="text-gray-950 text-sm font-black">₹{combinedGrand.toLocaleString()}</strong>
                       </div>
                       <div>
                         <span className="text-gray-500 text-[11px] block">Total Paid Till Date</span>
@@ -2312,10 +2493,10 @@ _GPK Crackers_`;
                   <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-300 rounded-2xl p-4 space-y-3 shadow-2xs">
                     <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200 pb-2">
                       <div className="flex items-center gap-2">
-                        <span className="bg-[#7A1416] text-white p-1 rounded-md">
+                        <span className="bg-[#A1CB35] text-gray-950 font-bold p-1 rounded-md">
                           <Receipt className="w-3.5 h-3.5" />
                         </span>
-                        <span className="text-xs font-black uppercase text-[#7A1416] tracking-wide">
+                        <span className="text-xs font-black uppercase text-[#2D4505] tracking-wide">
                           Chits Calculation Formula Breakdown
                         </span>
                       </div>
@@ -2332,12 +2513,12 @@ _GPK Crackers_`;
                         return (
                           <div key={idx} className="bg-white border border-amber-200 rounded-xl p-2.5 flex items-center justify-between shadow-2xs">
                             <div>
-                              <div className="text-xs font-black text-[#2A1B54] truncate max-w-[130px]">{schItem.schemeName}</div>
+                              <div className="text-xs font-black text-gray-950 truncate max-w-[130px]">{schItem.schemeName}</div>
                               <div className="text-[10px] text-gray-500 font-medium">₹{rate} / person</div>
                             </div>
                             <div className="text-right">
-                              <div className="font-mono text-xs font-black text-[#7A1416] bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                                {rate} × {count} = ₹{subTot.toLocaleString()}
+                              <div className="font-sans tabular-nums text-xs font-black text-[#2D4505] bg-amber-50 px-2.5 py-1 rounded border border-amber-200">
+                                ₹{rate.toLocaleString()} × {count} = ₹{subTot.toLocaleString()}
                               </div>
                               <div className="text-[10px] text-gray-500 mt-0.5">{count} Person{count > 1 ? 's' : ''}</div>
                             </div>
@@ -2347,19 +2528,19 @@ _GPK Crackers_`;
                     </div>
 
                     <div className="bg-white/90 border border-amber-300 rounded-xl p-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
-                      <div className="font-mono font-bold text-gray-800 text-[11px]">
-                        <span className="text-gray-500 font-sans">Calculation Summary: </span>
-                        <span className="text-[#7A1416] font-black">
+                      <div className="font-sans font-bold text-gray-800 text-[11px] tabular-nums">
+                        <span className="text-gray-500 font-medium">Calculation Summary: </span>
+                        <span className="text-[#2D4505] font-black">
                           {enrolledSchemes.map(s => {
                             const rate = s.monthlyAmountPerPerson || s.monthlyAmount || s.price || 0;
                             const count = s.personCount || 1;
-                            return `${rate} × ${count} = ${rate * count}`;
+                            return `₹${rate.toLocaleString()} × ${count} = ₹${(rate * count).toLocaleString()}`;
                           }).join(" + ")}
                         </span>
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="font-bold text-gray-700">
-                          Total Persons: <span className="font-black text-[#7A1416] text-sm">{totalPersons}</span>
+                          Total Persons: <span className="font-black text-[#2D4505] text-sm">{totalPersons}</span>
                         </div>
                         <div className="font-bold text-gray-700">
                           Monthly Payable: <span className="font-black text-emerald-700 text-sm">₹{combinedMonthly.toLocaleString()}</span>
@@ -2371,8 +2552,8 @@ _GPK Crackers_`;
                   {/* SCHEME-WISE BREAKDOWN TABLE (REQUIREMENT 4) */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-extrabold text-[#2A1B54] text-xs uppercase tracking-wide flex items-center gap-1.5">
-                        <Gift className="w-4 h-4 text-[#7A1416]" />
+                      <h4 className="font-extrabold text-gray-950 text-xs uppercase tracking-wide flex items-center gap-1.5">
+                        <Gift className="w-4 h-4 text-[#2D4505]" />
                         <span>Scheme-Wise Enrollment Breakdown ({enrolledSchemes.length} Scheme{enrolledSchemes.length > 1 ? 's' : ''})</span>
                       </h4>
                       <span className="text-[11px] text-gray-500 font-medium">Click "View Schedule" to see month-wise passbook</span>
@@ -2402,11 +2583,11 @@ _GPK Crackers_`;
                               <tr
                                 key={sIdx}
                                 className={`hover:bg-gray-50 transition-colors ${
-                                  isCurrentSelected ? 'bg-amber-50/40 ring-1 ring-[#7A1416]/20' : ''
+                                  isCurrentSelected ? 'bg-amber-50/40 ring-1 ring-[#A1CB35]/30' : ''
                                 }`}
                               >
                                 <td className="p-3">
-                                  <span className="font-extrabold text-[#2A1B54] text-xs block">
+                                  <span className="font-extrabold text-gray-950 text-xs block">
                                     {schItem.schemeName}
                                   </span>
                                   <span className="text-[10px] text-gray-400">
@@ -2427,7 +2608,7 @@ _GPK Crackers_`;
                                 <td className="p-3 text-center font-semibold text-gray-700">
                                   {schItem.durationMonths || 10}m
                                 </td>
-                                <td className="p-3 text-right font-bold text-[#2A1B54]">
+                                <td className="p-3 text-right font-bold text-gray-950">
                                   ₹{schItem.totalSchemeAmount?.toLocaleString()}
                                 </td>
                                 <td className="p-3 text-right">
@@ -2461,7 +2642,7 @@ _GPK Crackers_`;
                                       onClick={() => setViewingSchemePassbook(schItem)}
                                       className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
                                         isCurrentSelected
-                                          ? "bg-[#7A1416] text-white"
+                                          ? "bg-[#A1CB35] text-gray-950 font-bold"
                                           : "bg-gray-100 hover:bg-gray-200 text-gray-800"
                                       }`}
                                     >
@@ -2482,16 +2663,16 @@ _GPK Crackers_`;
                     <div className="flex flex-wrap items-center justify-between gap-2 bg-amber-50 p-3.5 rounded-2xl border border-amber-200">
                       <div>
                         <div className="text-xs font-black text-amber-950 flex items-center gap-1.5 uppercase">
-                          <Calendar className="w-4 h-4 text-[#7A1416]" />
+                          <Calendar className="w-4 h-4 text-[#2D4505]" />
                           <span>Monthwise Schedule: {activeScheme.schemeName}</span>
                         </div>
                         <span className="text-[11px] text-gray-600">
-                          {activeScheme.personCount} Person(s) • Monthly/Person: <strong className="text-gray-900">₹{activeScheme.monthlyAmountPerPerson?.toLocaleString()}</strong> • Expected Monthly: <strong className="text-emerald-700">₹{schemeMonthlyTotal.toLocaleString()}</strong> • Scheme Total: <strong className="text-[#2A1B54]">₹{(activeScheme.totalSchemeAmount || (schemeMonthlyTotal * schemeDuration)).toLocaleString()}</strong>
+                          {activeScheme.personCount} Person(s) • Monthly/Person: <strong className="text-gray-900">₹{activeScheme.monthlyAmountPerPerson?.toLocaleString()}</strong> • Expected Monthly: <strong className="text-emerald-700">₹{schemeMonthlyTotal.toLocaleString()}</strong> • Scheme Total: <strong className="text-gray-950">₹{(activeScheme.totalSchemeAmount || (schemeMonthlyTotal * schemeDuration)).toLocaleString()}</strong>
                         </span>
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <span className="bg-[#7A1416] text-white text-xs font-bold px-3 py-1 rounded-xl">
+                        <span className="bg-[#A1CB35] text-gray-950 font-bold text-xs font-bold px-3 py-1 rounded-xl">
                           {activeScheme.monthsPaid || 0} / {schemeDuration} Months Paid
                         </span>
                       </div>
@@ -2510,7 +2691,7 @@ _GPK Crackers_`;
                               onClick={() => setViewingSchemePassbook(schTab)}
                               className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 ${
                                 isTabActive
-                                  ? "bg-[#7A1416] text-white shadow-2xs"
+                                  ? "bg-[#A1CB35] text-gray-950 font-bold shadow-2xs"
                                   : "bg-white hover:bg-gray-100 text-gray-800 border border-gray-200"
                               }`}
                             >
@@ -2643,7 +2824,7 @@ _GPK Crackers_`;
                                     <button
                                       type="button"
                                       onClick={() => handleOpenPaymentModal(sub, activeScheme, mNum)}
-                                      className="bg-[#7A1416] hover:bg-[#900000] text-white font-bold text-[11px] px-2.5 py-1 rounded-xl transition-all shadow-2xs inline-flex items-center gap-1 cursor-pointer"
+                                      className="bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black shadow-sm font-bold text-[11px] px-2.5 py-1 rounded-xl transition-all shadow-2xs inline-flex items-center gap-1 cursor-pointer"
                                     >
                                       <Check className="w-3 h-3 stroke-[3]" />
                                       <span>Record Pay</span>
@@ -2682,12 +2863,12 @@ _GPK Crackers_`;
         <Dialog open={paymentModalState.isOpen} onOpenChange={(open) => setPaymentModalState(prev => ({ ...prev, isOpen: open }))}>
           <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto p-5 sm:p-6 bg-white rounded-3xl font-sans space-y-4">
             <DialogHeader className="pb-1 border-b border-gray-100">
-              <DialogTitle className="text-lg font-extrabold text-[#2A1B54] flex items-center gap-2">
+              <DialogTitle className="text-lg font-extrabold text-gray-950 flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
                 <span>Record Installment Payment</span>
               </DialogTitle>
               <DialogDescription className="text-xs text-gray-600 pt-0.5">
-                Customer: <strong className="text-gray-900">{paymentModalState.subscription?.name}</strong> • Scheme: <strong className="text-[#7A1416]">{paymentModalState.schemeName}</strong>
+                Customer: <strong className="text-gray-900">{paymentModalState.subscription?.name}</strong> • Scheme: <strong className="text-[#2D4505]">{paymentModalState.schemeName}</strong>
               </DialogDescription>
             </DialogHeader>
 
@@ -2725,7 +2906,7 @@ _GPK Crackers_`;
                         monthName: `Month ${m}`
                       }));
                     }}
-                    className="w-full h-10 text-xs px-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold text-gray-900 cursor-pointer"
+                    className="w-full h-10 text-xs px-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-semibold text-gray-900 cursor-pointer"
                     required
                   >
                     {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
@@ -2745,7 +2926,7 @@ _GPK Crackers_`;
                     type="number"
                     value={paymentModalState.amount}
                     onChange={(e) => setPaymentModalState(prev => ({ ...prev, amount: parseFloat(e.target.value) || 0 }))}
-                    className="w-full h-10 text-xs font-black px-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none text-emerald-800 text-sm"
+                    className="w-full h-10 text-xs font-black px-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none text-emerald-800 text-sm"
                     required
                   />
                 </div>
@@ -2759,7 +2940,7 @@ _GPK Crackers_`;
                     type="date"
                     value={paymentModalState.paymentDate}
                     onChange={(e) => setPaymentModalState(prev => ({ ...prev, paymentDate: e.target.value }))}
-                    className="w-full h-10 text-xs px-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold cursor-pointer"
+                    className="w-full h-10 text-xs px-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-semibold cursor-pointer"
                     required
                   />
                 </div>
@@ -2772,7 +2953,7 @@ _GPK Crackers_`;
                   <select
                     value={paymentModalState.paymentMethod}
                     onChange={(e) => setPaymentModalState(prev => ({ ...prev, paymentMethod: e.target.value as any }))}
-                    className="w-full h-10 text-xs px-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-semibold text-gray-900 cursor-pointer"
+                    className="w-full h-10 text-xs px-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-semibold text-gray-900 cursor-pointer"
                     required
                   >
                     <option value="UPI">UPI / GPay / PhonePe</option>
@@ -2792,7 +2973,7 @@ _GPK Crackers_`;
                     placeholder="e.g. TXN123456 or Receipt #99"
                     value={paymentModalState.transactionNumber}
                     onChange={(e) => setPaymentModalState(prev => ({ ...prev, transactionNumber: e.target.value }))}
-                    className="w-full h-10 text-xs px-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-medium"
+                    className="w-full h-10 text-xs px-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-medium"
                   />
                 </div>
 
@@ -2806,7 +2987,7 @@ _GPK Crackers_`;
                     placeholder="e.g. Received via store counter"
                     value={paymentModalState.notes}
                     onChange={(e) => setPaymentModalState(prev => ({ ...prev, notes: e.target.value }))}
-                    className="w-full h-10 text-xs px-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#7A1416]/20 focus:border-[#7A1416] outline-none font-medium"
+                    className="w-full h-10 text-xs px-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-medium"
                   />
                 </div>
               </div>
@@ -2836,7 +3017,7 @@ _GPK Crackers_`;
       {confirmModal.isOpen && (
         <Dialog open={confirmModal.isOpen} onOpenChange={(open) => setConfirmModal(prev => ({ ...prev, isOpen: open }))}>
           <DialogContent className="sm:max-w-md p-6 bg-white rounded-3xl text-center space-y-4 font-sans">
-            <div className="w-14 h-14 rounded-full bg-amber-100 text-[#7A1416] mx-auto flex items-center justify-center border-4 border-amber-50">
+            <div className="w-14 h-14 rounded-full bg-[#F4F9EA] text-[#2D4505] mx-auto flex items-center justify-center border-4 border-amber-50">
               <AlertTriangle className="w-7 h-7 stroke-[2.5]" />
             </div>
 
