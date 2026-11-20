@@ -49,6 +49,27 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
+const AdminEntryRoute = () => {
+  const { isAuthenticated, isAdmin, loading } = useAuth();
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#FBFDF8]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#A1CB35] mx-auto mb-4"></div>
+          <p className="text-gray-600 font-semibold text-xs">Loading admin session...</p>
+        </div>
+      </div>
+    );
+  }
+  return isAuthenticated && isAdmin ? (
+    <ProtectedRoute>
+      <Dashboard />
+    </ProtectedRoute>
+  ) : (
+    <AdminLogin />
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -88,76 +109,10 @@ const App = () => (
                   {/* <Route path="/terms-and-conditions" element={<Terms />} /> */}
                   {/* <Route path="/privacy-policy" element={<Terms defaultTab="privacy" />} /> */}
                   
-                  {/* ── Admin login: only accessible via /admin-dashboard-panel ── */}
-                  <Route path="/admin-dashboard-panel" element={<AdminLogin />} />
-
-                  {/* ── Block all other guessable admin entry paths → redirect to chit-scheme ── */}
-                  <Route path="/admin-login" element={<Navigate to="/chit-scheme" replace />} />
-                  <Route path="/admin-panel" element={<Navigate to="/chit-scheme" replace />} />
-                  <Route path="/admin/login" element={<Navigate to="/admin-dashboard-panel" replace />} />
-                  <Route path="/admin/dashboard" element={<Navigate to="/admin" replace />} />
-
-                  {/* Admin root redirects directly to Chit Scheme */}
+                  {/* ── Secret Admin Route: ONLY accessible via /admin-dashboard-panel ── */}
+                  <Route path="/admin-dashboard-panel" element={<AdminEntryRoute />} />
                   <Route
-                    path="/admin"
-                    element={
-                      <ProtectedRoute>
-                        <Dashboard />
-                      </ProtectedRoute>
-                    }
-                  />
-                  {/*
-                  <Route
-                    path="/admin"
-                    element={
-                      <ProtectedRoute>
-                        <Dashboard />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/admin/brands"
-                    element={
-                      <ProtectedRoute>
-                        <AdminBrands />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/admin/products"
-                    element={
-                      <ProtectedRoute>
-                        <AdminProducts />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/admin/orders"
-                    element={
-                      <ProtectedRoute>
-                        <AdminOrders />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/admin/categories"
-                    element={
-                      <ProtectedRoute>
-                        <AdminCategories />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/admin/customers"
-                    element={
-                      <ProtectedRoute>
-                        <AdminCustomers />
-                      </ProtectedRoute>
-                    }
-                  />
-                  */}
-                  <Route
-                    path="/admin/chit-scheme"
+                    path="/admin-dashboard-panel/chit-scheme"
                     element={
                       <ProtectedRoute>
                         <AdminChitScheme />
@@ -165,49 +120,21 @@ const App = () => (
                     }
                   />
                   <Route
-                    path="/admin/settings"
+                    path="/admin-dashboard-panel/settings"
                     element={
                       <ProtectedRoute>
                         <AdminSettings />
                       </ProtectedRoute>
                     }
                   />
-                  {/*
-                  <Route
-                    path="/admin/content"
-                    element={
-                      <ProtectedRoute>
-                        <AdminContent />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/admin/price-list"
-                    element={
-                      <ProtectedRoute>
-                        <AdminPriceList />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/admin/reports"
-                    element={
-                      <ProtectedRoute>
-                        <AdminReports />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/admin/page-content"
-                    element={
-                      <ProtectedRoute>
-                        <AdminPageContent />
-                      </ProtectedRoute>
-                    }
-                  />
-                  */}
-                  {/* ── Catch-all: any invented /admin/* path not listed above → admin dashboard ── */}
-                  <Route path="/admin/*" element={<Navigate to="/admin" replace />} />
+                  <Route path="/admin-dashboard-panel/*" element={<Navigate to="/admin-dashboard-panel" replace />} />
+
+                  {/* ── Block /admin and all public guesses: redirect to /chit-scheme ── */}
+                  <Route path="/admin" element={<Navigate to="/chit-scheme" replace />} />
+                  <Route path="/admin/*" element={<Navigate to="/chit-scheme" replace />} />
+                  <Route path="/admin-login" element={<Navigate to="/chit-scheme" replace />} />
+                  <Route path="/admin-panel" element={<Navigate to="/chit-scheme" replace />} />
+                  <Route path="/admin/login" element={<Navigate to="/chit-scheme" replace />} />
 
                   <Route path="*" element={<Navigate to="/chit-scheme" replace />} />
                 </Routes>

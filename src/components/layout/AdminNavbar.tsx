@@ -8,9 +8,9 @@ import { cn } from "@/lib/utils";
 import companyLogo from "@/assets/gpk-logo.svg";
 
 const navItems = [
-  { label: "Dashboard", icon: LayoutDashboard, href: "/admin" },
-  { label: "Chit Scheme", icon: Gift, href: "/admin/chit-scheme" },
-  { label: "Settings", icon: Settings, href: "/admin/settings" },
+  { label: "Dashboard", icon: LayoutDashboard, href: "/admin-dashboard-panel" },
+  { label: "Chit Scheme", icon: Gift, href: "/admin-dashboard-panel/chit-scheme" },
+  { label: "Settings", icon: Settings, href: "/admin-dashboard-panel/settings" },
 ];
 
 const AdminNavbar = () => {
@@ -27,7 +27,7 @@ const AdminNavbar = () => {
   return (
     <nav className="lg:hidden sticky top-0 z-50 border-b border-border bg-sidebar">
       <div className="flex items-center justify-between p-4">
-        <Link to="/admin" className="flex items-center gap-2.5">
+        <Link to="/admin-dashboard-panel" className="flex items-center gap-2.5">
           <img src={companyLogo} alt="GPK Crackers" className="h-10 w-auto object-contain" />
           <div className="flex flex-col">
             <span className="font-display font-black text-[#A1CB35] text-base leading-tight">GPK CRACKERS</span>

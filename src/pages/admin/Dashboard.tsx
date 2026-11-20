@@ -168,7 +168,7 @@ export const Dashboard: React.FC = () => {
               </button>
 
               <Link
-                to="/admin/chit-scheme"
+                to="/admin-dashboard-panel/chit-scheme"
                 className="bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 px-4 py-2.5 rounded-xl text-xs font-black transition-all shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95 uppercase tracking-wider"
               >
                 <Gift className="w-3.5 h-3.5" />
@@ -195,7 +195,7 @@ export const Dashboard: React.FC = () => {
               </div>
 
               <Link
-                to="/admin/chit-scheme"
+                to="/admin-dashboard-panel/chit-scheme"
                 className="bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl transition-all shadow-sm flex items-center gap-1.5 cursor-pointer shrink-0 uppercase tracking-wider"
               >
                 <span>Review Now ({pendingCount})</span>
@@ -312,7 +312,7 @@ export const Dashboard: React.FC = () => {
                   </h2>
                 </div>
                 <Link
-                  to="/admin/chit-scheme"
+                  to="/admin-dashboard-panel/chit-scheme"
                   className="text-xs text-[#2D4505] font-extrabold hover:underline flex items-center gap-1"
                 >
                   <span>Edit Schemes</span>
@@ -377,7 +377,7 @@ export const Dashboard: React.FC = () => {
                   </h2>
                 </div>
                 <Link
-                  to="/admin/chit-scheme"
+                  to="/admin-dashboard-panel/chit-scheme"
                   className="text-xs text-[#2D4505] font-extrabold hover:underline flex items-center gap-1"
                 >
                   <span>View All</span>
@@ -425,7 +425,7 @@ export const Dashboard: React.FC = () => {
                             ₹{monthly.toLocaleString()}/mo
                           </div>
                           <Link
-                            to="/admin/chit-scheme"
+                            to="/admin-dashboard-panel/chit-scheme"
                             className="text-[10px] text-[#2D4505] font-bold hover:underline"
                           >
                             Details →
@@ -440,7 +440,7 @@ export const Dashboard: React.FC = () => {
               {/* Quick Navigation Cards */}
               <div className="grid grid-cols-2 gap-3 pt-2">
                 <Link
-                  to="/admin/chit-scheme"
+                  to="/admin-dashboard-panel/chit-scheme"
                   className="bg-white hover:bg-[#F4F9EA]/50 border border-gray-200 hover:border-[#A1CB35]/40 rounded-2xl p-3.5 transition-all flex items-center gap-2.5 shadow-2xs group"
                 >
                   <div className="w-9 h-9 rounded-xl bg-[#F4F9EA] text-[#2D4505] border border-[#A1CB35]/30 flex items-center justify-center font-bold shrink-0">

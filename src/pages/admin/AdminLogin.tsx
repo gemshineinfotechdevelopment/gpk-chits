@@ -16,7 +16,7 @@ const AdminLogin: React.FC = () => {
   // Redirect if already logged in as admin
   useEffect(() => {
     if (isAuthenticated && isAdmin) {
-      navigate("/admin");
+      navigate("/admin-dashboard-panel");
     }
   }, [isAuthenticated, isAdmin, navigate]);
 
@@ -36,7 +36,7 @@ const AdminLogin: React.FC = () => {
     try {
       await login(email.trim(), password.trim());
       toast.success("Admin login successful! Welcome back.");
-      navigate("/admin");
+      navigate("/admin-dashboard-panel");
     } catch (error: any) {
       toast.error(error.message || "Invalid admin credentials");
     } finally {

@@ -7,9 +7,9 @@ import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect, useRef } from "react";
 
 const navItems = [
-  { label: "Dashboard", icon: LayoutDashboard, href: "/admin" },
-  { label: "Chit Scheme", icon: Gift, href: "/admin/chit-scheme" },
-  { label: "Settings", icon: Settings, href: "/admin/settings" },
+  { label: "Dashboard", icon: LayoutDashboard, href: "/admin-dashboard-panel" },
+  { label: "Chit Scheme", icon: Gift, href: "/admin-dashboard-panel/chit-scheme" },
+  { label: "Settings", icon: Settings, href: "/admin-dashboard-panel/settings" },
 ];
 
 interface AdminSidebarProps {
