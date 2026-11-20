@@ -14,7 +14,7 @@ Internet (Customers & Admin)
     │   Nginx   │ (Domain: gpk-chits.gemshine.tech)
     └─────┬─────┘
           │
-          ├───► Static Files (`/var/www/gpk-chit/dist`) ──► React SPA (Vite)
+          ├───► Static Files (`/var/www/gpk-chits/dist`) ──► React SPA (Vite)
           │
           └───► `/api/*` (Reverse Proxy) ──► Node.js Backend (`127.0.0.1:5033`)
                                                 │
@@ -32,8 +32,9 @@ Internet (Customers & Admin)
 | **User** | `root` |
 | **Domain** | `gpk-chits.gemshine.tech` |
 | **Backend Port** | `5033` |
+| **Directory** | `/var/www/gpk-chits` |
 | **Database** | Local MongoDB (`mongodb://127.0.0.1:27017/gpk_chit`) |
-| **Process Manager** | PM2 (`gpk-chit-backend`) |
+| **Process Manager** | PM2 (`gpk-chits-backend`) |
 | **Web Server / Reverse Proxy** | Nginx |
 | **SSL / HTTPS** | Free Let's Encrypt SSL via Certbot |
 
@@ -65,11 +66,11 @@ This single command installs **Node.js 20 LTS**, **PM2**, **Local MongoDB Commun
 
 ```bash
 # Move to /root or /var/www
-mkdir -p /var/www/gpk-chit
-cd /var/www/gpk-chit
+mkdir -p /var/www/gpk-chits
+cd /var/www/gpk-chits
 
 # Clone or pull your repository
-git clone https://github.com/YOUR_GITHUB_USERNAME/gpk-chit.git .
+git clone https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO.git .
 # (Or if you have code already on your server, enter that directory)
 
 # Make setup script executable and run it
@@ -98,9 +99,9 @@ systemctl status mongod
 
 ## ⚙ Step 5: Verify the Backend `.env` File
 
-Check or create `/var/www/gpk-chit/server/.env`:
+Check or create `/var/www/gpk-chits/server/.env`:
 ```bash
-nano /var/www/gpk-chit/server/.env
+nano /var/www/gpk-chits/server/.env
 ```
 
 Ensure it contains the following:
@@ -136,7 +137,7 @@ Save and exit: press `Ctrl+O`, `Enter`, then `Ctrl+X`.
 
 Run the local database initializer to create your admin credentials, site settings, and 4 default chit schemes:
 ```bash
-node /var/www/gpk-chit/server/seed-local-db.mjs
+node /var/www/gpk-chits/server/seed-local-db.mjs
 ```
 
 You will see:
@@ -155,13 +156,13 @@ You will see:
 
 Run the automated deployment script:
 ```bash
-cd /var/www/gpk-chit
+cd /var/www/gpk-chits
 ./deploy.sh
 ```
 
 This will:
 1. Build the production React frontend with Vite into `dist/`.
-2. Sync `dist/` to `/var/www/gpk-chit/dist/` with proper permissions.
+2. Sync `dist/` to `/var/www/gpk-chits/dist/` with proper permissions.
 3. Install backend dependencies.
 4. Launch/reload the backend under **PM2** on port **`5033`**.
 5. Test and reload Nginx.
@@ -192,13 +193,13 @@ certbot --nginx -d gpk-chits.gemshine.tech
 ### PM2 Process Management
 ```bash
 # View live logs of backend
-pm2 logs gpk-chit-backend
+pm2 logs gpk-chits-backend
 
 # Restart backend
-pm2 restart gpk-chit-backend
+pm2 restart gpk-chits-backend
 
 # Stop backend
-pm2 stop gpk-chit-backend
+pm2 stop gpk-chits-backend
 ```
 
 ### Local MongoDB Management
@@ -222,8 +223,8 @@ nginx -t
 systemctl reload nginx
 
 # View Nginx access & error logs
-tail -f /var/log/nginx/gpk-chit-access.log
-tail -f /var/log/nginx/gpk-chit-error.log
+tail -f /var/log/nginx/gpk-chits-access.log
+tail -f /var/log/nginx/gpk-chits-error.log
 ```
 
 ---

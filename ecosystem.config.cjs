@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'gpk-chit-backend',
+      name: 'gpk-chits-backend',
       cwd: './server',
       script: 'server.js',
       instances: 1,

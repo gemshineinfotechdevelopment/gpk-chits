@@ -70,12 +70,12 @@ log_info "Building production frontend (Vite)..."
 npm run build
 log_success "Frontend built successfully -> dist/ folder updated."
 
-# Ensure Nginx web root /var/www/gpk-chit/dist is up to date
-if [ "$PROJECT_DIR" != "/var/www/gpk-chit" ]; then
-  mkdir -p /var/www/gpk-chit
-  cp -r "$PROJECT_DIR/dist" /var/www/gpk-chit/
-  chmod -R 755 /var/www/gpk-chit
-  log_success "Synced built dist/ to /var/www/gpk-chit/dist for Nginx."
+# Ensure Nginx web root /var/www/gpk-chits/dist is up to date
+if [ "$PROJECT_DIR" != "/var/www/gpk-chits" ]; then
+  mkdir -p /var/www/gpk-chits
+  cp -r "$PROJECT_DIR/dist" /var/www/gpk-chits/
+  chmod -R 755 /var/www/gpk-chits
+  log_success "Synced built dist/ to /var/www/gpk-chits/dist for Nginx."
 fi
 
 # 4. Backend Dependencies & Environment Verification
@@ -109,7 +109,7 @@ fi
 
 # 5. Restart Backend Process via PM2 (Port 5033)
 log_info "Managing PM2 backend process on port 5033..."
-APP_NAME="gpk-chit-backend"
+APP_NAME="gpk-chits-backend"
 
 if command -v pm2 >/dev/null 2>&1; then
   if [ -f "$PROJECT_DIR/ecosystem.config.cjs" ]; then

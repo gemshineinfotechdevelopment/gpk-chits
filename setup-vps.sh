@@ -23,7 +23,7 @@ NC='\033[0m'
 
 DOMAIN="gpk-chits.gemshine.tech"
 BACKEND_PORT=5033
-DEPLOY_DIR="/var/www/gpk-chit"
+DEPLOY_DIR="/var/www/gpk-chits"
 
 echo -e "${BLUE}"
 echo "========================================================"
