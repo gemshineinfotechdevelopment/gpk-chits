@@ -37,17 +37,15 @@ app.use('/api', (req, res, next) => {
 
 // ===== CORS MUST BE FIRST =====
 const allowedOrigins = [
-  'https://saiyogicrackers.com',
-  'https://www.saiyogicrackers.com',
-  'https://saiyogi-crackers.gemshine.tech',
+  'https://gpk-chits.gemshine.tech',
+  'http://gpk-chits.gemshine.tech',
+  'http://localhost:5033',
+  'http://127.0.0.1:5033',
+  'http://localhost:8080',
+  'http://localhost:8081',
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:3000',
-  'http://localhost:5000',
-  'http://localhost:5005',
-  'http://127.0.0.1:5005',
-  'http://localhost:8080',
-  'http://localhost:8081',
 ];
 
 if (process.env.CLIENT_URL) {
@@ -65,15 +63,7 @@ const corsOptions = {
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    // 3. Allow all Vercel previews (*.vercel.app), Netlify (*.netlify.app) & Render (*.onrender.com)
-    if (
-      origin.endsWith('.vercel.app') ||
-      origin.endsWith('.netlify.app') ||
-      origin.endsWith('.onrender.com')
-    ) {
-      return callback(null, true);
-    }
-    // 4. Allow local development origins
+    // 3. Allow local development origins
     if (
       origin.startsWith('http://localhost:') ||
       origin.startsWith('http://127.0.0.1:') ||
@@ -173,7 +163,7 @@ app.use(errorHandler);
 import { exec } from 'child_process';
 import os from 'os';
 
-const PORT = process.env.PORT || 5005;
+const PORT = process.env.PORT || 5033;
 
 const execCmd = (cmd) => new Promise((resolve, reject) => {
   exec(cmd, { windowsHide: true }, (err, stdout, stderr) => {

@@ -6,7 +6,8 @@ import {
   Gift, Users, ArrowRight, ShieldCheck, CheckCircle2, Clock,
   AlertCircle, ChevronRight, Phone, Mail, MapPin, User, LogIn, Lock,
   Plus, Minus, Trash2, Calendar, DollarSign, FileText, ArrowLeft,
-  Sparkles, Check, X, Printer, Download, Receipt, Calculator, Award, TrendingUp, SlidersHorizontal
+  Sparkles, Check, X, Printer, Download, Receipt, Calculator, Award, TrendingUp, SlidersHorizontal,
+  Eye, ZoomIn, Image as ImageIcon
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
@@ -32,6 +33,7 @@ interface SchemeOption {
   totalMonths: number;
   dueDateDay: number;
   monthlyAmount: number;
+  url?: string;
 }
 
 interface BannerImage {
@@ -115,15 +117,33 @@ const ChitScheme: React.FC = () => {
   }, [schemes, calcSchemeId]);
 
   const formRef = useRef<HTMLDivElement>(null);
+  const previousPhoneRef = useRef<string | null>(userPhone);
 
-  // Auto-fill customer form from login or clear on logout
+  // Auto-fill customer form from login or clear on logout / account switch
   useEffect(() => {
+    const cleanCurrent = userPhone ? userPhone.replace(/\D/g, "").slice(-10) : "";
+    const cleanPrev = previousPhoneRef.current ? previousPhoneRef.current.replace(/\D/g, "").slice(-10) : "";
+
+    // Clear selected schemes and person counts whenever logging out or switching to a different account
+    if (!isUserLoggedIn || cleanCurrent !== cleanPrev) {
+      setSelectedSchemes([]);
+      setCardPersonCounts({});
+      setIsEnrollmentDrawerOpen(false);
+      previousPhoneRef.current = userPhone;
+    }
+
+    // Clean up any legacy sticky location cached in browser storage
+    try {
+      localStorage.removeItem("user_location");
+      localStorage.removeItem("user_email");
+    } catch {}
+
     if (isUserLoggedIn && userPhone) {
       setFormData(prev => ({
         name: prev.name || userName || "",
         phone: prev.phone || userPhone || "",
-        email: prev.email || localStorage.getItem("user_email") || "",
-        location: prev.location || localStorage.getItem("user_location") || ""
+        email: prev.email || "",
+        location: prev.location || ""
       }));
     } else {
       // Clear sensitive customer data and subscriptions when logged out
@@ -192,7 +212,8 @@ const ChitScheme: React.FC = () => {
                 startDate: item.startDate || '',
                 totalMonths: item.totalMonths || item.numberOfMonths || 10,
                 dueDateDay: item.dueDateDay || item.paymentDueDay || 10,
-                monthlyAmount: item.monthlyAmount || 0
+                monthlyAmount: item.monthlyAmount || 0,
+                url: item.url || ''
               }));
 
             const imageList = data
@@ -414,9 +435,6 @@ const ChitScheme: React.FC = () => {
         loginWithPhone(formData.phone.trim(), formData.name.trim());
       }
 
-      if (formData.email) localStorage.setItem("user_email", formData.email.trim());
-      if (formData.location) localStorage.setItem("user_location", formData.location.trim());
-
       setSubmittedData(result);
       setIsEnrollmentDrawerOpen(false);
       setShowSuccessModal(true);
@@ -589,6 +607,31 @@ const ChitScheme: React.FC = () => {
                           </span>
                         )}
                       </div>
+
+                      {/* Scheme Image Banner if assigned */}
+                      {sch.url && sch.url.trim().length > 0 && (
+                        <div
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveZoomImage({ id: sch.id, url: sch.url!, title: sch.title, monthlyAmount: sch.monthlyAmount });
+                          }}
+                          className="relative w-full h-44 sm:h-48 mb-4 rounded-2xl overflow-hidden border border-[#A1CB35]/30 bg-gray-50 group/img cursor-pointer shadow-2xs hover:border-[#A1CB35] transition-all"
+                          title="Click to zoom image"
+                        >
+                          <img
+                            src={sch.url}
+                            alt={sch.title}
+                            className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                          />
+                          <div className="absolute inset-0 bg-black/25 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                            <span className="bg-white/95 text-gray-950 text-xs font-black px-3 py-1.5 rounded-full shadow-md flex items-center gap-1.5">
+                              <ZoomIn className="w-3.5 h-3.5 text-[#2D4505]" />
+                              <span>View Full Poster</span>
+                            </span>
+                          </div>
+                        </div>
+                      )}
 
                       {/* Title & Description */}
                       <h4 className="text-lg font-black text-gray-950 group-hover:text-[#2D4505] transition-colors line-clamp-1" title={sch.title}>
@@ -1306,8 +1349,8 @@ const ChitScheme: React.FC = () => {
                                     <div className="text-[10px] text-gray-500 font-medium">₹{rate} / person</div>
                                   </div>
                                   <div className="text-right">
-                                    <div className="font-mono text-xs font-black text-[#2D4505] bg-[#F7FBEF] px-2 py-0.5 rounded border border-[#A1CB35]/40">
-                                      {rate} × {count} = ₹{subTot.toLocaleString()}
+                                    <div className="font-sans tabular-nums text-xs font-black text-[#2D4505] bg-[#F7FBEF] px-2.5 py-1 rounded-md border border-[#A1CB35]/40">
+                                      ₹{rate.toLocaleString()} × {count} = ₹{subTot.toLocaleString()}
                                     </div>
                                     <div className="text-[10px] text-gray-500 mt-0.5">{count} Person{count > 1 ? 's' : ''}</div>
                                   </div>

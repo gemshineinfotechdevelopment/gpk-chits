@@ -32,6 +32,7 @@ import Dashboard from "./pages/admin/Dashboard";
 // import AdminCategories from "./pages/admin/AdminCategories";
 // import AdminCustomers from "./pages/admin/AdminCustomers";
 import AdminChitScheme from "./pages/admin/AdminChitScheme";
+import AdminSettings from "./pages/admin/AdminSettings";
 // import AdminReports from "./pages/admin/AdminReports";
 // import AdminContent from "./pages/admin/AdminContent";
 // import AdminPriceList from "./pages/admin/AdminPriceList";
@@ -42,6 +43,7 @@ import AdminChitScheme from "./pages/admin/AdminChitScheme";
 import { SettingsProvider } from "@/context/SettingsContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import GlobalLoginModal from "@/components/auth/GlobalLoginModal";
+import ErrorBoundary from "@/components/ErrorBoundary";
 // import FloatingCartTotal from "@/components/FloatingCartTotal";
 // import FloatingQuickEnquiry from "@/components/FloatingQuickEnquiry";
 
@@ -62,8 +64,9 @@ const App = () => (
                 <GlobalLoginModal />
                 {/* <FloatingCartTotal /> */}
                 {/* <FloatingQuickEnquiry /> */}
-                <Routes>
-                  {/* Root redirects to Chit Scheme */}
+                <ErrorBoundary>
+                  <Routes>
+                    {/* Root redirects to Chit Scheme */}
                   <Route path="/" element={<Navigate to="/chit-scheme" replace />} />
                   {/* <Route path="/" element={<Index />} /> */}
                   {/* <Route path="/combo-packs" element={<ComboPacks />} /> */}
@@ -161,6 +164,14 @@ const App = () => (
                       </ProtectedRoute>
                     }
                   />
+                  <Route
+                    path="/admin/settings"
+                    element={
+                      <ProtectedRoute>
+                        <AdminSettings />
+                      </ProtectedRoute>
+                    }
+                  />
                   {/*
                   <Route
                     path="/admin/content"
@@ -200,6 +211,7 @@ const App = () => (
 
                   <Route path="*" element={<Navigate to="/chit-scheme" replace />} />
                 </Routes>
+                </ErrorBoundary>
                 {/* <CartDrawer /> */}
                 {/* <WishlistDrawer /> */}
               </SettingsProvider>

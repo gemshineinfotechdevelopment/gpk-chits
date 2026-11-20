@@ -98,7 +98,7 @@ const AdminChitScheme: React.FC = () => {
   const [schemeFilter, setSchemeFilter] = useState("all");
   const [approvalFilter, setApprovalFilter] = useState<"all" | "Pending" | "Approved" | "Rejected">("all");
   const [paymentFilter, setPaymentFilter] = useState<"all" | "Paid" | "Pending">("all");
-  const [dateSortOrder, setDateSortOrder] = useState<'desc' | 'asc'>('desc');
+  const [dateSortOrder, setDateSortOrder] = useState<'desc' | 'asc'>('asc');
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   // Create Scheme Modal State
@@ -225,8 +225,10 @@ const AdminChitScheme: React.FC = () => {
     }
   };
 
-  const loadSubscriptions = async () => {
-    setLoadingSubscriptions(true);
+  const loadSubscriptions = async (isSilent = false) => {
+    if (!isSilent) {
+      setLoadingSubscriptions(true);
+    }
     try {
       const data = await getChitSubscriptions();
       const allSubscriptions = data || [];
@@ -242,22 +244,19 @@ const AdminChitScheme: React.FC = () => {
       });
     } catch (err) {
       console.error("Failed to load chit subscriptions:", err);
-      toast.error("Failed to load customer applications");
+      if (!isSilent) {
+        toast.error("Failed to load customer applications");
+      }
     } finally {
-      setLoadingSubscriptions(false);
+      if (!isSilent) {
+        setLoadingSubscriptions(false);
+      }
     }
   };
 
   useEffect(() => {
     loadChitSchemes();
     loadSubscriptions();
-
-    const interval = setInterval(() => {
-      loadChitSchemes();
-      loadSubscriptions();
-    }, 15000);
-
-    return () => clearInterval(interval);
   }, []);
 
   // File Select for New Scheme
@@ -281,7 +280,7 @@ const AdminChitScheme: React.FC = () => {
     }
   };
 
-  // Create Scheme Handler (No image file input required)
+  // Create Scheme Handler (Image optional, never auto-assigned)
   const handleCreateSchemeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!uploadTitle.trim()) {
@@ -293,6 +292,11 @@ const AdminChitScheme: React.FC = () => {
     try {
       toast.loading("Creating Chit Scheme...", { id: "scheme-toast" });
 
+      let finalUrl = "";
+      if (selectedFile) {
+        finalUrl = await uploadImageToCloudinary(selectedFile, "chit_schemes");
+      }
+
       const monthly = parseFloat(uploadMonthlyAmount) || 0;
       const months = parseInt(uploadTotalMonths, 10) || 9;
       const totalExpected = monthly * months;
@@ -301,7 +305,7 @@ const AdminChitScheme: React.FC = () => {
         title: uploadTitle.trim(),
         schemeName: uploadTitle.trim(),
         description: uploadDescription.trim(),
-        url: "https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1200&auto=format&fit=crop",
+        url: finalUrl,
         startDate: uploadStartDate,
         totalMonths: months,
         numberOfMonths: months,
@@ -316,6 +320,11 @@ const AdminChitScheme: React.FC = () => {
       toast.success("Chit Scheme created successfully!", { id: "scheme-toast" });
       setUploadTitle("");
       setUploadDescription("");
+      setSelectedFile(null);
+      if (filePreview && filePreview.startsWith("blob:")) {
+        URL.revokeObjectURL(filePreview);
+      }
+      setFilePreview(null);
       setUploadStartDate(new Date().toISOString().split('T')[0]);
       setUploadTotalMonths("9");
       setUploadDueDateDay("10");
@@ -388,7 +397,8 @@ const AdminChitScheme: React.FC = () => {
     if (editFilePreview && editFilePreview.startsWith("blob:")) {
       URL.revokeObjectURL(editFilePreview);
     }
-    setEditFilePreview(editUrl || null);
+    setEditFilePreview(null);
+    setEditUrl("");
   };
 
   // Open Edit Scheme Modal
@@ -421,7 +431,7 @@ const AdminChitScheme: React.FC = () => {
     setIsSavingEdit(true);
     try {
       toast.loading("Updating scheme...", { id: "edit-toast" });
-      let finalUrl = editUrl;
+      let finalUrl = editUrl || "";
       if (editSelectedFile) {
         finalUrl = await uploadImageToCloudinary(editSelectedFile, "chit_schemes");
       }
@@ -435,6 +445,7 @@ const AdminChitScheme: React.FC = () => {
         schemeName: editTitle.trim(),
         description: editDescription.trim(),
         url: finalUrl,
+        removeImage: !finalUrl,
         startDate: editStartDate,
         totalMonths: months,
         numberOfMonths: months,
@@ -935,7 +946,7 @@ _GPK Crackers_`;
       const phone = (sub.phone || sub.mobileNumber || "").toLowerCase();
       const appNo = (sub.applicationNumber || "").toLowerCase();
       const sch = (sub.schemeName || "").toLowerCase();
-      const allSchemeNames = (sub.schemes || []).map(s => s.schemeName.toLowerCase()).join(" ");
+      const allSchemeNames = (sub.schemes || []).map(s => (s.schemeName || "").toLowerCase()).join(" ");
       const q = searchQuery.toLowerCase().trim();
 
       const matchesSearch = !q || name.includes(q) || phone.includes(q) || sch.includes(q) || allSchemeNames.includes(q) || appNo.includes(q);
@@ -954,9 +965,25 @@ _GPK Crackers_`;
 
       return matchesSearch && matchesScheme && matchesApproval && matchesPayment;
     }).sort((a, b) => {
+      const getAppNum = (sub: any) => {
+        const app = String(sub.applicationNumber || '');
+        const match = app.match(/\d+/g);
+        if (match && match.length > 0) {
+          return parseInt(match[match.length - 1], 10);
+        }
+        return 0;
+      };
+
+      const numA = getAppNum(a);
+      const numB = getAppNum(b);
+
+      if (numA && numB && numA !== numB) {
+        return dateSortOrder === 'desc' ? numB - numA : numA - numB;
+      }
+
       const timeA = new Date(a.createdAt || a.updatedAt || a.date || 0).getTime();
       const timeB = new Date(b.createdAt || b.updatedAt || b.date || 0).getTime();
-      return dateSortOrder === 'asc' ? timeA - timeB : timeB - timeA;
+      return dateSortOrder === 'desc' ? timeB - timeA : timeA - timeB;
     });
   }, [subscriptions, searchQuery, schemeFilter, approvalFilter, paymentFilter, dateSortOrder]);
 
@@ -1181,16 +1208,16 @@ _GPK Crackers_`;
                 </select>
               </div>
 
-              {/* Date Sorting Dropdown */}
+              {/* App No & Date Sorting Dropdown */}
               <div>
                 <select
                   value={dateSortOrder}
                   onChange={(e) => setDateSortOrder(e.target.value as any)}
                   className="w-full h-10 text-xs px-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-semibold text-gray-700 cursor-pointer"
-                  title="Date Sorting Option"
+                  title="Application Sorting Option"
                 >
-                  <option value="desc">Date: Newest First ⬇️</option>
-                  <option value="asc">Date: Oldest First ⬆️</option>
+                  <option value="asc">App No: Ascending (00001 → 00005) ⬆️</option>
+                  <option value="desc">App No: Descending (Newest First) ⬇️</option>
                 </select>
               </div>
             </div>
@@ -1214,7 +1241,7 @@ _GPK Crackers_`;
                     <tr className="bg-gray-100/90 text-gray-700 text-xs uppercase font-extrabold tracking-wider border-b border-gray-200 whitespace-nowrap">
                       <th className="p-4 w-[180px]">Customer &amp; App ID</th>
                       <th className="p-4 w-[150px]">Contact Info</th>
-                      <th className="p-4 w-[300px]">Selected Schemes</th>
+                      <th className="p-4 w-[320px]">Selected Schemes</th>
                       <th className="p-4 w-[100px] text-center">Total Persons</th>
                       <th className="p-4 w-[120px] text-right">Monthly Total</th>
                       <th className="p-4 w-[130px] text-right">Grand Total</th>
@@ -1253,7 +1280,7 @@ _GPK Crackers_`;
                             </button>
                             <div className="flex items-center gap-2 mt-1">
                               <span className="font-mono text-[10px] bg-purple-50 text-purple-900 border border-purple-200 px-2 py-0.5 rounded font-extrabold shrink-0">
-                                {sub.applicationNumber || `APP-${String(id).slice(-5)}`}
+                                {sub.applicationNumber ? sub.applicationNumber.replace(/^AB-APP-|^SY-APP-/i, 'GPK-APP-') : `GPK-APP-${String(id).slice(-5)}`}
                               </span>
                               <span className="text-[10px] text-gray-400 font-medium shrink-0">
                                 {sub.createdAt ? new Date(sub.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : 'Recent'}
@@ -1273,11 +1300,11 @@ _GPK Crackers_`;
                             </div>
                           </td>
 
-                          {/* Column 3: Selected Schemes & Formula Calculation */}
+                          {/* Column 3: Selected Schemes & Clean Cardlet Breakdown */}
                           <td className="p-4 align-middle">
                             {enrolledSchemes ? (
-                              <div className="space-y-1.5">
-                                <div className="flex items-center gap-1.5">
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-1.5 flex-wrap">
                                   <span className="bg-amber-50 text-amber-900 border border-amber-200/80 font-bold text-[10px] px-2 py-0.5 rounded-md shrink-0">
                                     {schemeCount} Scheme{schemeCount > 1 ? 's' : ''}
                                   </span>
@@ -1285,20 +1312,19 @@ _GPK Crackers_`;
                                     {personsCount} {personsCount > 1 ? 'Persons' : 'Person'}
                                   </span>
                                 </div>
-                                <div className="space-y-1">
+                                <div className="space-y-1.5">
                                   {enrolledSchemes.map((s, sIdx) => {
                                     const rate = s.monthlyAmountPerPerson || s.monthlyAmount || s.price || 0;
                                     const count = s.personCount || 1;
                                     const lineTot = rate * count;
                                     return (
-                                      <div key={sIdx} className="text-xs leading-snug">
-                                        <div className="font-semibold text-gray-900 truncate" title={s.schemeName}>
+                                      <div key={sIdx} className="bg-gray-50/80 border border-gray-200 rounded-lg p-2 space-y-1 shadow-2xs">
+                                        <div className="font-bold text-gray-900 text-xs truncate" title={s.schemeName}>
                                           {s.schemeName}
                                         </div>
-                                        <div className="text-[11px] text-gray-500 font-sans tabular-nums flex items-center gap-1.5">
+                                        <div className="text-[11px] font-sans tabular-nums flex items-center justify-between gap-1 text-gray-600">
                                           <span className="font-medium text-gray-600">₹{rate.toLocaleString()} × {count} {count > 1 ? 'persons' : 'person'}</span>
-                                          <span className="text-gray-400">=</span>
-                                          <span className="font-bold text-[#2D4505]">₹{lineTot.toLocaleString()}</span>
+                                          <span className="font-extrabold text-[#2D4505] text-xs">₹{lineTot.toLocaleString()}<span className="text-[10px] text-gray-400 font-normal">/mo</span></span>
                                         </div>
                                       </div>
                                     );
@@ -1422,7 +1448,7 @@ _GPK Crackers_`;
                           </button>
                           <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                             <span className="font-mono text-[10px] bg-purple-50 text-purple-900 border border-purple-200 px-1.5 py-0.5 rounded font-extrabold shrink-0">
-                              {sub.applicationNumber || `APP-${String(id).slice(-5)}`}
+                              {sub.applicationNumber ? sub.applicationNumber.replace(/^AB-APP-|^SY-APP-/i, 'GPK-APP-') : `GPK-APP-${String(id).slice(-5)}`}
                             </span>
                             <span className="text-[10px] text-gray-400 font-medium">
                               {sub.createdAt ? new Date(sub.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : 'Recent'}
@@ -1459,8 +1485,8 @@ _GPK Crackers_`;
 
                       {/* Selected Schemes Breakdown */}
                       {enrolledSchemes ? (
-                        <div className="space-y-1.5 bg-[#F4F9EA]/30 border border-[#A1CB35]/30 p-2.5 rounded-xl">
-                          <div className="flex items-center justify-between gap-1.5 text-[10px] font-bold text-gray-500">
+                        <div className="space-y-2 bg-[#F4F9EA]/40 border border-[#A1CB35]/30 p-2.5 rounded-xl">
+                          <div className="flex items-center justify-between gap-1.5 text-[10px] font-bold">
                             <span className="bg-amber-50 text-amber-900 px-2 py-0.5 rounded border border-amber-200">
                               {schemeCount} Scheme{schemeCount > 1 ? 's' : ''}
                             </span>
@@ -1468,20 +1494,19 @@ _GPK Crackers_`;
                               {personsCount} Total Persons
                             </span>
                           </div>
-                          <div className="space-y-1 pt-1 border-t border-gray-200/50">
+                          <div className="space-y-1.5 pt-1 border-t border-[#A1CB35]/20">
                             {enrolledSchemes.map((s, sIdx) => {
                               const rate = s.monthlyAmountPerPerson || s.monthlyAmount || s.price || 0;
                               const count = s.personCount || 1;
                               const lineTot = rate * count;
                               return (
-                                <div key={sIdx} className="text-xs">
-                                  <div className="font-semibold text-gray-900 truncate" title={s.schemeName}>
+                                <div key={sIdx} className="bg-white/90 border border-gray-200 rounded-lg p-2 space-y-1 shadow-2xs">
+                                  <div className="font-bold text-gray-900 text-xs truncate" title={s.schemeName}>
                                     {s.schemeName}
                                   </div>
-                                  <div className="text-[11px] text-gray-500 font-sans tabular-nums flex items-center gap-1">
-                                    <span>₹{rate.toLocaleString()} × {count} {count > 1 ? 'persons' : 'person'}</span>
-                                    <span className="text-gray-400">=</span>
-                                    <span className="font-bold text-[#2D4505]">₹{lineTot.toLocaleString()}</span>
+                                  <div className="text-[11px] font-sans tabular-nums flex items-center justify-between gap-1 text-gray-600">
+                                    <span className="font-medium text-gray-600">₹{rate.toLocaleString()} × {count} {count > 1 ? 'persons' : 'person'}</span>
+                                    <span className="font-extrabold text-[#2D4505] text-xs">₹{lineTot.toLocaleString()}<span className="text-[10px] text-gray-400 font-normal">/mo</span></span>
                                   </div>
                                 </div>
                               );
@@ -1513,15 +1538,10 @@ _GPK Crackers_`;
                             <>
                               <button
                                 type="button"
-                                onClick={() => handleApproveApplication(sub)}
-                                disabled={actionLoading === id}
-                                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1 cursor-pointer shadow-xs disabled:opacity-50"
+                                onClick={() => handleApproveApplicationPrompt(sub)}
+                                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1 cursor-pointer shadow-xs"
                               >
-                                {actionLoading === id ? (
-                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                ) : (
-                                  <Check className="w-3.5 h-3.5 stroke-[3]" />
-                                )}
+                                <Check className="w-3.5 h-3.5 stroke-[3]" />
                                 <span>Approve</span>
                               </button>
                               <button
@@ -1969,6 +1989,58 @@ _GPK Crackers_`;
                 />
               </div>
 
+              <div>
+                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
+                  Scheme Banner Image (Optional)
+                </label>
+                {filePreview ? (
+                  <div className="relative border border-gray-200 rounded-2xl p-2.5 bg-gray-50 flex items-center justify-between">
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      <img src={filePreview} alt="Preview" className="w-14 h-14 object-cover rounded-xl shrink-0 border border-gray-200" />
+                      <div className="truncate">
+                        <span className="text-xs font-semibold text-gray-800 block truncate">
+                          {selectedFile?.name || "Selected Image"}
+                        </span>
+                        <label className="text-[11px] text-[#2D4505] hover:underline font-bold cursor-pointer inline-block mt-0.5">
+                          Change Image
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileSelect}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleClearSelectedFile}
+                      className="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                      title="Remove image"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Remove</span>
+                    </button>
+                  </div>
+                ) : (
+                  <label className="border-2 border-dashed border-gray-200 hover:border-[#A1CB35]/50 rounded-2xl p-3.5 text-center transition-colors bg-gray-50 flex items-center justify-between cursor-pointer">
+                    <div className="flex items-center gap-2">
+                      <ImageIcon className="w-5 h-5 text-[#2D4505]" />
+                      <span className="text-xs font-bold text-gray-700">Upload Scheme Image (Optional)</span>
+                    </div>
+                    <span className="bg-[#A1CB35] text-gray-950 font-bold text-[11px] font-bold px-3 py-1 rounded-lg">
+                      Select File
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+              </div>
+
               <DialogFooter className="gap-2 pt-3 border-t">
                 <button
                   type="button"
@@ -2237,10 +2309,11 @@ _GPK Crackers_`;
                     <button
                       type="button"
                       onClick={handleClearEditSelectedFile}
-                      className="text-xs text-rose-600 hover:text-rose-700 font-bold p-1 cursor-pointer"
-                      title="Remove image"
+                      className="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                      title="Remove image from scheme"
                     >
-                      <X className="w-4 h-4" />
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Remove</span>
                     </button>
                   </div>
                 ) : (
@@ -2396,7 +2469,7 @@ _GPK Crackers_`;
                             Application Details
                           </span>
                           <span className="font-mono text-xs font-black text-[#2D4505] bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                            {sub.applicationNumber || `APP-${String(sub._id || sub.id).slice(-5)}`}
+                            {sub.applicationNumber ? sub.applicationNumber.replace(/^AB-APP-|^SY-APP-/i, 'GPK-APP-') : `GPK-APP-${String(sub._id || sub.id).slice(-5)}`}
                           </span>
                           <span className={`px-2 py-0.5 rounded-full font-extrabold text-[11px] ${
                             currentApproval === 'Approved' ? 'bg-emerald-100 text-emerald-800' :
@@ -2517,7 +2590,7 @@ _GPK Crackers_`;
                               <div className="text-[10px] text-gray-500 font-medium">₹{rate} / person</div>
                             </div>
                             <div className="text-right">
-                              <div className="font-sans tabular-nums text-xs font-black text-[#2D4505] bg-amber-50 px-2.5 py-1 rounded border border-amber-200">
+                              <div className="font-sans tabular-nums text-xs font-black text-[#2D4505] bg-[#F4F9EA] px-2.5 py-1 rounded border border-[#A1CB35]/30">
                                 ₹{rate.toLocaleString()} × {count} = ₹{subTot.toLocaleString()}
                               </div>
                               <div className="text-[10px] text-gray-500 mt-0.5">{count} Person{count > 1 ? 's' : ''}</div>
@@ -2527,7 +2600,7 @@ _GPK Crackers_`;
                       })}
                     </div>
 
-                    <div className="bg-white/90 border border-amber-300 rounded-xl p-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+                    <div className="bg-white/90 border border-[#A1CB35]/30 rounded-xl p-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
                       <div className="font-sans font-bold text-gray-800 text-[11px] tabular-nums">
                         <span className="text-gray-500 font-medium">Calculation Summary: </span>
                         <span className="text-[#2D4505] font-black">
@@ -2725,7 +2798,7 @@ _GPK Crackers_`;
                             const existingLog = (activeScheme.monthlyPayments || []).find(p => p.monthNumber === mNum);
                             const isPaid = existingLog && ['Paid', 'Late Pay', 'Advanced Payment', 'Advance Payment', 'On-time Payment', 'Delay Payment'].includes(existingLog.status || '');
                             const timingStatus = existingLog?.status || (isPaid ? 'Paid' : 'Pending');
-                            const receiptNumber = existingLog?.receiptNumber ? existingLog.receiptNumber.replace(/^AB-CHIT-/i, "SY-CHIT-") : (isPaid ? `SY-CHIT-000${mNum}` : '-');
+                            const receiptNumber = existingLog?.receiptNumber ? existingLog.receiptNumber.replace(/^AB-CHIT-|^SY-CHIT-/i, "GPK-CHIT-") : (isPaid ? `GPK-CHIT-000${mNum}` : '-');
 
                             return (
                               <tr
@@ -2774,8 +2847,8 @@ _GPK Crackers_`;
                                       type="button"
                                       onClick={() => {
                                         setActiveReceipt({
-                                          receiptNumber: (existingLog?.receiptNumber ? existingLog.receiptNumber.replace(/^AB-CHIT-/i, "SY-CHIT-") : `SY-CHIT-000${mNum}`),
-                                          applicationNumber: (sub.applicationNumber ? sub.applicationNumber.replace(/^AB-APP-/i, "SY-APP-") : `SY-APP-${String(sub._id || sub.id).slice(-5)}`),
+                                          receiptNumber: (existingLog?.receiptNumber ? existingLog.receiptNumber.replace(/^AB-CHIT-|^SY-CHIT-/i, "GPK-CHIT-") : `GPK-CHIT-000${mNum}`),
+                                          applicationNumber: (sub.applicationNumber ? sub.applicationNumber.replace(/^AB-APP-|^SY-APP-/i, "GPK-APP-") : `GPK-APP-${String(sub._id || sub.id).slice(-5)}`),
                                           customerName: sub.name || "Customer",
                                           phone: sub.phone || "",
                                           email: sub.email,

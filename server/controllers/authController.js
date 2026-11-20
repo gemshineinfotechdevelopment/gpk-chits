@@ -31,7 +31,7 @@ export const signup = async (req, res, next) => {
 
     const token = jwt.sign(
       { id: savedCustomer._id, role: 'CUSTOMER' },
-      process.env.JWT_SECRET || 'saiyogi_jwt_secret_key_2026',
+      process.env.JWT_SECRET || 'gpk_chit_jwt_secret_key_2026',
       { expiresIn: process.env.JWT_EXPIRE || '30d' }
     );
 
@@ -90,7 +90,7 @@ export const login = async (req, res, next) => {
 
     const token = jwt.sign(
       { id: account._id, role },
-      process.env.JWT_SECRET || 'saiyogi_jwt_secret_key_2026',
+      process.env.JWT_SECRET || 'gpk_chit_jwt_secret_key_2026',
       { expiresIn: process.env.JWT_EXPIRE || '30d' }
     );
 
@@ -195,7 +195,7 @@ export const customerPhoneLogin = async (req, res, next) => {
 
     const token = jwt.sign(
       { id: customer._id, phone: cleanPhone, role: 'CUSTOMER' },
-      process.env.JWT_SECRET || 'saiyogi_jwt_secret_key_2026',
+      process.env.JWT_SECRET || 'gpk_chit_jwt_secret_key_2026',
       { expiresIn: process.env.JWT_EXPIRE || '30d' }
     );
 

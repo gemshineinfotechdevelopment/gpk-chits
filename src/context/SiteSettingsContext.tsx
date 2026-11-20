@@ -45,6 +45,18 @@ export interface SiteSettings {
   priceListPdf?: string;
   heroBanners?: string[];
   noticeBanners?: string[];
+  chitConfig?: {
+    whatsappNumber?: string;
+    whatsappMessage?: string;
+    upiId?: string;
+    upiPayeeName?: string;
+    bankAccountNo?: string;
+    bankIfsc?: string;
+    bankName?: string;
+    defaultDueDay?: number;
+    announcementNotice?: string;
+    isEnrollmentOpen?: boolean;
+  };
 }
 
 interface SiteSettingsContextType {
@@ -130,6 +142,7 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
             priceListPdf: siteInfo.priceListPdf !== undefined ? siteInfo.priceListPdf : prev.priceListPdf,
             heroBanners: siteInfo.heroBanners !== undefined ? siteInfo.heroBanners : prev.heroBanners,
             noticeBanners: siteInfo.noticeBanners !== undefined ? siteInfo.noticeBanners : prev.noticeBanners,
+            chitConfig: siteInfo.chitConfig !== undefined ? siteInfo.chitConfig : prev.chitConfig,
           }));
         }
       } catch (error) {

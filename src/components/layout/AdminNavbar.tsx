@@ -9,16 +9,8 @@ import companyLogo from "@/assets/gpk-logo.svg";
 
 const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, href: "/admin" },
-  // { label: "Brands", icon: Tag, href: "/admin/brands" },
-  // { label: "Products", icon: Package, href: "/admin/products" },
-  // { label: "Categories", icon: FolderTree, href: "/admin/categories" },
-  // { label: "Orders", icon: ShoppingBag, href: "/admin/orders" },
-  // { label: "Customers", icon: Users, href: "/admin/customers" },
   { label: "Chit Scheme", icon: Gift, href: "/admin/chit-scheme" },
-  // { label: "Reports", icon: BarChart3, href: "/admin/reports" },
-  // { label: "Page Content", icon: Image, href: "/admin/page-content" },
-  // { label: "Content", icon: Settings, href: "/admin/content" },
-  // { label: "Price List", icon: FileText, href: "/admin/price-list" },
+  { label: "Settings", icon: Settings, href: "/admin/settings" },
 ];
 
 const AdminNavbar = () => {

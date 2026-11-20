@@ -121,7 +121,13 @@ export const updateChitScheme = async (req, res, next) => {
       return next(new AppError('Chit Scheme not found', 404));
     }
 
-    if (req.file || req.body.image || req.body.base64 || (req.body.url && req.body.url !== chitScheme.url)) {
+    if (req.body.removeImage === true || req.body.removeImage === 'true' || req.body.url === '') {
+      if (chitScheme.url) {
+        await deleteFromBoth(chitScheme.url, chitScheme.public_id).catch(() => {});
+      }
+      chitScheme.url = '';
+      chitScheme.public_id = '';
+    } else if (req.file || req.body.image || req.body.base64 || (req.body.url && req.body.url !== chitScheme.url)) {
       const imageResult = await processChitImageUpload(req);
       if (imageResult && imageResult.url) {
         // If old image exists and is different, attempt deletion

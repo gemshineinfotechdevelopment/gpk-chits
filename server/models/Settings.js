@@ -96,7 +96,19 @@ const settingsSchema = new mongoose.Schema(
       default: ''
     },
     heroBanners: [String],
-    noticeBanners: [String]
+    noticeBanners: [String],
+    chitConfig: {
+      whatsappNumber: { type: String, default: '9488073004' },
+      whatsappMessage: { type: String, default: 'Hello GPK Crackers, I have an enquiry regarding Diwali Chit Scheme' },
+      upiId: { type: String, default: '' },
+      upiPayeeName: { type: String, default: 'GPK Crackers' },
+      bankAccountNo: { type: String, default: '' },
+      bankIfsc: { type: String, default: '' },
+      bankName: { type: String, default: '' },
+      defaultDueDay: { type: Number, default: 10 },
+      announcementNotice: { type: String, default: '' },
+      isEnrollmentOpen: { type: Boolean, default: true }
+    }
   },
   { timestamps: true }
 );

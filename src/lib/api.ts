@@ -5,7 +5,7 @@ const isLocalhost = typeof window !== 'undefined' &&
 
 const rawEnvUrl = (import.meta.env.VITE_API_URL as string) || "";
 export const API_BASE_URL = isLocalhost
-  ? "http://localhost:5005" 
+  ? "http://localhost:5033" 
   : rawEnvUrl.trim().replace(/\/+$/, "");
 
 function resolveAuthToken(path: string): string | null {
@@ -60,8 +60,8 @@ async function fetchJSON<T>(path: string, method: string = 'GET', body?: any): P
     ? [path]
     : isLocalhost
       ? [
-          `http://127.0.0.1:5005${cleanPath}`,
-          `http://localhost:5005${cleanPath}`,
+          `http://127.0.0.1:5033${cleanPath}`,
+          `http://localhost:5033${cleanPath}`,
           `${API_BASE_URL}${cleanPath}`,
         ].filter((v, i, a) => a.indexOf(v) === i && !!v)
       : [`${API_BASE_URL}${cleanPath}`];
@@ -435,6 +435,18 @@ export interface SiteSettings {
   priceListPdf?: string;
   heroBanners?: string[];
   noticeBanners?: string[];
+  chitConfig?: {
+    whatsappNumber?: string;
+    whatsappMessage?: string;
+    upiId?: string;
+    upiPayeeName?: string;
+    bankAccountNo?: string;
+    bankIfsc?: string;
+    bankName?: string;
+    defaultDueDay?: number;
+    announcementNotice?: string;
+    isEnrollmentOpen?: boolean;
+  };
 }
 
 export async function getSettings(): Promise<SiteSettings> {
@@ -616,8 +628,8 @@ export async function uploadImageToCloudinary(fileOrBase64: File | string, folde
     ? [path]
     : isLocalhost
       ? [
-          `http://127.0.0.1:5005${path}`,
-          `http://localhost:5005${path}`,
+          `http://127.0.0.1:5033${path}`,
+          `http://localhost:5033${path}`,
           `${API_BASE_URL}${path}`,
         ].filter((v, i, a) => a.indexOf(v) === i && !!v)
       : [`${API_BASE_URL}${path}`];
@@ -664,6 +676,7 @@ export interface ChitSchemeItem {
   description?: string;
   url: string;
   public_id?: string;
+  removeImage?: boolean;
   startDate?: string;
   totalMonths?: number;
   numberOfMonths?: number;
@@ -861,7 +874,7 @@ export async function submitChitSubscription(data: {
 
   const newSub: ChitSubscriptionItem = {
     id: String(Date.now()),
-    applicationNumber: `SY-APP-${Date.now().toString().slice(-5)}`,
+    applicationNumber: `GPK-APP-${Date.now().toString().slice(-5)}`,
     name: data.name,
     phone: cleanPhone,
     email: data.email || '',

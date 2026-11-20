@@ -174,8 +174,8 @@ export const downloadChitReceiptPDF = async (
     timingStatus = calculatePaymentTimingStatus(paidAt, monthNumber, dueDateDay, startDateStr);
   }
 
-  const rawReceiptNo = customReceiptNo || existingLog?.receiptNumber || `SY-CHIT-${String(monthNumber).padStart(2, '0')}${Date.now().toString().slice(-4)}`;
-  const receiptNo = rawReceiptNo.replace(/^AB-CHIT-/i, 'SY-CHIT-');
+  const rawReceiptNo = customReceiptNo || existingLog?.receiptNumber || `GPK-CHIT-${String(monthNumber).padStart(2, '0')}${Date.now().toString().slice(-4)}`;
+  const receiptNo = rawReceiptNo.replace(/^AB-CHIT-|^SY-CHIT-/i, 'GPK-CHIT-');
   const historyList = getPaidHistoryList(sub, monthNumber, expectedAmount, dueDateDay, startDateStr);
   const paidItems = historyList.filter(item => item.isPaid);
   const totalPaidTillNow = paidItems.reduce((sum, item) => sum + item.amount, 0);
@@ -206,12 +206,12 @@ export const downloadChitReceiptPDF = async (
 
   const breakdownRowsHTML = breakdownList.map(item => `
     <tr>
-      <td style="padding: 5px; border: 1px solid #cbd5e1; font-weight: bold; color: #0f172a;">${item.schemeName}</td>
-      <td style="padding: 5px; border: 1px solid #cbd5e1; text-align: center; font-family: monospace; font-weight: bold; color: #7A1416;">
-        ${item.rate} × ${item.count} = ₹${(item.subTotal || 0).toLocaleString()}
+      <td style="padding: 6px; border: 1px solid #cbd5e1; font-weight: bold; color: #0f172a;">${item.schemeName}</td>
+      <td style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; font-weight: 600; color: #1e293b;">
+        ₹${item.rate.toLocaleString()} × ${item.count} = <strong style="color: #2D4505;">₹${(item.subTotal || 0).toLocaleString()}</strong>
       </td>
-      <td style="padding: 5px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold;">${item.count}</td>
-      <td style="padding: 5px; border: 1px solid #cbd5e1; text-align: right; font-weight: bold; color: #047857;">₹${(item.subTotal || 0).toLocaleString()}</td>
+      <td style="padding: 6px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold;">${item.count}</td>
+      <td style="padding: 6px; border: 1px solid #cbd5e1; text-align: right; font-weight: bold; color: #047857;">₹${(item.subTotal || 0).toLocaleString()}</td>
     </tr>
   `).join('');
 
@@ -321,14 +321,14 @@ export const downloadChitReceiptPDF = async (
             </tr>
           </tfoot>
         </table>
-        <div style="margin-top: 6px; padding: 6px 10px; background: #fffbeb; border: 1px dashed #f59e0b; border-radius: 6px; font-size: 11px; color: #92400e; font-weight: bold;">
-          Summary Calculation: ${breakdownList.map(b => `${b.rate} × ${b.count} = ${b.subTotal}`).join(' + ')} | Total Persons = ${totalPersonsSum} | Monthly Payable Amount = ₹${totalMonthlySum.toLocaleString()}
+        <div style="margin-top: 6px; padding: 6px 10px; background: #F4F9EA; border: 1px solid #A1CB35; border-radius: 6px; font-size: 11px; color: #2D4505; font-weight: bold;">
+          Summary Calculation: ${breakdownList.map(b => `₹${b.rate.toLocaleString()} × ${b.count} = ₹${b.subTotal.toLocaleString()}`).join(', ')} | Total Persons = ${totalPersonsSum} | Monthly Payable Amount = ₹${totalMonthlySum.toLocaleString()}
         </div>
       </div>
       ` : ''}
 
-      <div style="margin-bottom: 16px; background: #fef2f2; border: 1px solid #fca5a5; padding: 10px 14px; border-radius: 10px; font-size: 12px;">
-        <div style="font-weight: bold; color: #7A1416; font-size: 13px; margin-bottom: 4px; text-transform: uppercase;">CURRENT PAYMENT RECEIVED</div>
+      <div style="margin-bottom: 16px; background: #F4F9EA; border: 1px solid #A1CB35; padding: 10px 14px; border-radius: 10px; font-size: 12px;">
+        <div style="font-weight: bold; color: #2D4505; font-size: 13px; margin-bottom: 4px; text-transform: uppercase;">CURRENT PAYMENT RECEIVED</div>
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <span><strong>Month:</strong> Month ${monthNumber} (${existingLog?.monthName || `Month ${monthNumber}`})</span>
           <span><strong>Status:</strong> <strong style="color: ${statusBadgeColor};">${timingStatus}</strong></span>

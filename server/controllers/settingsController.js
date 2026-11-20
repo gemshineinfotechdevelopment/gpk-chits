@@ -35,11 +35,20 @@ export const updateSettings = async (req, res, next) => {
     let settings = await Settings.findOne();
     if (!settings) {
       settings = new Settings(updateData);
-      await settings.save();
     } else {
       Object.assign(settings, updateData);
-      await settings.save();
     }
+
+    // Keep contact.phone & billing.whatsapp in sync with chitConfig.whatsappNumber if provided
+    if (updateData.chitConfig?.whatsappNumber) {
+      const cleanWp = updateData.chitConfig.whatsappNumber.trim();
+      if (!settings.contact) settings.contact = {};
+      settings.contact.phone = cleanWp;
+      if (!settings.billing) settings.billing = {};
+      settings.billing.whatsapp = cleanWp;
+    }
+
+    await settings.save();
 
     res.json({
       message: 'Settings updated successfully',
@@ -86,7 +95,8 @@ export const getSiteInfo = async (req, res, next) => {
       youtubeVideos: settings.youtubeVideos || [],
       priceListPdf: settings.priceListPdf || '',
       heroBanners: settings.heroBanners || [],
-      noticeBanners: settings.noticeBanners || []
+      noticeBanners: settings.noticeBanners || [],
+      chitConfig: settings.chitConfig || {}
     };
 
     res.json(info);

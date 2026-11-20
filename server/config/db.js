@@ -96,7 +96,7 @@ const autoSeedIfEmpty = async () => {
         },
         {
           name: 'Admin',
-          email: 'cracker@saiyogi.com',
+          email: 'cracker@gpkcrackers.com',
           password: hashedPassword,
           role: 'SUPER ADMIN',
           isActive: true
@@ -163,7 +163,7 @@ const autoSeedIfEmpty = async () => {
         phone: "9092548347",
         mobileNumber: "9092548347",
         location: "SVKC",
-        applicationNumber: "SY-APP-00001",
+        applicationNumber: "GPK-APP-00001",
         approvalStatus: "Pending",
         status: "Pending",
         totalPersons: 20,
@@ -230,7 +230,7 @@ const connectDB = async () => {
 
   // Fallback to local 127.0.0.1:27017
   try {
-    const localUri = "mongodb://127.0.0.1:27017/saiyogi";
+    const localUri = "mongodb://127.0.0.1:27017/gpk_chit";
     const conn = await mongoose.connect(localUri, { serverSelectionTimeoutMS: 4000 });
     logger.info(`MongoDB Connected locally: ${conn.connection.host} / Database: ${conn.connection.name}`);
     await autoSeedIfEmpty();

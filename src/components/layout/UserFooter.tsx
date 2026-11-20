@@ -19,8 +19,9 @@ import {
 const UserFooter: React.FC = () => {
   const { settings } = useSiteSettings();
 
-  const contactPhone = settings?.contact?.phone || settings?.billing?.whatsapp || "+91 94880 73004";
+  const contactPhone = settings?.chitConfig?.whatsappNumber || settings?.contact?.phone || settings?.billing?.whatsapp || "+91 94880 73004";
   const cleanPhone = contactPhone.replace(/\D/g, "");
+  const whatsappMsg = encodeURIComponent(settings?.chitConfig?.whatsappMessage || "Hello GPK Crackers, I have an enquiry regarding Diwali Chit Scheme");
 
   const socialLinks = [
     {
@@ -178,7 +179,7 @@ const UserFooter: React.FC = () => {
               {cleanPhone && (
                 <div className="pt-1 flex flex-wrap gap-2">
                   <a
-                    href={`https://wa.me/91${cleanPhone.slice(-10)}?text=Hello%20GPK%20Crackers`}
+                    href={`https://wa.me/91${cleanPhone.slice(-10)}?text=${whatsappMsg}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black px-3.5 py-2 rounded-xl text-xs transition-all shadow-2xs hover:shadow-sm"
