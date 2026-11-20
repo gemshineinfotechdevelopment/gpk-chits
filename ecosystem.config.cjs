@@ -1,8 +1,10 @@
+const path = require('path');
+
 module.exports = {
   apps: [
     {
       name: 'gpk-chits-backend',
-      cwd: './server',
+      cwd: path.resolve(__dirname, 'server'),
       script: 'server.js',
       instances: 1,
       autorestart: true,

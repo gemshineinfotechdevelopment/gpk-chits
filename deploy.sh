@@ -107,6 +107,8 @@ if [ -f "$PROJECT_DIR/server/seed-local-db.mjs" ]; then
   node "$PROJECT_DIR/server/seed-local-db.mjs" || log_warn "DB seed warning, continuing..."
 fi
 
+cd "$PROJECT_DIR"
+
 # 5. Restart Backend Process via PM2 (Port 5033)
 log_info "Managing PM2 backend process on port 5033..."
 APP_NAME="gpk-chits-backend"
