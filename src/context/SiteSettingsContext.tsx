@@ -61,7 +61,7 @@ export interface SiteSettings {
 
 interface SiteSettingsContextType {
   settings: SiteSettings;
-  updateSettings: (settings: SiteSettings) => Promise<void>;
+  updateSettings: (settings: SiteSettings | Partial<SiteSettings>) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -154,6 +154,22 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     fetchSettings();
 
+    // Listen for manual settings update event dispatched across tabs or admin panels
+    const handleSettingsUpdated = (e: any) => {
+      if (e.detail) {
+        setSettings((prev) => ({
+          ...prev,
+          ...e.detail,
+          contact: { ...prev.contact, ...(e.detail.contact || {}) },
+          billing: { ...prev.billing, ...(e.detail.billing || {}) },
+          chitConfig: { ...prev.chitConfig, ...(e.detail.chitConfig || {}) },
+        }));
+      } else {
+        fetchSettings();
+      }
+    };
+    window.addEventListener('site_settings_updated', handleSettingsUpdated);
+
     // Refresh settings when tab becomes visible
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
@@ -170,15 +186,21 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }, 60000);
 
     return () => {
+      window.removeEventListener('site_settings_updated', handleSettingsUpdated);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       clearInterval(pollInterval);
     };
   }, []);
 
-  const updateSettings = async (newSettings: SiteSettings) => {
+  const updateSettings = async (newSettings: SiteSettings | Partial<SiteSettings>) => {
     try {
-      setSettings(newSettings);
-      // The actual API call will be made from AdminContent
+      setSettings((prev) => ({
+        ...prev,
+        ...newSettings,
+        contact: { ...prev.contact, ...(newSettings.contact || {}) },
+        billing: { ...prev.billing, ...(newSettings.billing || {}) },
+        chitConfig: { ...prev.chitConfig, ...(newSettings.chitConfig || {}) },
+      }));
     } catch (error) {
       console.error("Failed to update settings:", error);
       setSettings(settings);

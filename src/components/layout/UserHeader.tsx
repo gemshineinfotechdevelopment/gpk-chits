@@ -16,7 +16,7 @@ const UserHeader: React.FC<UserHeaderProps> = ({ isHidden = false }) => {
 
   const isChitSchemePage = location.pathname === "/chit-scheme";
   const contactPhone = settings?.chitConfig?.whatsappNumber || settings?.contact?.phone || settings?.billing?.whatsapp || "9488073004";
-  const cleanPhone = contactPhone.replace(/\D/g, "");
+  const cleanPhone = contactPhone.replace(/\D/g, "").slice(-10);
   const whatsappMsg = encodeURIComponent(settings?.chitConfig?.whatsappMessage || "Hello GPK Crackers, I have an enquiry regarding Diwali Chit Scheme");
 
   return (
@@ -56,7 +56,7 @@ const UserHeader: React.FC<UserHeaderProps> = ({ isHidden = false }) => {
             {/* Quick Contact / Support */}
             {cleanPhone && (
               <a
-                href={`https://wa.me/91${cleanPhone.slice(-10)}?text=${whatsappMsg}`}
+                href={`https://wa.me/91${cleanPhone}?text=${whatsappMsg}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl border border-gray-200 hover:border-[#A1CB35] text-gray-700 hover:text-[#35520D] text-xs font-bold transition-all bg-white shadow-2xs hover:shadow-xs"

@@ -19,9 +19,10 @@ import {
 const UserFooter: React.FC = () => {
   const { settings } = useSiteSettings();
 
-  const contactPhone = settings?.chitConfig?.whatsappNumber || settings?.contact?.phone || settings?.billing?.whatsapp || "+91 94880 73004";
-  const cleanPhone = contactPhone.replace(/\D/g, "");
-  const whatsappMsg = encodeURIComponent(settings?.chitConfig?.whatsappMessage || "Hello GPK Crackers, I have an enquiry regarding Diwali Chit Scheme");
+  const contactPhone = settings?.chitConfig?.whatsappNumber || settings?.contact?.phone || settings?.billing?.whatsapp || "9488073004";
+  const cleanPhone = contactPhone.replace(/\D/g, "").slice(-10);
+  const rawMsg = settings?.chitConfig?.whatsappMessage || "Hello GPK Crackers, I have an enquiry regarding Diwali Chit Scheme";
+  const whatsappMsg = encodeURIComponent(rawMsg);
 
   const socialLinks = [
     {
@@ -231,7 +232,7 @@ const UserFooter: React.FC = () => {
       {/* Floating WhatsApp Help Button (cleanly positioned) */}
       {cleanPhone && (
         <a
-          href={`https://wa.me/91${cleanPhone.slice(-10)}?text=Hello%20GPK%20Crackers,%20I%20have%20an%20enquiry%20regarding%20Diwali%20Chit%20Scheme`}
+          href={`https://wa.me/91${cleanPhone}?text=${whatsappMsg}`}
           target="_blank"
           rel="noopener noreferrer"
           className="fixed bottom-6 right-6 z-40 bg-[#25D366] hover:bg-[#20ba59] text-white p-3.5 rounded-full shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group cursor-pointer"

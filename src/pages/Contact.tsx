@@ -7,10 +7,10 @@ import contactImg from "@/assets/contact.png";
 const Contact = () => {
   const { settings } = useSiteSettings();
 
-  const phoneNum = settings.contact?.phone || "+91 94880 73004";
+  const phoneNum = settings?.chitConfig?.whatsappNumber || settings.contact?.phone || "9488073004";
   const phoneNum2 = settings.contact?.phone2 || "";
-  const cleanPhone = phoneNum.replace(/[^0-9]/g, "");
-  const cleanPhone2 = phoneNum2 ? phoneNum2.replace(/[^0-9]/g, "") : "";
+  const cleanPhone = phoneNum.replace(/[^0-9]/g, "").slice(-10);
+  const cleanPhone2 = phoneNum2 ? phoneNum2.replace(/[^0-9]/g, "").slice(-10) : "";
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FFF6E5] font-sans text-gray-900 antialiased">
@@ -155,7 +155,7 @@ const Contact = () => {
 
               {/* WhatsApp Support Box */}
               <a
-                href={`https://wa.me/${cleanPhone}`}
+                href={`https://wa.me/91${cleanPhone}?text=${encodeURIComponent(settings?.chitConfig?.whatsappMessage || "Hello GPK Crackers, I have an enquiry regarding Diwali Chit Scheme")}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-4 bg-white border border-green-200/80 rounded-2xl px-5 py-4 hover:bg-green-50/60 hover:border-green-300 transition-all shadow-md group cursor-pointer"

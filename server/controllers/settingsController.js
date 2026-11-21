@@ -41,11 +41,23 @@ export const updateSettings = async (req, res, next) => {
 
     // Keep contact.phone & billing.whatsapp in sync with chitConfig.whatsappNumber if provided
     if (updateData.chitConfig?.whatsappNumber) {
-      const cleanWp = updateData.chitConfig.whatsappNumber.trim();
+      const cleanWp = updateData.chitConfig.whatsappNumber.replace(/\D/g, '').slice(-10);
       if (!settings.contact) settings.contact = {};
       settings.contact.phone = cleanWp;
       if (!settings.billing) settings.billing = {};
       settings.billing.whatsapp = cleanWp;
+      if (!settings.chitConfig) settings.chitConfig = {};
+      settings.chitConfig.whatsappNumber = cleanWp;
+    }
+
+    if (updateData.chitConfig) {
+      settings.markModified('chitConfig');
+    }
+    if (updateData.contact) {
+      settings.markModified('contact');
+    }
+    if (updateData.billing) {
+      settings.markModified('billing');
     }
 
     await settings.save();
@@ -73,6 +85,11 @@ export const getSiteInfo = async (req, res, next) => {
     }
 
     const resolvedSiteName = (!settings.siteName || /avinaash|bala|sai\s*yogi|cracker\s*hub/i.test(settings.siteName)) ? 'GPK Crackers' : settings.siteName;
+
+    const chitConfig = settings.chitConfig ? (settings.chitConfig.toObject ? settings.chitConfig.toObject() : { ...settings.chitConfig }) : {};
+    if (!chitConfig.whatsappNumber) {
+      chitConfig.whatsappNumber = settings.contact?.phone || settings.billing?.whatsapp || '9488073004';
+    }
 
     const info = {
       siteName: resolvedSiteName,

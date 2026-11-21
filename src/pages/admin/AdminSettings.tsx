@@ -24,9 +24,11 @@ import {
   Unlock
 } from "lucide-react";
 import { getSettings, updateSettings, SiteSettings } from "@/lib/api";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 import { toast } from "sonner";
 
 export const AdminSettings: React.FC = () => {
+  const { updateSettings: updateContextSettings } = useSiteSettings();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -209,6 +211,10 @@ export const AdminSettings: React.FC = () => {
       };
 
       await updateSettings(payload);
+      if (updateContextSettings) {
+        await updateContextSettings(payload as any);
+      }
+      window.dispatchEvent(new CustomEvent('site_settings_updated', { detail: payload }));
       
       // Update local snapshot with newly saved data
       setSnapshot({
