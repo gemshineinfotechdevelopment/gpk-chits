@@ -483,7 +483,8 @@ export const recordSchemePayment = async (req, res, next) => {
       paymentMethod,
       transactionNumber,
       paymentDate,
-      notes
+      notes,
+      isFullSchemePayment
     } = req.body;
 
     if (!monthNumber || parseInt(monthNumber, 10) < 1) {
@@ -572,51 +573,161 @@ export const recordSchemePayment = async (req, res, next) => {
     }
 
     // Calculate amounts
+    const duration = targetScheme.durationMonths || targetScheme.totalMonths || 10;
     const persons = targetScheme.personCount || 1;
     const monthlyPerPerson = targetScheme.monthlyAmountPerPerson || targetScheme.monthlyAmount || 0;
-    const expectedInstallment = monthlyPerPerson * persons;
+    const expectedInstallment = targetScheme.totalMonthlyAmount || (monthlyPerPerson * persons);
+    const totalSchemeAmount = targetScheme.totalSchemeAmount || (expectedInstallment * duration);
+
+    // Calculate previously paid total (excluding current installment month)
+    const previouslyPaid = (targetScheme.monthlyPayments || [])
+      .filter(p => validPaidStatuses.includes(p.status) && p.monthNumber !== mNum)
+      .reduce((sum, p) => sum + (p.amount || 0), 0);
+    const remainingBefore = Math.max(0, totalSchemeAmount - previouslyPaid);
+
     const receivedAmount = amount !== undefined && !isNaN(parseFloat(amount)) ? parseFloat(amount) : expectedInstallment;
+
+    // RULE: Check if whole scheme is being paid (settled in full) or advance multi-month payment
+    const isFullSettlement =
+      isFullSchemePayment === true ||
+      isFullSchemePayment === 'true' ||
+      (remainingBefore > 0 && receivedAmount >= remainingBefore);
 
     // Generate unique sequential receipt number (Test Case 5)
     const receiptNumber = await getNextReceiptNumber();
     const payDateObj = paymentDate ? new Date(paymentDate) : new Date();
 
-    const paymentLog = {
-      monthNumber: mNum,
-      monthName: monthName || `Month ${mNum}`,
-      expectedAmount: expectedInstallment,
-      amount: receivedAmount,
-      paidAmount: receivedAmount,
-      status: 'Paid',
-      paidAt: payDateObj,
-      paymentMethod: paymentMethod || 'Cash',
-      transactionNumber: transactionNumber || '',
-      transactionId: transactionNumber || '',
-      receiptNumber: receiptNumber,
-      updatedBy: 'Admin',
-      markedAsRead: true,
-      notes: notes || `Installment for ${persons} person(s)`
-    };
-
     if (!targetScheme.monthlyPayments) {
       targetScheme.monthlyPayments = [];
     }
 
-    if (existingLog) {
-      Object.assign(existingLog, paymentLog);
-    } else {
-      targetScheme.monthlyPayments.push(paymentLog);
-    }
+    if (isFullSettlement) {
+      // 1. Settle current month
+      const currentLog = {
+        monthNumber: mNum,
+        monthName: monthName || `Month ${mNum}`,
+        expectedAmount: expectedInstallment,
+        amount: expectedInstallment,
+        paidAmount: expectedInstallment,
+        status: 'Paid',
+        paidAt: payDateObj,
+        paymentMethod: paymentMethod || 'Cash',
+        transactionNumber: transactionNumber || '',
+        transactionId: transactionNumber || '',
+        receiptNumber: receiptNumber,
+        updatedBy: 'Admin',
+        markedAsRead: true,
+        notes: notes || (mNum === 1 ? 'Full Scheme Payment (Upfront Full Settlement)' : `Full Scheme Settlement in Month ${mNum}`)
+      };
+      if (existingLog) {
+        Object.assign(existingLog, currentLog);
+      } else {
+        targetScheme.monthlyPayments.push(currentLog);
+      }
 
-    // Recompute scheme paid stats
-    const paidLogs = targetScheme.monthlyPayments.filter(p => validPaidStatuses.includes(p.status));
-    targetScheme.monthsPaid = paidLogs.length;
-    targetScheme.paidInstallments = paidLogs.length;
-    targetScheme.paidAmount = paidLogs.reduce((sum, p) => sum + (p.amount || 0), 0);
-    const duration = targetScheme.durationMonths || targetScheme.totalMonths || 10;
-    targetScheme.remainingAmount = Math.max(0, (targetScheme.totalMonthlyAmount * duration) - targetScheme.paidAmount);
-    targetScheme.status = 'Paid';
-    targetScheme.stage = calculateStage(targetScheme, duration);
+      // 2. Settle all subsequent months up to duration so the scheme is completely over
+      for (let rMonth = mNum + 1; rMonth <= duration; rMonth++) {
+        let rLog = targetScheme.monthlyPayments.find(p => p.monthNumber === rMonth);
+        const advPayment = {
+          monthNumber: rMonth,
+          monthName: `Month ${rMonth}`,
+          expectedAmount: expectedInstallment,
+          amount: expectedInstallment,
+          paidAmount: expectedInstallment,
+          status: 'Advance Payment',
+          paidAt: payDateObj,
+          paymentMethod: paymentMethod || 'Cash',
+          transactionNumber: transactionNumber || '',
+          transactionId: transactionNumber || '',
+          receiptNumber: receiptNumber,
+          updatedBy: 'Admin',
+          markedAsRead: true,
+          notes: `Advance Payment (Full Scheme Settlement in Month ${mNum})`
+        };
+        if (rLog) {
+          Object.assign(rLog, advPayment);
+        } else {
+          targetScheme.monthlyPayments.push(advPayment);
+        }
+      }
+
+      // Recompute scheme stats for full completion
+      targetScheme.monthsPaid = duration;
+      targetScheme.paidInstallments = duration;
+      targetScheme.paidAmount = totalSchemeAmount;
+      targetScheme.remainingAmount = 0;
+      targetScheme.status = 'Paid';
+      targetScheme.stage = 'Completed';
+    } else {
+      // Check multi-month advance coverage (e.g. paying 2 or 3 months)
+      const monthsCovered = Math.min(
+        duration - mNum + 1,
+        Math.max(1, Math.floor(receivedAmount / expectedInstallment))
+      );
+
+      // Record current month
+      const paymentLog = {
+        monthNumber: mNum,
+        monthName: monthName || `Month ${mNum}`,
+        expectedAmount: expectedInstallment,
+        amount: expectedInstallment,
+        paidAmount: expectedInstallment,
+        status: 'Paid',
+        paidAt: payDateObj,
+        paymentMethod: paymentMethod || 'Cash',
+        transactionNumber: transactionNumber || '',
+        transactionId: transactionNumber || '',
+        receiptNumber: receiptNumber,
+        updatedBy: 'Admin',
+        markedAsRead: true,
+        notes: notes || `Installment for ${persons} person(s)`
+      };
+      if (existingLog) {
+        Object.assign(existingLog, paymentLog);
+      } else {
+        targetScheme.monthlyPayments.push(paymentLog);
+      }
+
+      // If advance months were paid
+      if (monthsCovered > 1) {
+        for (let adv = 1; adv < monthsCovered; adv++) {
+          const advMonth = mNum + adv;
+          if (advMonth <= duration) {
+            let advLog = targetScheme.monthlyPayments.find(p => p.monthNumber === advMonth);
+            const advObj = {
+              monthNumber: advMonth,
+              monthName: `Month ${advMonth}`,
+              expectedAmount: expectedInstallment,
+              amount: expectedInstallment,
+              paidAmount: expectedInstallment,
+              status: 'Advance Payment',
+              paidAt: payDateObj,
+              paymentMethod: paymentMethod || 'Cash',
+              transactionNumber: transactionNumber || '',
+              transactionId: transactionNumber || '',
+              receiptNumber: receiptNumber,
+              updatedBy: 'Admin',
+              markedAsRead: true,
+              notes: `Advance Payment recorded in Month ${mNum}`
+            };
+            if (advLog) {
+              Object.assign(advLog, advObj);
+            } else {
+              targetScheme.monthlyPayments.push(advObj);
+            }
+          }
+        }
+      }
+
+      // Recompute scheme paid stats
+      const paidLogs = targetScheme.monthlyPayments.filter(p => validPaidStatuses.includes(p.status));
+      targetScheme.monthsPaid = paidLogs.length;
+      targetScheme.paidInstallments = paidLogs.length;
+      targetScheme.paidAmount = paidLogs.reduce((sum, p) => sum + (p.amount || 0), 0);
+      targetScheme.remainingAmount = Math.max(0, totalSchemeAmount - targetScheme.paidAmount);
+      targetScheme.status = 'Paid';
+      targetScheme.stage = calculateStage(targetScheme, duration);
+    }
 
     // Save subscription (pre-save hook will update top-level aggregations)
     subscription.markModified('schemes');
@@ -641,8 +752,10 @@ export const recordSchemePayment = async (req, res, next) => {
       paymentMethod: paymentMethod || 'Cash',
       transactionId: transactionNumber || '',
       paymentDate: payDateObj.toISOString(),
-      paymentStatus: 'PAID',
-      installmentMonth: `Month ${mNum} / ${duration}`,
+      paymentStatus: isFullSettlement ? 'PAID (FULL SCHEME SETTLEMENT)' : 'PAID',
+      installmentMonth: isFullSettlement
+        ? (mNum === 1 ? `Full Scheme (Months 1 - ${duration})` : `Months ${mNum} - ${duration} (Full Settlement)`)
+        : `Month ${mNum} / ${duration}`,
       monthNumber: mNum,
       totalPaidTillDate: updatedTargetScheme?.paidAmount || 0,
       remainingSchemeBalance: updatedTargetScheme?.remainingAmount || 0,

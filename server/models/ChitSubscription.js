@@ -267,10 +267,16 @@ chitSubscriptionSchema.pre('save', function (next) {
 
           // Update scheme stage
           if (sch.approvalStatus === 'Approved' || sch.status === 'Approved') {
-            if (sch.monthsPaid === 0) sch.stage = 'Payment Started';
-            else if (sch.monthsPaid >= duration) sch.stage = 'Completed';
-            else if (sch.monthsPaid >= Math.ceil(duration * 0.75)) sch.stage = 'Almost Completed';
-            else sch.stage = 'In Progress';
+            if ((sch.remainingAmount === 0 && (sch.paidAmount || 0) >= totalScheme) || sch.monthsPaid >= duration) {
+              sch.stage = 'Completed';
+              sch.status = 'Paid';
+            } else if (sch.monthsPaid === 0) {
+              sch.stage = 'Payment Started';
+            } else if (sch.monthsPaid >= Math.ceil(duration * 0.75)) {
+              sch.stage = 'Almost Completed';
+            } else {
+              sch.stage = 'In Progress';
+            }
           }
         }
 
@@ -287,7 +293,11 @@ chitSubscriptionSchema.pre('save', function (next) {
       this.remainingGrandTotal = Math.max(0, calcCombinedGrand - calcTotalPaid);
 
       // Status synchronization
-      if (this.schemes.some(s => s.approvalStatus === 'Approved' || s.status === 'Approved')) {
+      if (this.schemes.length > 0 && this.schemes.every(s => s.stage === 'Completed' || (s.remainingAmount === 0 && (s.paidAmount || 0) >= (s.totalSchemeAmount || 1)))) {
+        this.approvalStatus = 'Approved';
+        this.status = 'Paid';
+        this.stage = 'Completed';
+      } else if (this.schemes.some(s => s.approvalStatus === 'Approved' || s.status === 'Approved')) {
         this.approvalStatus = 'Approved';
         this.status = 'Approved';
       } else if (this.schemes.length > 0 && this.schemes.every(s => s.approvalStatus === 'Rejected' || s.status === 'Rejected')) {

@@ -927,6 +927,7 @@ export async function recordChitSchemePaymentApi(
     transactionNumber?: string;
     paymentDate?: string;
     notes?: string;
+    isFullSchemePayment?: boolean;
   }
 ): Promise<{ message: string; subscription: ChitSubscriptionItem; receipt: any }> {
   return fetchJSON<{ message: string; subscription: ChitSubscriptionItem; receipt: any }>(

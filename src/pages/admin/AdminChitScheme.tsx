@@ -159,6 +159,9 @@ const AdminChitScheme: React.FC = () => {
     transactionNumber: string;
     notes: string;
     isEdit: boolean;
+    isFullSchemePayment?: boolean;
+    remainingSchemeAmount?: number;
+    totalSchemeDuration?: number;
   }>({
     isOpen: false,
     subscription: null,
@@ -175,7 +178,10 @@ const AdminChitScheme: React.FC = () => {
     paymentMethod: "UPI",
     transactionNumber: "",
     notes: "",
-    isEdit: false
+    isEdit: false,
+    isFullSchemePayment: false,
+    remainingSchemeAmount: 0,
+    totalSchemeDuration: 10
   });
 
   // Official Receipt Modal State (View / Download PDF / Print)
@@ -574,6 +580,12 @@ const AdminChitScheme: React.FC = () => {
     const monthlyPerPerson = sch.monthlyAmountPerPerson || sch.monthlyAmount || 0;
     const expectedMonthly = sch.totalMonthlyAmount || (monthlyPerPerson * persons);
     const mName = existingLog?.monthName || `Month ${monthNum}`;
+    const duration = sch.durationMonths || sch.totalMonths || 10;
+    const totalScheme = sch.totalSchemeAmount || (expectedMonthly * duration);
+    const paidSoFar = (sch.monthlyPayments || [])
+      .filter(p => validPaidStatuses.includes(p.status || ''))
+      .reduce((s, p) => s + (p.amount || 0), 0);
+    const remainingSchemeAmount = Math.max(0, totalScheme - paidSoFar);
 
     setPaymentModalState({
       isOpen: true,
@@ -591,18 +603,22 @@ const AdminChitScheme: React.FC = () => {
       paymentMethod: (existingLog?.paymentMethod as any) || 'UPI',
       transactionNumber: existingLog?.transactionNumber || existingLog?.transactionId || '',
       notes: existingLog?.notes || '',
-      isEdit: !!existingLog && ['Paid', 'Late Pay', 'Advanced Payment', 'Advance Payment', 'On-time Payment', 'Delay Payment'].includes(existingLog.status || '')
+      isEdit: !!existingLog && validPaidStatuses.includes(existingLog.status || ''),
+      isFullSchemePayment: false,
+      remainingSchemeAmount: remainingSchemeAmount,
+      totalSchemeDuration: duration
     });
   };
 
   // Confirm Admin Payment Submission Handler
   const handleConfirmPaymentEntry = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { subscription, schemeId, schemeName, monthNumber, monthName, amount, paymentDate, paymentMethod, transactionNumber, notes } = paymentModalState;
+    const { subscription, schemeId, schemeName, monthNumber, monthName, amount, paymentDate, paymentMethod, transactionNumber, notes, isFullSchemePayment, remainingSchemeAmount } = paymentModalState;
     if (!subscription) return;
 
     try {
-      toast.loading("Recording monthly payment...", { id: "pay-toast" });
+      const isFull = isFullSchemePayment || (remainingSchemeAmount !== undefined && remainingSchemeAmount > 0 && amount >= remainingSchemeAmount);
+      toast.loading(isFull ? "Recording full scheme settlement..." : "Recording monthly payment...", { id: "pay-toast" });
       const id = subscription._id || subscription.id || "";
 
       const res = await recordChitSchemePaymentApi(id, {
@@ -613,7 +629,8 @@ const AdminChitScheme: React.FC = () => {
         paymentDate,
         paymentMethod,
         transactionNumber,
-        notes
+        notes,
+        isFullSchemePayment: isFull
       });
 
       toast.success(res.message || `Payment for ${monthName} recorded successfully!`, { id: "pay-toast" });
@@ -2795,11 +2812,40 @@ _GPK Crackers_`;
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <span className="bg-[#A1CB35] text-gray-950 font-bold text-xs font-bold px-3 py-1 rounded-xl">
-                          {activeScheme.monthsPaid || 0} / {schemeDuration} Months Paid
+                        <span className={`text-xs font-bold px-3 py-1 rounded-xl ${
+                          ((activeScheme.remainingAmount !== undefined && activeScheme.remainingAmount <= 0 && (activeScheme.paidAmount || 0) > 0) || nextPayableMonth > schemeDuration)
+                            ? "bg-emerald-600 text-white font-black"
+                            : "bg-[#A1CB35] text-gray-950 font-bold"
+                        }`}>
+                          {((activeScheme.remainingAmount !== undefined && activeScheme.remainingAmount <= 0 && (activeScheme.paidAmount || 0) > 0) || nextPayableMonth > schemeDuration)
+                            ? `Completed (${schemeDuration}/${schemeDuration} Paid)`
+                            : `${activeScheme.monthsPaid || 0} / ${schemeDuration} Months Paid`}
                         </span>
                       </div>
                     </div>
+
+                    {/* Celebratory Banner when scheme is over */}
+                    {(((activeScheme.remainingAmount !== undefined && activeScheme.remainingAmount <= 0 && (activeScheme.paidAmount || 0) > 0) || nextPayableMonth > schemeDuration)) && (
+                      <div className="bg-emerald-50 border border-emerald-300 rounded-2xl p-3.5 flex items-center justify-between text-emerald-950 shadow-2xs">
+                        <div className="flex items-center gap-2.5">
+                          <div className="p-1.5 bg-emerald-600 text-white rounded-xl">
+                            <CheckCircle2 className="w-5 h-5 stroke-[2.5]" />
+                          </div>
+                          <div>
+                            <div className="font-black text-xs uppercase tracking-wide text-emerald-900 flex items-center gap-1.5">
+                              <span>Scheme Over &amp; Fully Settled</span>
+                              <span className="bg-emerald-200 text-emerald-900 text-[10px] px-2 py-0.5 rounded-full font-extrabold">All ${schemeDuration} Months Settled</span>
+                            </div>
+                            <div className="text-[11px] text-emerald-700 font-medium">
+                              Full scheme amount of ₹{(activeScheme.paidAmount || (schemeMonthlyTotal * schemeDuration)).toLocaleString()} has been settled in full. No remaining payments due.
+                            </div>
+                          </div>
+                        </div>
+                        <span className="bg-emerald-600 text-white font-extrabold text-xs px-3 py-1.5 rounded-xl">
+                          COMPLETED
+                        </span>
+                      </div>
+                    )}
 
                     {/* Scheme Selector Tabs when multiple schemes are present */}
                     {enrolledSchemes.length > 1 && (
@@ -3008,19 +3054,77 @@ _GPK Crackers_`;
 
             <form onSubmit={handleConfirmPaymentEntry} className="space-y-4 text-xs">
               {/* Scheme Summary Badge */}
-              <div className="bg-amber-50/80 p-3.5 rounded-2xl border border-amber-200/80 space-y-1.5">
+              <div className="bg-amber-50/80 p-3.5 rounded-2xl border border-amber-200/80 space-y-2">
                 <div className="flex justify-between items-center text-xs font-black text-amber-950">
                   <span className="font-bold">{paymentModalState.monthName || `Month ${paymentModalState.monthNumber}`}</span>
                   <span className="bg-amber-200 text-amber-900 px-2 py-0.5 rounded font-black text-[10px]">
                     {paymentModalState.personCount} Person(s)
                   </span>
                 </div>
-                <div className="flex justify-between items-center text-xs border-t border-amber-200/60 pt-1">
-                  <span className="text-gray-600 font-medium">Expected Installment:</span>
-                  <strong className="text-emerald-800 text-base font-black">
-                    ₹{paymentModalState.expectedMonthlyAmount.toLocaleString()}
-                  </strong>
+                <div className="flex justify-between items-center text-xs border-t border-amber-200/60 pt-1.5">
+                  <div>
+                    <span className="text-gray-500 text-[11px] block">Monthly Expected:</span>
+                    <strong className="text-emerald-800 text-sm font-black">
+                      ₹{paymentModalState.expectedMonthlyAmount.toLocaleString()}
+                    </strong>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-gray-500 text-[11px] block">Remaining Scheme Balance:</span>
+                    <strong className="text-rose-700 text-sm font-black">
+                      ₹{(paymentModalState.remainingSchemeAmount || 0).toLocaleString()}
+                    </strong>
+                  </div>
                 </div>
+
+                {/* Quick Payment Mode Selector: Regular Monthly vs Pay Whole Scheme */}
+                <div className="pt-2 border-t border-amber-200/60 grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPaymentModalState(prev => ({
+                        ...prev,
+                        amount: prev.expectedMonthlyAmount,
+                        isFullSchemePayment: false
+                      }));
+                    }}
+                    className={`p-2 rounded-xl text-left border text-xs transition-all cursor-pointer ${
+                      !paymentModalState.isFullSchemePayment && paymentModalState.amount === paymentModalState.expectedMonthlyAmount
+                        ? "bg-[#A1CB35] text-gray-950 font-black border-[#8FB82B] shadow-2xs"
+                        : "bg-white hover:bg-gray-100 text-gray-700 border-gray-200"
+                    }`}
+                  >
+                    <div className="text-[10px] uppercase font-bold opacity-80">1. Normal Installment</div>
+                    <div className="font-extrabold text-xs">Month {paymentModalState.monthNumber} (₹{paymentModalState.expectedMonthlyAmount.toLocaleString()})</div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPaymentModalState(prev => ({
+                        ...prev,
+                        amount: prev.remainingSchemeAmount || (prev.expectedMonthlyAmount * (prev.totalSchemeDuration || 10)),
+                        isFullSchemePayment: true
+                      }));
+                    }}
+                    className={`p-2 rounded-xl text-left border text-xs transition-all cursor-pointer ${
+                      paymentModalState.isFullSchemePayment || (paymentModalState.remainingSchemeAmount && paymentModalState.amount >= paymentModalState.remainingSchemeAmount)
+                        ? "bg-emerald-600 text-white font-black border-emerald-700 shadow-2xs"
+                        : "bg-white hover:bg-emerald-50 text-emerald-800 border-emerald-300"
+                    }`}
+                  >
+                    <div className="text-[10px] uppercase font-bold opacity-80">2. Pay Whole Amount</div>
+                    <div className="font-extrabold text-xs">Full Settlement (₹{(paymentModalState.remainingSchemeAmount || 0).toLocaleString()})</div>
+                  </button>
+                </div>
+
+                {(paymentModalState.isFullSchemePayment || (paymentModalState.remainingSchemeAmount && paymentModalState.amount >= paymentModalState.remainingSchemeAmount)) && (
+                  <div className="bg-emerald-100 border border-emerald-300 text-emerald-950 p-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 animate-in fade-in">
+                    <Sparkles className="w-4 h-4 text-emerald-700 shrink-0" />
+                    <span>
+                      <strong>Whole Scheme Settlement:</strong> All remaining installments (Month {paymentModalState.monthNumber} to {paymentModalState.totalSchemeDuration || 10}) will be marked as paid and the scheme will be completed.
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* 2-Column Responsive Form Fields */}
