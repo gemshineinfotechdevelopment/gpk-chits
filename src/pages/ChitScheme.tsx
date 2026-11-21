@@ -1628,9 +1628,11 @@ const ChitScheme: React.FC = () => {
                           </thead>
                           <tbody className="divide-y divide-gray-100">
                             {monthList.map((mNum) => {
+                              const isSchemeDone = (sch.remainingAmount !== undefined && sch.remainingAmount <= 0 && (sch.paidAmount || 0) > 0) || (sch.paidAmount !== undefined && sch.totalSchemeAmount && sch.paidAmount >= sch.totalSchemeAmount) || sch.stage === 'Completed';
                               const existingLog = (sch.monthlyPayments || []).find(p => p.monthNumber === mNum);
-                              const isPaid = existingLog && ['Paid', 'Late Pay', 'Advanced Payment', 'Advance Payment', 'On-time Payment', 'Delay Payment'].includes(existingLog.status);
-                              const paidDateStr = existingLog?.paidAt ? new Date(existingLog.paidAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
+                              const isDirectlyPaid = existingLog && ['Paid', 'Late Pay', 'Advanced Payment', 'Advance Payment', 'On-time Payment', 'Delay Payment'].includes(existingLog.status);
+                              const isPaid = isDirectlyPaid || isSchemeDone;
+                              const paidDateStr = existingLog?.paidAt ? new Date(existingLog.paidAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : (isSchemeDone ? 'Settled' : '-');
 
                               return (
                                 <tr key={mNum} className={`hover:bg-[#F7FBEF]/40 ${isPaid ? 'bg-[#F7FBEF]/30' : ''}`}>

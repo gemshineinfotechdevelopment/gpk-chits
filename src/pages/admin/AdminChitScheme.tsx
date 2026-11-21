@@ -2493,6 +2493,11 @@ _GPK Crackers_`;
               const schemeMonthlyTotal = activeScheme.totalMonthlyAmount || (activeScheme.monthlyAmountPerPerson * activeScheme.personCount);
               const schemeMonthList = Array.from({ length: schemeDuration }, (_, i) => i + 1);
 
+              const isSchemeCompleted =
+                (activeScheme.remainingAmount !== undefined && activeScheme.remainingAmount <= 0 && (activeScheme.paidAmount || 0) > 0) ||
+                activeScheme.stage === 'Completed' ||
+                (activeScheme.paidAmount !== undefined && activeScheme.paidAmount >= (activeScheme.totalSchemeAmount || (schemeMonthlyTotal * schemeDuration)));
+
               const validPaidStatuses = ['Paid', 'Late Pay', 'Advanced Payment', 'Advance Payment', 'On-time Payment', 'Delay Payment'];
               const activePaidMonthsSet = new Set(
                 (activeScheme.monthlyPayments || [])
@@ -2500,8 +2505,12 @@ _GPK Crackers_`;
                   .map(p => p.monthNumber)
               );
               let nextPayableMonth = 1;
-              while (nextPayableMonth <= schemeDuration && activePaidMonthsSet.has(nextPayableMonth)) {
-                nextPayableMonth++;
+              if (isSchemeCompleted) {
+                nextPayableMonth = schemeDuration + 1;
+              } else {
+                while (nextPayableMonth <= schemeDuration && activePaidMonthsSet.has(nextPayableMonth)) {
+                  nextPayableMonth++;
+                }
               }
 
               return (
@@ -2747,6 +2756,11 @@ _GPK Crackers_`;
                                   <div className="flex items-center justify-end gap-1.5">
                                     {schApproved && (
                                       (() => {
+                                        const isItemDone =
+                                          (schItem.remainingAmount !== undefined && schItem.remainingAmount <= 0 && (schItem.paidAmount || 0) > 0) ||
+                                          schItem.stage === 'Completed' ||
+                                          (schItem.paidAmount !== undefined && schItem.paidAmount >= (schItem.totalSchemeAmount || ((schItem.totalMonthlyAmount || 0) * (schItem.durationMonths || 10))));
+
                                         const pSet = new Set(
                                           (schItem.monthlyPayments || [])
                                             .filter(p => ['Paid', 'Late Pay', 'Advanced Payment', 'Advance Payment', 'On-time Payment', 'Delay Payment'].includes(p.status || ''))
@@ -2757,7 +2771,7 @@ _GPK Crackers_`;
                                         while (nextM <= dur && pSet.has(nextM)) {
                                           nextM++;
                                         }
-                                        if (nextM > dur) {
+                                        if (nextM > dur || isItemDone) {
                                           return (
                                             <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-md font-bold">
                                               Completed
@@ -2813,11 +2827,11 @@ _GPK Crackers_`;
 
                       <div className="flex items-center gap-2">
                         <span className={`text-xs font-bold px-3 py-1 rounded-xl ${
-                          ((activeScheme.remainingAmount !== undefined && activeScheme.remainingAmount <= 0 && (activeScheme.paidAmount || 0) > 0) || nextPayableMonth > schemeDuration)
+                          isSchemeCompleted
                             ? "bg-emerald-600 text-white font-black"
                             : "bg-[#A1CB35] text-gray-950 font-bold"
                         }`}>
-                          {((activeScheme.remainingAmount !== undefined && activeScheme.remainingAmount <= 0 && (activeScheme.paidAmount || 0) > 0) || nextPayableMonth > schemeDuration)
+                          {isSchemeCompleted
                             ? `Completed (${schemeDuration}/${schemeDuration} Paid)`
                             : `${activeScheme.monthsPaid || 0} / ${schemeDuration} Months Paid`}
                         </span>
@@ -2825,7 +2839,7 @@ _GPK Crackers_`;
                     </div>
 
                     {/* Celebratory Banner when scheme is over */}
-                    {(((activeScheme.remainingAmount !== undefined && activeScheme.remainingAmount <= 0 && (activeScheme.paidAmount || 0) > 0) || nextPayableMonth > schemeDuration)) && (
+                    {isSchemeCompleted && (
                       <div className="bg-emerald-50 border border-emerald-300 rounded-2xl p-3.5 flex items-center justify-between text-emerald-950 shadow-2xs">
                         <div className="flex items-center gap-2.5">
                           <div className="p-1.5 bg-emerald-600 text-white rounded-xl">
@@ -2834,7 +2848,7 @@ _GPK Crackers_`;
                           <div>
                             <div className="font-black text-xs uppercase tracking-wide text-emerald-900 flex items-center gap-1.5">
                               <span>Scheme Over &amp; Fully Settled</span>
-                              <span className="bg-emerald-200 text-emerald-900 text-[10px] px-2 py-0.5 rounded-full font-extrabold">All ${schemeDuration} Months Settled</span>
+                              <span className="bg-emerald-200 text-emerald-900 text-[10px] px-2 py-0.5 rounded-full font-extrabold">All {schemeDuration} Months Settled</span>
                             </div>
                             <div className="text-[11px] text-emerald-700 font-medium">
                               Full scheme amount of ₹{(activeScheme.paidAmount || (schemeMonthlyTotal * schemeDuration)).toLocaleString()} has been settled in full. No remaining payments due.
@@ -2892,9 +2906,11 @@ _GPK Crackers_`;
                         <tbody className="divide-y divide-gray-100">
                           {schemeMonthList.map((mNum) => {
                             const existingLog = (activeScheme.monthlyPayments || []).find(p => p.monthNumber === mNum);
-                            const isPaid = existingLog && ['Paid', 'Late Pay', 'Advanced Payment', 'Advance Payment', 'On-time Payment', 'Delay Payment'].includes(existingLog.status || '');
-                            const timingStatus = existingLog?.status || (isPaid ? 'Paid' : 'Pending');
-                            const receiptNumber = existingLog?.receiptNumber ? existingLog.receiptNumber.replace(/^AB-CHIT-|^SY-CHIT-/i, "GPK-CHIT-") : (isPaid ? `GPK-CHIT-000${mNum}` : '-');
+                            const isDirectlyPaid = existingLog && ['Paid', 'Late Pay', 'Advanced Payment', 'Advance Payment', 'On-time Payment', 'Delay Payment'].includes(existingLog.status || '');
+                            const isPaid = isDirectlyPaid || isSchemeCompleted;
+                            const timingStatus = existingLog?.status || (isSchemeCompleted ? 'Paid (Settled)' : (isPaid ? 'Paid' : 'Pending'));
+                            const fallbackReceipt = (activeScheme.monthlyPayments || []).find(p => p.receiptNumber)?.receiptNumber || (sub.monthlyPayments || []).find(p => p.receiptNumber)?.receiptNumber || `GPK-CHIT-000${mNum}`;
+                            const receiptNumber = existingLog?.receiptNumber ? existingLog.receiptNumber.replace(/^AB-CHIT-|^SY-CHIT-/i, "GPK-CHIT-") : (isPaid ? fallbackReceipt.replace(/^AB-CHIT-|^SY-CHIT-/i, "GPK-CHIT-") : '-');
 
                             return (
                               <tr

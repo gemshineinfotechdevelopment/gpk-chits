@@ -42,6 +42,12 @@ export const calculateStage = (item, totalMonths = 10) => {
   if (item.approvalStatus === 'Rejected' || item.status === 'Rejected') {
     return 'Rejected';
   }
+  if (
+    (item.remainingAmount !== undefined && item.remainingAmount <= 0 && (item.paidAmount || 0) > 0) ||
+    (item.paidAmount !== undefined && item.totalSchemeAmount && item.paidAmount >= item.totalSchemeAmount)
+  ) {
+    return 'Completed';
+  }
   const paidCount = item.monthsPaid || item.paidInstallments || 0;
   if (paidCount === 0) {
     return 'Payment Started';
@@ -58,6 +64,7 @@ export const calculateStage = (item, totalMonths = 10) => {
 // Normalizes a raw subscription document into consistent multi-scheme format
 export const normalizeSubscriptionDoc = (sub) => {
   const doc = sub.toObject ? sub.toObject() : { ...sub };
+  const validPaidStatuses = ['Paid', 'Late Pay', 'Advanced Payment', 'Advance Payment', 'On-time Payment', 'Delay Payment'];
 
   if (!Array.isArray(doc.schemes) || doc.schemes.length === 0) {
     let monthly = doc.monthlyAmount || 0;
@@ -69,9 +76,39 @@ export const normalizeSubscriptionDoc = (sub) => {
     const totalMonthly = monthly * persons;
     const duration = 10;
     const totalScheme = totalMonthly * duration;
-    const validPaidStatuses = ['Paid', 'Late Pay', 'Advanced Payment', 'Advance Payment', 'On-time Payment', 'Delay Payment'];
     const paidLogs = (doc.monthlyPayments || []).filter(p => validPaidStatuses.includes(p.status));
     const paidAmount = paidLogs.reduce((sum, p) => sum + (p.amount || monthly), 0);
+    const remainingAmount = Math.max(0, totalScheme - paidAmount);
+    const isSchemeDone = remainingAmount === 0 || (paidAmount >= totalScheme && totalScheme > 0) || doc.stage === 'Completed';
+
+    let monthlyPayments = Array.isArray(doc.monthlyPayments) ? [...doc.monthlyPayments] : [];
+    if (isSchemeDone) {
+      const lastPaid = paidLogs[paidLogs.length - 1] || {};
+      for (let m = 1; m <= duration; m++) {
+        let pIdx = monthlyPayments.findIndex(p => p.monthNumber === m);
+        if (pIdx === -1) {
+          monthlyPayments.push({
+            monthNumber: m,
+            monthName: `Month ${m}`,
+            expectedAmount: totalMonthly,
+            amount: totalMonthly,
+            paidAmount: totalMonthly,
+            status: 'Advance Payment',
+            paidAt: lastPaid.paidAt || new Date(),
+            paymentMethod: lastPaid.paymentMethod || 'UPI',
+            transactionNumber: lastPaid.transactionNumber || '',
+            transactionId: lastPaid.transactionId || '',
+            receiptNumber: lastPaid.receiptNumber || `GPK-CHIT-000${m}`,
+            updatedBy: 'Admin',
+            markedAsRead: true,
+            notes: 'Full Scheme Pre-Payment Settled'
+          });
+        }
+      }
+    }
+
+    const finalPaidLogs = monthlyPayments.filter(p => validPaidStatuses.includes(p.status));
+    const finalMonthsPaid = isSchemeDone ? duration : finalPaidLogs.length;
 
     doc.schemes = [
       {
@@ -86,22 +123,26 @@ export const normalizeSubscriptionDoc = (sub) => {
         totalMonths: duration,
         dueDateDay: 10,
         totalSchemeAmount: totalScheme,
-        paidAmount: paidAmount,
-        remainingAmount: Math.max(0, totalScheme - paidAmount),
-        monthsPaid: doc.monthsPaid || paidLogs.length,
-        paidInstallments: doc.monthsPaid || paidLogs.length,
-        status: doc.status || 'Pending',
+        paidAmount: isSchemeDone ? Math.max(paidAmount, totalScheme) : paidAmount,
+        remainingAmount: isSchemeDone ? 0 : remainingAmount,
+        monthsPaid: finalMonthsPaid,
+        paidInstallments: finalMonthsPaid,
+        status: isSchemeDone ? 'Paid' : (doc.status || 'Pending'),
         approvalStatus: doc.approvalStatus || 'Pending',
-        stage: doc.stage || 'Pending Approval',
-        monthlyPayments: doc.monthlyPayments || []
+        stage: isSchemeDone ? 'Completed' : (doc.stage || 'Pending Approval'),
+        monthlyPayments: monthlyPayments
       }
     ];
 
     doc.totalPersons = persons;
     doc.combinedMonthlyAmount = totalMonthly;
     doc.combinedGrandTotal = totalScheme;
-    doc.totalPaidAmount = paidAmount;
-    doc.remainingGrandTotal = Math.max(0, totalScheme - paidAmount);
+    doc.totalPaidAmount = isSchemeDone ? Math.max(paidAmount, totalScheme) : paidAmount;
+    doc.remainingGrandTotal = isSchemeDone ? 0 : remainingAmount;
+    if (isSchemeDone) {
+      doc.stage = 'Completed';
+      doc.status = 'Paid';
+    }
   } else {
     // Ensure all computed fields on schemes are present
     let sumPersons = 0;
@@ -119,14 +160,44 @@ export const normalizeSubscriptionDoc = (sub) => {
       const duration = sch.durationMonths || sch.totalMonths || 10;
       const totalMonthly = monthly * persons;
       const totalScheme = totalMonthly * duration;
-      const validPaidStatuses = ['Paid', 'Late Pay', 'Advanced Payment', 'Advance Payment', 'On-time Payment', 'Delay Payment'];
       const paidLogs = (sch.monthlyPayments || []).filter(p => validPaidStatuses.includes(p.status));
       const paidAmount = paidLogs.reduce((sum, p) => sum + (p.amount || p.paidAmount || totalMonthly), 0);
+      const remainingAmount = Math.max(0, totalScheme - paidAmount);
+      const isSchemeDone = remainingAmount === 0 || (paidAmount >= totalScheme && totalScheme > 0) || sch.stage === 'Completed';
+
+      let monthlyPayments = Array.isArray(sch.monthlyPayments) ? [...sch.monthlyPayments] : [];
+      if (isSchemeDone) {
+        const lastPaid = paidLogs[paidLogs.length - 1] || {};
+        for (let m = 1; m <= duration; m++) {
+          let pIdx = monthlyPayments.findIndex(p => p.monthNumber === m);
+          if (pIdx === -1) {
+            monthlyPayments.push({
+              monthNumber: m,
+              monthName: `Month ${m}`,
+              expectedAmount: totalMonthly,
+              amount: totalMonthly,
+              paidAmount: totalMonthly,
+              status: 'Advance Payment',
+              paidAt: lastPaid.paidAt || new Date(),
+              paymentMethod: lastPaid.paymentMethod || 'UPI',
+              transactionNumber: lastPaid.transactionNumber || '',
+              transactionId: lastPaid.transactionId || '',
+              receiptNumber: lastPaid.receiptNumber || `GPK-CHIT-000${m}`,
+              updatedBy: 'Admin',
+              markedAsRead: true,
+              notes: 'Full Scheme Pre-Payment Settled'
+            });
+          }
+        }
+      }
+
+      const finalPaidLogs = monthlyPayments.filter(p => validPaidStatuses.includes(p.status));
+      const finalMonthsPaid = isSchemeDone ? duration : finalPaidLogs.length;
 
       sumPersons += persons;
       sumMonthly += totalMonthly;
       sumGrand += totalScheme;
-      sumPaid += paidAmount;
+      sumPaid += (isSchemeDone ? Math.max(paidAmount, totalScheme) : paidAmount);
 
       return {
         ...sch,
@@ -137,11 +208,13 @@ export const normalizeSubscriptionDoc = (sub) => {
         durationMonths: duration,
         totalMonths: duration,
         totalSchemeAmount: totalScheme,
-        paidAmount: paidAmount,
-        remainingAmount: Math.max(0, totalScheme - paidAmount),
-        monthsPaid: paidLogs.length,
-        paidInstallments: paidLogs.length,
-        stage: calculateStage(sch, duration)
+        paidAmount: isSchemeDone ? Math.max(paidAmount, totalScheme) : paidAmount,
+        remainingAmount: isSchemeDone ? 0 : remainingAmount,
+        monthsPaid: finalMonthsPaid,
+        paidInstallments: finalMonthsPaid,
+        status: isSchemeDone ? 'Paid' : (sch.status || 'Approved'),
+        stage: isSchemeDone ? 'Completed' : calculateStage(sch, duration),
+        monthlyPayments: monthlyPayments
       };
     });
 
@@ -150,6 +223,10 @@ export const normalizeSubscriptionDoc = (sub) => {
     doc.combinedGrandTotal = sumGrand;
     doc.totalPaidAmount = sumPaid;
     doc.remainingGrandTotal = Math.max(0, sumGrand - sumPaid);
+    if (doc.schemes.length > 0 && doc.schemes.every(s => s.stage === 'Completed' || (s.remainingAmount === 0 && (s.paidAmount || 0) > 0))) {
+      doc.stage = 'Completed';
+      doc.status = 'Paid';
+    }
   }
 
   if (doc.applicationNumber) {
