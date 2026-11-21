@@ -42,7 +42,7 @@ const UserHeader: React.FC<UserHeaderProps> = ({ isHidden = false }) => {
                   GPK <span className="text-[#35520D]">CRACKERS</span>
                 </span>
                 <span className="hidden sm:inline-flex items-center gap-1 bg-[#F4F9EA] text-[#2D4505] text-[10px] font-black px-2.5 py-0.5 rounded-full border border-[#A1CB35]/40">
-                  Diwali 2026
+                  Diwali 2027
                 </span>
               </div>
               <span className="text-[9px] sm:text-[10px] md:text-[11px] font-bold text-gray-500 uppercase tracking-wider mt-0.5 truncate max-w-[120px] sm:max-w-none">

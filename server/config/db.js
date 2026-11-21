@@ -107,9 +107,9 @@ const autoSeedIfEmpty = async () => {
 
     const defaultSchemesData = [
       {
-        title: "Diwali Special Savings Scheme 2026",
+        title: "Diwali Special Savings Scheme 2027",
         description: "Save monthly and receive crackers bonus packages with bumper gifts!",
-        startDate: "2026-01-01",
+        startDate: "2027-01-01",
         totalMonths: 10,
         dueDateDay: 10,
         monthlyAmount: 3000,
@@ -121,7 +121,7 @@ const autoSeedIfEmpty = async () => {
       {
         title: "Diwali Family Savings Scheme",
         description: "Affordable monthly plan for family celebrations.",
-        startDate: "2026-01-01",
+        startDate: "2027-01-01",
         totalMonths: 10,
         dueDateDay: 10,
         monthlyAmount: 2000,
@@ -133,7 +133,7 @@ const autoSeedIfEmpty = async () => {
       {
         title: "Diwali Economy Savings Scheme",
         description: "Budget-friendly installment plan for everyone.",
-        startDate: "2026-01-01",
+        startDate: "2027-01-01",
         totalMonths: 10,
         dueDateDay: 10,
         monthlyAmount: 1000,
@@ -150,6 +150,21 @@ const autoSeedIfEmpty = async () => {
       { $set: { url: '', public_id: '' } }
     );
 
+    // Automatically migrate any legacy 'Diwali Special Savings Scheme 2026' to 2027
+    await ChitScheme.updateMany(
+      { title: /Diwali Special Savings Scheme 2026/i },
+      { $set: { title: "Diwali Special Savings Scheme 2027" } }
+    );
+    await ChitSubscription.updateMany(
+      { schemeName: /Diwali Special Savings Scheme 2026/i },
+      { $set: { schemeName: "Diwali Special Savings Scheme 2027" } }
+    );
+    await ChitSubscription.updateMany(
+      { "schemes.schemeName": /Diwali Special Savings Scheme 2026/i },
+      { $set: { "schemes.$[elem].schemeName": "Diwali Special Savings Scheme 2027" } },
+      { arrayFilters: [{ "elem.schemeName": /Diwali Special Savings Scheme 2026/i }] }
+    );
+
     for (const sch of defaultSchemesData) {
       const exists = await ChitScheme.findOne({ title: sch.title });
       if (!exists) {
@@ -160,7 +175,7 @@ const autoSeedIfEmpty = async () => {
 
     const subCount = await ChitSubscription.countDocuments();
     if (subCount === 0) {
-      const sch1 = await ChitScheme.findOne({ title: "Diwali Special Savings Scheme 2026" });
+      const sch1 = await ChitScheme.findOne({ title: "Diwali Special Savings Scheme 2027" });
       const sch2 = await ChitScheme.findOne({ title: "Diwali Economy Savings Scheme" });
 
       const sampleSub = {
@@ -179,7 +194,7 @@ const autoSeedIfEmpty = async () => {
         schemes: [
           {
             schemeId: sch1 ? sch1._id : null,
-            schemeName: "Diwali Special Savings Scheme 2026",
+            schemeName: "Diwali Special Savings Scheme 2027",
             monthlyAmountPerPerson: 3000,
             monthlyAmount: 3000,
             personCount: 10,

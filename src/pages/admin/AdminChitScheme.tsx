@@ -1967,7 +1967,7 @@ _GPK Crackers_`;
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Diwali Special Savings Scheme 2026"
+                  placeholder="e.g. Diwali Special Savings Scheme 2027"
                   value={uploadTitle}
                   onChange={(e) => setUploadTitle(e.target.value)}
                   className="w-full text-xs p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none font-semibold"

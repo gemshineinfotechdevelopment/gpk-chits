@@ -500,7 +500,7 @@ const ChitScheme: React.FC = () => {
 
             <div className="space-y-2">
               <span className="text-[10px] font-black uppercase tracking-wider bg-[#F4F9EA] text-[#2D4505] px-3 py-1 rounded-full border border-[#A1CB35]/40 inline-block">
-                Diwali 2026 Chit Scheme
+                Diwali 2027 Chit Scheme
               </span>
               <h2 className="text-2xl sm:text-3xl font-black text-gray-950 tracking-tight">
                 Login / Register
@@ -531,7 +531,7 @@ const ChitScheme: React.FC = () => {
             <div>
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <span className="text-[10px] font-extrabold uppercase tracking-wider bg-[#A1CB35]/20 text-[#2D4505] px-2.5 py-0.5 rounded-full border border-[#A1CB35]/40">
-                  Diwali 2026 Savings
+                  Diwali 2027 Savings
                 </span>
                 <span className="text-xs font-semibold text-gray-500 hidden sm:inline">• 10 Months Fixed Scheme</span>
               </div>
@@ -596,7 +596,7 @@ const ChitScheme: React.FC = () => {
               </div>
               <h4 className="font-extrabold text-gray-950 text-lg">New Chit Schemes Opening Soon!</h4>
               <p className="text-xs text-gray-500 max-w-md mx-auto leading-relaxed">
-                Currently all scheme batches are finalizing. New savings schemes for Diwali 2026 will be available for registration shortly.
+                Currently all scheme batches are finalizing. New savings schemes for Diwali 2027 will be available for registration shortly.
               </p>
             </div>
           ) : (
@@ -833,7 +833,7 @@ const ChitScheme: React.FC = () => {
                   <span className="text-[10px] font-black uppercase tracking-wider bg-[#A1CB35] text-gray-950 px-2.5 py-0.5 rounded-full border border-[#8FB82B]">
                     Application Form
                   </span>
-                  <span className="text-xs text-gray-600 font-semibold">• Diwali 2026</span>
+                  <span className="text-xs text-gray-600 font-semibold">• Diwali 2027</span>
                 </div>
                 <SheetTitle className="text-2xl font-black text-gray-950">
                   Chit Scheme Enrollment

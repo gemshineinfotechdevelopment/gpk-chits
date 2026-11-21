@@ -631,7 +631,7 @@ export const AdminSettings: React.FC = () => {
                       type="text"
                       value={announcementNotice}
                       onChange={(e) => setAnnouncementNotice(e.target.value)}
-                      placeholder="e.g. Diwali 2026 Chit Bookings are closing on 10th of this month! Register now."
+                      placeholder="e.g. Diwali 2027 Chit Bookings are closing on 10th of this month! Register now."
                       disabled={!isEditing}
                       className={getInputClass()}
                     />

@@ -89,7 +89,7 @@ async function runSeed() {
     // 3. Default GPK Chit Schemes
     const defaultSchemes = [
       {
-        title: 'Diwali Special Savings Scheme 2026',
+        title: 'Diwali Special Savings Scheme 2027',
         description: 'Save monthly and receive crackers bonus packages with bumper gifts!',
         startDate: '2026-01-01',
         totalMonths: 10,

@@ -93,7 +93,7 @@ const UserFooter: React.FC = () => {
                   GPK <span className="text-[#35520D]">CRACKERS</span>
                 </span>
                 <span className="text-[10px] font-extrabold text-[#35520D] uppercase tracking-widest mt-1">
-                  Diwali 2026 Chit Scheme • Sivakasi
+                  Diwali 2027 Chit Scheme • Sivakasi
                 </span>
               </div>
             </Link>
@@ -219,12 +219,12 @@ const UserFooter: React.FC = () => {
       <div className="bg-[#111827] text-gray-400 border-t border-gray-800 py-4 px-4 sm:px-8">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] font-medium text-center sm:text-left">
           <div>
-            © 2026 <strong className="text-white font-bold">{settings?.siteName || "GPK Crackers"}</strong>. All rights reserved.
+            © 2027 <strong className="text-white font-bold">{settings?.siteName || "GPK Crackers"}</strong>. All rights reserved.
           </div>
           <div className="flex items-center gap-4 text-gray-500 text-[10px] uppercase tracking-wider">
             <span>Sivakasi Licensed Manufacturer</span>
             <span>•</span>
-            <span className="text-[#A1CB35]">Diwali 2026 Chit Scheme</span>
+            <span className="text-[#A1CB35]">Diwali 2027 Chit Scheme</span>
           </div>
         </div>
       </div>
