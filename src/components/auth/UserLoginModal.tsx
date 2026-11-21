@@ -11,12 +11,13 @@ import {
   CheckCircle2, 
   LogOut, 
   ShoppingBag, 
-  ChevronRight
+  ChevronRight,
+  Lock
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { getCustomers } from "@/lib/api";
+import { getCustomers, lookupCustomerByPhone } from "@/lib/api";
 
 interface UserLoginModalProps {
   isOpen: boolean;
@@ -32,6 +33,8 @@ export const UserLoginModal: React.FC<UserLoginModalProps> = ({ isOpen, onClose,
   const [otp, setOtp] = useState("");
   const [generatedOtp, setGeneratedOtp] = useState("");
   const [name, setName] = useState("");
+  const [isExistingCustomer, setIsExistingCustomer] = useState(false);
+  const [isLookingUp, setIsLookingUp] = useState(false);
   const [error, setError] = useState("");
   const [timer, setTimer] = useState(30);
   const [isResendDisabled, setIsResendDisabled] = useState(true);
@@ -58,6 +61,8 @@ export const UserLoginModal: React.FC<UserLoginModalProps> = ({ isOpen, onClose,
       setOtp("");
       setGeneratedOtp("");
       setName("");
+      setIsExistingCustomer(false);
+      setIsLookingUp(false);
       setError("");
       setTimer(30);
       setIsResendDisabled(true);
@@ -79,20 +84,38 @@ export const UserLoginModal: React.FC<UserLoginModalProps> = ({ isOpen, onClose,
     return phoneRegex.test(inputPhone);
   };
 
+  // Auto-lookup registered name when 10-digit phone number is entered
+  useEffect(() => {
+    const clean = phone.replace(/\D/g, "");
+    if (clean.length === 10 && validatePhone(clean)) {
+      setIsLookingUp(true);
+      lookupCustomerByPhone(clean)
+        .then((res) => {
+          if (res.exists && res.name && res.name.trim() && res.name.trim() !== "Customer") {
+            setName(res.name.trim());
+            setIsExistingCustomer(true);
+          } else {
+            setIsExistingCustomer(false);
+          }
+        })
+        .catch(() => {
+          setIsExistingCustomer(false);
+        })
+        .finally(() => {
+          setIsLookingUp(false);
+        });
+    } else {
+      setIsExistingCustomer(false);
+    }
+  }, [phone]);
+
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value.replace(/\D/g, "");
     if (val.length <= 10) {
       setPhone(val);
       if (error) setError("");
-
-      if (val.length === 10 && !name.trim()) {
-        try {
-          const localTracks = JSON.parse(localStorage.getItem("local_customer_tracks") || "{}");
-          const existingLocal = localTracks[val];
-          if (existingLocal && existingLocal.name && existingLocal.name !== "Customer") {
-            setName(existingLocal.name);
-          }
-        } catch {}
+      if (val.length < 10) {
+        setIsExistingCustomer(false);
       }
     }
   };
@@ -309,38 +332,26 @@ export const UserLoginModal: React.FC<UserLoginModalProps> = ({ isOpen, onClose,
               </button>
             </div>
           ) : step === "phone" ? (
-            /* STEP 1: NAME & PHONE NUMBER INPUT */
+            /* STEP 1: PHONE NUMBER & NAME INPUT */
             <form onSubmit={handleSendOtp} className="space-y-4 font-sans max-w-lg mx-auto">
               <div className="space-y-3.5">
-                {/* Full Name Input */}
+                {/* 1. WhatsApp Mobile Number */}
                 <div>
-                  <label className="text-slate-700 font-semibold text-xs sm:text-sm mb-1.5 block text-left">
-                    Your Full Name <span className="text-red-500">*</span>
-                  </label>
-                  <div className="flex items-center bg-[#F8FAFC] border border-[#E2E8F0] focus-within:border-[#A1CB35] focus-within:ring-2 focus-within:ring-[#A1CB35]/25 rounded-xl sm:rounded-2xl overflow-hidden transition-all shadow-2xs">
-                    <div className="pl-3.5 pr-1 text-gray-400">
-                      <User className="w-4 h-4 text-[#35520D]" />
-                    </div>
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => {
-                        setName(e.target.value);
-                        if (error) setError("");
-                      }}
-                      placeholder="Enter your full name"
-                      className="flex-1 bg-transparent text-slate-800 text-xs sm:text-sm font-semibold px-3 py-3 outline-none placeholder:text-slate-400 placeholder:font-medium"
-                      required
-                      autoFocus
-                    />
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-slate-700 font-semibold text-xs sm:text-sm block text-left">
+                      Whatsapp Number <span className="text-red-500">*</span>
+                    </label>
+                    {isLookingUp && (
+                      <span className="text-[10px] text-gray-500 flex items-center gap-1 font-bold">
+                        <RefreshCw className="w-3 h-3 animate-spin text-[#2D4505]" /> Checking account...
+                      </span>
+                    )}
+                    {isExistingCustomer && !isLookingUp && (
+                      <span className="text-[10px] text-emerald-800 bg-emerald-100 font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1 border border-emerald-300">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-700" /> Registered Customer
+                      </span>
+                    )}
                   </div>
-                </div>
-
-                {/* WhatsApp Mobile Number */}
-                <div>
-                  <label className="text-slate-700 font-semibold text-xs sm:text-sm mb-1.5 block text-left">
-                    Whatsapp Number <span className="text-red-500">*</span>
-                  </label>
 
                   {/* Pill Shaped Input Box */}
                   <div className="flex items-center bg-[#F8FAFC] border border-[#E2E8F0] focus-within:border-[#A1CB35] focus-within:ring-2 focus-within:ring-[#A1CB35]/25 rounded-xl sm:rounded-2xl overflow-hidden transition-all shadow-2xs">
@@ -357,10 +368,62 @@ export const UserLoginModal: React.FC<UserLoginModalProps> = ({ isOpen, onClose,
                       onChange={handlePhoneChange}
                       placeholder="10-digit mobile number"
                       maxLength={10}
+                      autoFocus
                       className="flex-1 bg-transparent text-slate-800 text-xs sm:text-sm font-semibold px-3.5 sm:px-4 py-3 outline-none focus:outline-none placeholder:text-slate-400 placeholder:font-medium"
                       required
                     />
                   </div>
+                </div>
+
+                {/* 2. Full Name Input */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-slate-700 font-semibold text-xs sm:text-sm block text-left">
+                      {isExistingCustomer ? "Customer Name" : "Your Full Name"} <span className="text-red-500">*</span>
+                    </label>
+                    {isExistingCustomer && (
+                      <span className="text-[10px] text-gray-500 font-bold flex items-center gap-1">
+                        <Lock className="w-3 h-3 text-gray-400" /> First login name locked
+                      </span>
+                    )}
+                  </div>
+                  <div className={`flex items-center border rounded-xl sm:rounded-2xl overflow-hidden transition-all shadow-2xs ${
+                    isExistingCustomer 
+                      ? "bg-gray-100 border-gray-300 cursor-not-allowed select-none" 
+                      : "bg-[#F8FAFC] border-[#E2E8F0] focus-within:border-[#A1CB35] focus-within:ring-2 focus-within:ring-[#A1CB35]/25"
+                  }`}>
+                    <div className="pl-3.5 pr-1 text-gray-400">
+                      {isExistingCustomer ? (
+                        <Lock className="w-4 h-4 text-gray-500" />
+                      ) : (
+                        <User className="w-4 h-4 text-[#35520D]" />
+                      )}
+                    </div>
+                    <input
+                      type="text"
+                      value={name}
+                      readOnly={isExistingCustomer}
+                      onChange={(e) => {
+                        if (!isExistingCustomer) {
+                          setName(e.target.value);
+                          if (error) setError("");
+                        }
+                      }}
+                      placeholder={isLookingUp ? "Fetching registered name..." : (isExistingCustomer ? name : "Enter your full name")}
+                      className={`flex-1 text-xs sm:text-sm font-semibold px-3 py-3 outline-none ${
+                        isExistingCustomer
+                          ? "bg-transparent text-gray-700 cursor-not-allowed font-bold"
+                          : "bg-transparent text-slate-800 placeholder:text-slate-400 placeholder:font-medium"
+                      }`}
+                      required
+                    />
+                  </div>
+                  {isExistingCustomer && (
+                    <p className="text-[11px] text-emerald-800 font-medium mt-1 text-left flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-600 inline shrink-0" />
+                      <span>Automatically fetched from your first login.</span>
+                    </p>
+                  )}
                 </div>
 
                 {error && <p className="text-xs text-red-600 font-bold mt-2 text-center">{error}</p>}

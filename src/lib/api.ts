@@ -334,6 +334,14 @@ export async function customerPhoneLoginAPI(phone: string, name?: string): Promi
   return await fetchJSON<{ token: string; user: any }>('/api/auth/customer-login', 'POST', { phone, name });
 }
 
+export async function lookupCustomerByPhone(phone: string): Promise<{ exists: boolean; name?: string; phone?: string }> {
+  const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+  if (!cleanPhone || cleanPhone.length !== 10) {
+    return { exists: false };
+  }
+  return await fetchJSON<{ exists: boolean; name?: string; phone?: string }>(`/api/auth/customer-lookup/${cleanPhone}`, 'GET');
+}
+
 export async function createOrder(orderData: {
   customerName: string;
   customerEmail: string;

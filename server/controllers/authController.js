@@ -2,6 +2,7 @@ import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import Customer from '../models/Customer.js';
+import ChitSubscription from '../models/ChitSubscription.js';
 import { AppError } from '../middleware/errorHandler.js';
 import logger from '../utils/logger.js';
 
@@ -158,6 +159,71 @@ export const updateProfile = async (req, res, next) => {
   }
 };
 
+// LOOKUP CUSTOMER BY PHONE NUMBER (AUTO-FETCH FIRST LOGIN NAME)
+export const customerLookup = async (req, res, next) => {
+  try {
+    const rawPhone = req.params.phone || req.query.phone || req.body?.phone || '';
+    const cleanPhone = String(rawPhone).replace(/\D/g, '').slice(-10);
+
+    if (!cleanPhone || cleanPhone.length !== 10) {
+      return res.json({ exists: false });
+    }
+
+    // 1. Check Customer model
+    let customer = await Customer.findOne({
+      $or: [
+        { phone: cleanPhone },
+        { phone: `+91${cleanPhone}` },
+        { phone: `91${cleanPhone}` }
+      ]
+    });
+
+    if (customer && customer.name && customer.name.trim() && customer.name.trim() !== 'Customer') {
+      return res.json({
+        exists: true,
+        name: customer.name.trim(),
+        phone: cleanPhone
+      });
+    }
+
+    // 2. Check ChitSubscription fallback
+    const sub = await ChitSubscription.findOne({
+      $or: [
+        { phone: cleanPhone },
+        { phone: `+91${cleanPhone}` },
+        { mobileNumber: cleanPhone }
+      ]
+    });
+
+    const subName = sub?.name || sub?.customerName;
+    if (subName && subName.trim() && subName.trim() !== 'Customer') {
+      if (customer && (!customer.name || customer.name === 'Customer')) {
+        customer.name = subName.trim();
+        await customer.save().catch(() => {});
+      } else if (!customer) {
+        customer = new Customer({
+          name: subName.trim(),
+          phone: cleanPhone,
+          customerType: 'WEBSITE',
+          isActive: true,
+          sources: ['chit_scheme']
+        });
+        await customer.save().catch(() => {});
+      }
+
+      return res.json({
+        exists: true,
+        name: subName.trim(),
+        phone: cleanPhone
+      });
+    }
+
+    return res.json({ exists: false, phone: cleanPhone });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const customerPhoneLogin = async (req, res, next) => {
   try {
     const { phone, name } = req.body;
@@ -179,18 +245,48 @@ export const customerPhoneLogin = async (req, res, next) => {
       ]
     });
 
+    // Check ChitSubscription if customer has an existing registered name
+    const existingSub = await ChitSubscription.findOne({
+      $or: [
+        { phone: cleanPhone },
+        { phone: `+91${cleanPhone}` },
+        { mobileNumber: cleanPhone }
+      ]
+    });
+    const subName = (existingSub?.name || existingSub?.customerName || '').trim();
+
     if (!customer) {
+      // First-time registration for this number:
+      // Prefer submitted name if provided, otherwise fallback to existing chit subscription name
+      const initialName = (name && name.trim() && name.trim() !== 'Customer') 
+        ? name.trim() 
+        : (subName && subName !== 'Customer' ? subName : 'Customer');
+
       customer = new Customer({
-        name: (name || 'Customer').trim(),
+        name: initialName,
         phone: cleanPhone,
         customerType: 'WEBSITE',
         isActive: true,
         sources: ['normal_login']
       });
       await customer.save();
-    } else if (name && name.trim() && name.trim() !== 'Customer') {
-      customer.name = name.trim();
-      await customer.save();
+    } else {
+      // Customer already exists!
+      // RULE: The first login name is permanent and locked to this number.
+      // If customer has a valid name from first login, NEVER overwrite with a new name.
+      const hasValidFirstLoginName = customer.name && customer.name.trim() && customer.name.trim() !== 'Customer';
+
+      if (!hasValidFirstLoginName) {
+        // If it was defaulted to 'Customer' or blank, set it once now
+        const resolvedName = (name && name.trim() && name.trim() !== 'Customer')
+          ? name.trim()
+          : (subName && subName !== 'Customer' ? subName : customer.name);
+
+        if (resolvedName && resolvedName !== customer.name) {
+          customer.name = resolvedName;
+          await customer.save();
+        }
+      }
     }
 
     const token = jwt.sign(
@@ -199,10 +295,11 @@ export const customerPhoneLogin = async (req, res, next) => {
       { expiresIn: process.env.JWT_EXPIRE || '30d' }
     );
 
-    logger.info(`Customer phone login successful (+91${cleanPhone})`, {
+    logger.info(`Customer phone login successful (+91${cleanPhone}) as '${customer.name}'`, {
       reqId: req.id,
       phone: cleanPhone,
-      customerId: customer._id
+      customerId: customer._id,
+      customerName: customer.name
     });
 
     res.json({
