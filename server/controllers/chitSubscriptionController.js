@@ -554,6 +554,23 @@ export const recordSchemePayment = async (req, res, next) => {
       ));
     }
 
+    // RULE: Strict sequential ascending order validation (Month 1 -> Month 2 -> Month 3, etc.)
+    if (mNum > 1) {
+      const paidMonthsSet = new Set(
+        (targetScheme.monthlyPayments || [])
+          .filter(p => validPaidStatuses.includes(p.status))
+          .map(p => p.monthNumber)
+      );
+      for (let prev = 1; prev < mNum; prev++) {
+        if (!paidMonthsSet.has(prev)) {
+          return next(new AppError(
+            `Installment Month ${prev} must be paid before Month ${mNum} can be recorded. Payments must be recorded in sequential ascending order (Month 1, Month 2, Month 3, etc.).`,
+            400
+          ));
+        }
+      }
+    }
+
     // Calculate amounts
     const persons = targetScheme.personCount || 1;
     const monthlyPerPerson = targetScheme.monthlyAmountPerPerson || targetScheme.monthlyAmount || 0;
@@ -689,6 +706,24 @@ export const updateMonthPaymentStatus = async (req, res, next) => {
     if (targetScheme) {
       if (!targetScheme.monthlyPayments) targetScheme.monthlyPayments = [];
       const mNum = parseInt(monthNumber, 10);
+
+      // RULE: Strict sequential ascending order validation when marking as paid
+      if (validPaidStatuses.includes(status) && mNum > 1) {
+        const paidMonthsSet = new Set(
+          targetScheme.monthlyPayments
+            .filter(p => p.monthNumber !== mNum && validPaidStatuses.includes(p.status))
+            .map(p => p.monthNumber)
+        );
+        for (let prev = 1; prev < mNum; prev++) {
+          if (!paidMonthsSet.has(prev)) {
+            return next(new AppError(
+              `Installment Month ${prev} must be paid before Month ${mNum} can be marked as paid. Payments must be recorded in sequential ascending order (Month 1, Month 2, Month 3, etc.).`,
+              400
+            ));
+          }
+        }
+      }
+
       let pIdx = targetScheme.monthlyPayments.findIndex(p => p.monthNumber === mNum);
 
       if (pIdx > -1) {

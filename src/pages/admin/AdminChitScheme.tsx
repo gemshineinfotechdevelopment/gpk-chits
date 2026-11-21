@@ -5,7 +5,7 @@ import {
   Image as ImageIcon, Upload, Trash2, AlertCircle, Edit2, FileText, Loader2, X, Users,
   CheckCircle2, Clock, Search, Filter, Phone, MapPin, Mail, RefreshCw, Check, XCircle,
   Eye, CheckCheck, Calendar, Plus, ArrowLeft, User, DollarSign, Award, ChevronRight, AlertTriangle,
-  Share2, MessageCircle, Sparkles, FileSpreadsheet, ArrowDownUp, Gift, Receipt
+  Share2, MessageCircle, Sparkles, FileSpreadsheet, ArrowDownUp, Gift, Receipt, Lock
 } from "lucide-react";
 import { calculatePaymentTimingStatus, getMonthTargetDate, getPaidHistoryList } from "@/lib/chitUtils";
 import { toast } from "sonner";
@@ -552,6 +552,24 @@ const AdminChitScheme: React.FC = () => {
     monthNum: number,
     existingLog?: MonthlyPaymentLog
   ) => {
+    const validPaidStatuses = ['Paid', 'Late Pay', 'Advanced Payment', 'Advance Payment', 'On-time Payment', 'Delay Payment'];
+    const isEdit = !!existingLog && validPaidStatuses.includes(existingLog.status || '');
+
+    // Strict ascending order verification: preceding months must be paid first
+    if (!isEdit && monthNum > 1) {
+      const paidMonths = new Set(
+        (sch.monthlyPayments || [])
+          .filter(p => validPaidStatuses.includes(p.status || ''))
+          .map(p => p.monthNumber)
+      );
+      for (let prev = 1; prev < monthNum; prev++) {
+        if (!paidMonths.has(prev)) {
+          toast.error(`Please pay Month ${prev} first! Installment payments must be recorded in sequential ascending order (Month 1, Month 2, etc.).`);
+          return;
+        }
+      }
+    }
+
     const persons = sch.personCount || 1;
     const monthlyPerPerson = sch.monthlyAmountPerPerson || sch.monthlyAmount || 0;
     const expectedMonthly = sch.totalMonthlyAmount || (monthlyPerPerson * persons);
@@ -2458,6 +2476,17 @@ _GPK Crackers_`;
               const schemeMonthlyTotal = activeScheme.totalMonthlyAmount || (activeScheme.monthlyAmountPerPerson * activeScheme.personCount);
               const schemeMonthList = Array.from({ length: schemeDuration }, (_, i) => i + 1);
 
+              const validPaidStatuses = ['Paid', 'Late Pay', 'Advanced Payment', 'Advance Payment', 'On-time Payment', 'Delay Payment'];
+              const activePaidMonthsSet = new Set(
+                (activeScheme.monthlyPayments || [])
+                  .filter(p => validPaidStatuses.includes(p.status || ''))
+                  .map(p => p.monthNumber)
+              );
+              let nextPayableMonth = 1;
+              while (nextPayableMonth <= schemeDuration && activePaidMonthsSet.has(nextPayableMonth)) {
+                nextPayableMonth++;
+              }
+
               return (
                 <>
                   {/* Modal Header */}
@@ -2700,15 +2729,36 @@ _GPK Crackers_`;
                                 <td className="p-3 text-right">
                                   <div className="flex items-center justify-end gap-1.5">
                                     {schApproved && (
-                                      <button
-                                        type="button"
-                                        onClick={() => handleOpenPaymentModal(sub, schItem, (schItem.monthsPaid || 0) + 1)}
-                                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] px-2.5 py-1 rounded-lg transition-all shadow-2xs flex items-center gap-1 cursor-pointer"
-                                        title="Record Next Month Payment"
-                                      >
-                                        <Plus className="w-3 h-3 stroke-[3]" />
-                                        <span>Pay</span>
-                                      </button>
+                                      (() => {
+                                        const pSet = new Set(
+                                          (schItem.monthlyPayments || [])
+                                            .filter(p => ['Paid', 'Late Pay', 'Advanced Payment', 'Advance Payment', 'On-time Payment', 'Delay Payment'].includes(p.status || ''))
+                                            .map(p => p.monthNumber)
+                                        );
+                                        const dur = schItem.durationMonths || 10;
+                                        let nextM = 1;
+                                        while (nextM <= dur && pSet.has(nextM)) {
+                                          nextM++;
+                                        }
+                                        if (nextM > dur) {
+                                          return (
+                                            <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-md font-bold">
+                                              Completed
+                                            </span>
+                                          );
+                                        }
+                                        return (
+                                          <button
+                                            type="button"
+                                            onClick={() => handleOpenPaymentModal(sub, schItem, nextM)}
+                                            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] px-2.5 py-1 rounded-lg transition-all shadow-2xs flex items-center gap-1 cursor-pointer"
+                                            title={`Record Month ${nextM} Payment`}
+                                          >
+                                            <Plus className="w-3 h-3 stroke-[3]" />
+                                            <span>Pay</span>
+                                          </button>
+                                        );
+                                      })()
                                     )}
                                     <button
                                       type="button"
@@ -2893,14 +2943,25 @@ _GPK Crackers_`;
                                       <FileText className="w-3 h-3" />
                                       <span>Receipt</span>
                                     </button>
-                                  ) : (
+                                  ) : mNum === nextPayableMonth ? (
                                     <button
                                       type="button"
                                       onClick={() => handleOpenPaymentModal(sub, activeScheme, mNum)}
                                       className="bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black shadow-sm font-bold text-[11px] px-2.5 py-1 rounded-xl transition-all shadow-2xs inline-flex items-center gap-1 cursor-pointer"
+                                      title={`Record Month ${mNum} Payment`}
                                     >
                                       <Check className="w-3 h-3 stroke-[3]" />
                                       <span>Record Pay</span>
+                                    </button>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      disabled
+                                      className="bg-gray-100 border border-gray-200 text-gray-400 font-bold text-[10px] px-2.5 py-1 rounded-xl inline-flex items-center gap-1 cursor-not-allowed select-none opacity-60"
+                                      title={`Month ${nextPayableMonth} must be paid first before Month ${mNum} can be recorded`}
+                                    >
+                                      <Lock className="w-3 h-3 text-gray-400" />
+                                      <span>Pay Month {nextPayableMonth} 1st</span>
                                     </button>
                                   )}
                                 </td>
