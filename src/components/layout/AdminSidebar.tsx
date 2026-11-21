@@ -57,7 +57,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = () => {
       <div className={cn("p-4 shrink-0 flex flex-col gap-2", !isCollapsed && "p-6")}>
         <div className={cn("flex items-center", isCollapsed ? "justify-center" : "justify-between")}>
           {!isCollapsed && (
-            <Link to="/admin" className="flex items-center gap-2.5 overflow-hidden">
+            <Link to="/admin-dashboard-panel" className="flex items-center gap-2.5 overflow-hidden">
               <img src={companyLogo} alt="GPK Crackers" className="h-8 w-auto object-contain shrink-0" />
               <div className="flex flex-col min-w-0">
                 <span className="font-display text-sm font-black text-[#A1CB35] whitespace-nowrap leading-tight">GPK CRACKERS</span>
