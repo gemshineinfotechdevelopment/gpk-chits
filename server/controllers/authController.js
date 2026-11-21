@@ -188,7 +188,7 @@ export const customerPhoneLogin = async (req, res, next) => {
         sources: ['normal_login']
       });
       await customer.save();
-    } else if (name && (customer.name === 'Customer' || !customer.name)) {
+    } else if (name && name.trim() && name.trim() !== 'Customer') {
       customer.name = name.trim();
       await customer.save();
     }

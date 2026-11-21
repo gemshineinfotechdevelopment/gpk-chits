@@ -125,10 +125,17 @@ const ChitScheme: React.FC = () => {
     const cleanPrev = previousPhoneRef.current ? previousPhoneRef.current.replace(/\D/g, "").slice(-10) : "";
 
     // Clear selected schemes and person counts whenever logging out or switching to a different account
-    if (!isUserLoggedIn || cleanCurrent !== cleanPrev) {
+    if (!isUserLoggedIn) {
       setSelectedSchemes([]);
       setCardPersonCounts({});
       setIsEnrollmentDrawerOpen(false);
+      previousPhoneRef.current = null;
+    } else if (previousPhoneRef.current && cleanCurrent !== cleanPrev) {
+      setSelectedSchemes([]);
+      setCardPersonCounts({});
+      setIsEnrollmentDrawerOpen(false);
+      previousPhoneRef.current = userPhone;
+    } else {
       previousPhoneRef.current = userPhone;
     }
 
@@ -140,8 +147,8 @@ const ChitScheme: React.FC = () => {
 
     if (isUserLoggedIn && userPhone) {
       setFormData(prev => ({
-        name: prev.name || userName || "",
-        phone: prev.phone || userPhone || "",
+        name: userName || prev.name || "",
+        phone: userPhone || prev.phone || "",
         email: prev.email || "",
         location: prev.location || ""
       }));
@@ -360,6 +367,13 @@ const ChitScheme: React.FC = () => {
           personCount: count
         }
       ]);
+    }
+    if (isUserLoggedIn && userPhone) {
+      setFormData(prev => ({
+        ...prev,
+        name: userName || prev.name || "",
+        phone: userPhone || prev.phone || ""
+      }));
     }
     setIsEnrollmentDrawerOpen(true);
   };
@@ -779,7 +793,16 @@ const ChitScheme: React.FC = () => {
             <div className="flex items-center gap-2.5 w-full sm:w-auto shrink-0">
               <button
                 type="button"
-                onClick={() => setIsEnrollmentDrawerOpen(true)}
+                onClick={() => {
+                  if (isUserLoggedIn && userPhone) {
+                    setFormData(prev => ({
+                      ...prev,
+                      name: userName || prev.name || "",
+                      phone: userPhone || prev.phone || ""
+                    }));
+                  }
+                  setIsEnrollmentDrawerOpen(true);
+                }}
                 className="w-full sm:w-auto bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 font-black text-xs sm:text-sm px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer active:scale-95 uppercase tracking-wider"
               >
                 <span>Proceed to Application</span>
@@ -837,9 +860,16 @@ const ChitScheme: React.FC = () => {
 
                   {/* Full Name */}
                   <div className="space-y-1">
-                    <label className="block text-[11px] font-bold text-gray-700 uppercase">
-                      Full Name *
-                    </label>
+                    <div className="flex justify-between items-center">
+                      <label className="block text-[11px] font-bold text-gray-700 uppercase">
+                        Full Name *
+                      </label>
+                      {isUserLoggedIn && (userName || formData.name) && (
+                        <span className="text-[10px] text-[#2D4505] font-bold bg-[#A1CB35]/20 px-2 py-0.5 rounded border border-[#A1CB35]/40">
+                          ✓ Verified Account
+                        </span>
+                      )}
+                    </div>
                     <div className="relative">
                       <User className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                       <input
@@ -848,7 +878,12 @@ const ChitScheme: React.FC = () => {
                         placeholder="Enter your full name"
                         value={formData.name}
                         onChange={handleInputChange}
-                        className="w-full text-xs font-semibold p-2.5 pl-8 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35] outline-none"
+                        readOnly={Boolean(isUserLoggedIn && (userName || formData.name))}
+                        className={`w-full text-xs font-bold p-2.5 pl-8 rounded-xl outline-none border ${
+                          isUserLoggedIn && (userName || formData.name)
+                            ? "bg-gray-100 text-gray-700 border-gray-300 cursor-not-allowed select-none"
+                            : "bg-white border-gray-300 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35]"
+                        }`}
                         required
                       />
                     </div>
