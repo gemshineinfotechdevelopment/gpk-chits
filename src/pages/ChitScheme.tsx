@@ -400,11 +400,14 @@ const ChitScheme: React.FC = () => {
       toast.error("Please select at least one chit scheme");
       return;
     }
-    if (!formData.name.trim()) {
+    const effectiveName = (formData.name || userName || "").trim();
+    const effectivePhone = (formData.phone || userPhone || "").trim();
+
+    if (!effectiveName) {
       toast.error("Please enter your full name");
       return;
     }
-    if (!formData.phone.trim() || formData.phone.length !== 10) {
+    if (!effectivePhone || effectivePhone.length !== 10) {
       toast.error("Please enter a valid 10-digit mobile number");
       return;
     }
@@ -422,9 +425,12 @@ const ChitScheme: React.FC = () => {
     setIsSubmitting(true);
 
     try {
+      const effectiveName = (formData.name || userName || "").trim();
+      const effectivePhone = (formData.phone || userPhone || "").trim();
+
       const payload = {
-        name: formData.name.trim(),
-        phone: formData.phone.trim(),
+        name: effectiveName,
+        phone: effectivePhone,
         email: formData.email.trim(),
         location: formData.location.trim(),
         schemes: selectedSchemes.map(s => ({
@@ -876,11 +882,11 @@ const ChitScheme: React.FC = () => {
                         type="text"
                         name="name"
                         placeholder="Enter your full name"
-                        value={formData.name}
+                        value={formData.name || userName || ""}
                         onChange={handleInputChange}
-                        readOnly={Boolean(isUserLoggedIn && (userName || formData.name))}
+                        readOnly={Boolean(isUserLoggedIn)}
                         className={`w-full text-xs font-bold p-2.5 pl-8 rounded-xl outline-none border ${
-                          isUserLoggedIn && (userName || formData.name)
+                          isUserLoggedIn
                             ? "bg-gray-100 text-gray-700 border-gray-300 cursor-not-allowed select-none"
                             : "bg-white border-gray-300 focus:ring-2 focus:ring-[#A1CB35]/25 focus:border-[#A1CB35]"
                         }`}
@@ -909,12 +915,12 @@ const ChitScheme: React.FC = () => {
                         type="tel"
                         name="phone"
                         placeholder="10-digit mobile number"
-                        value={formData.phone}
+                        value={formData.phone || userPhone || ""}
                         onChange={handleInputChange}
                         maxLength={10}
-                        readOnly={Boolean(userPhone)}
+                        readOnly={Boolean(isUserLoggedIn && userPhone)}
                         className={`w-full text-xs font-bold p-2.5 pl-11 rounded-xl outline-none border ${
-                          userPhone
+                          isUserLoggedIn && userPhone
                             ? "bg-gray-100 text-gray-700 border-gray-300 cursor-not-allowed select-none"
                             : "bg-white border-gray-300 focus:border-[#A1CB35]"
                         }`}

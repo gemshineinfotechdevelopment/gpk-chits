@@ -62,8 +62,17 @@ export const UserLoginModal: React.FC<UserLoginModalProps> = ({ isOpen, onClose,
       setTimer(30);
       setIsResendDisabled(true);
       setIsSubmitting(false);
+    } else {
+      const storedName = userName || localStorage.getItem("user_name") || "";
+      if (storedName && storedName !== "Customer") {
+        setName(storedName);
+      }
+      const storedPhone = userPhone || localStorage.getItem("user_phone") || "";
+      if (storedPhone) {
+        setPhone(storedPhone.replace(/\D/g, "").slice(-10));
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, userName, userPhone]);
 
   const validatePhone = (inputPhone: string) => {
     const phoneRegex = /^[6-9]\d{9}$/;
@@ -75,11 +84,26 @@ export const UserLoginModal: React.FC<UserLoginModalProps> = ({ isOpen, onClose,
     if (val.length <= 10) {
       setPhone(val);
       if (error) setError("");
+
+      if (val.length === 10 && !name.trim()) {
+        try {
+          const localTracks = JSON.parse(localStorage.getItem("local_customer_tracks") || "{}");
+          const existingLocal = localTracks[val];
+          if (existingLocal && existingLocal.name && existingLocal.name !== "Customer") {
+            setName(existingLocal.name);
+          }
+        } catch {}
+      }
     }
   };
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!name.trim()) {
+      setError("Please enter your full name");
+      return;
+    }
+
     if (!phone) {
       setError("Please enter your mobile number");
       return;
@@ -91,26 +115,6 @@ export const UserLoginModal: React.FC<UserLoginModalProps> = ({ isOpen, onClose,
     }
 
     setIsSubmitting(true);
-
-    try {
-      const localTracks = JSON.parse(localStorage.getItem("local_customer_tracks") || "{}");
-      const existingLocal = localTracks[phone];
-      let foundName = "";
-      if (existingLocal && existingLocal.name && existingLocal.name !== "Customer") {
-        foundName = existingLocal.name;
-      } else {
-        const customers = await getCustomers();
-        const existingApi = customers.find(c => String(c.phone).replace(/\D/g, "").slice(-10) === phone);
-        if (existingApi && existingApi.name && existingApi.name !== "Customer") {
-          foundName = existingApi.name;
-        }
-      }
-      if (foundName) {
-        setName(foundName);
-      }
-    } catch (err) {
-      console.warn("Failed to check existing customer", err);
-    }
 
     const code = String(Math.floor(100000 + Math.random() * 900000));
     setGeneratedOtp(code);
@@ -305,31 +309,58 @@ export const UserLoginModal: React.FC<UserLoginModalProps> = ({ isOpen, onClose,
               </button>
             </div>
           ) : step === "phone" ? (
-            /* STEP 1: PHONE NUMBER INPUT - BOTTOM SHEET WITH ORIGINAL BRAND RED COLORS */
+            /* STEP 1: NAME & PHONE NUMBER INPUT */
             <form onSubmit={handleSendOtp} className="space-y-4 font-sans max-w-lg mx-auto">
-              <div className="text-center">
-                <label className="text-slate-700 font-semibold text-xs sm:text-sm text-center mb-3 block">
-                  Whatsapp Number <span className="text-red-500">*</span>
-                </label>
-
-                {/* Pill Shaped Input Box */}
-                <div className="flex items-center bg-[#F8FAFC] border border-[#E2E8F0] focus-within:border-[#A1CB35] focus-within:ring-2 focus-within:ring-[#A1CB35]/25 rounded-xl sm:rounded-2xl overflow-hidden transition-all shadow-2xs max-w-lg mx-auto">
-                  {/* +91 Badge */}
-                  <div className="bg-[#A1CB35]/15 text-[#35520D] font-bold text-xs sm:text-sm px-3.5 sm:px-4 py-3 border-r border-[#E2E8F0] flex items-center gap-1.5 shrink-0 select-none">
-                    <span>+91</span>
-                    <ChevronDown className="w-3.5 h-3.5 text-[#35520D]" />
+              <div className="space-y-3.5">
+                {/* Full Name Input */}
+                <div>
+                  <label className="text-slate-700 font-semibold text-xs sm:text-sm mb-1.5 block text-left">
+                    Your Full Name <span className="text-red-500">*</span>
+                  </label>
+                  <div className="flex items-center bg-[#F8FAFC] border border-[#E2E8F0] focus-within:border-[#A1CB35] focus-within:ring-2 focus-within:ring-[#A1CB35]/25 rounded-xl sm:rounded-2xl overflow-hidden transition-all shadow-2xs">
+                    <div className="pl-3.5 pr-1 text-gray-400">
+                      <User className="w-4 h-4 text-[#35520D]" />
+                    </div>
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => {
+                        setName(e.target.value);
+                        if (error) setError("");
+                      }}
+                      placeholder="Enter your full name"
+                      className="flex-1 bg-transparent text-slate-800 text-xs sm:text-sm font-semibold px-3 py-3 outline-none placeholder:text-slate-400 placeholder:font-medium"
+                      required
+                      autoFocus
+                    />
                   </div>
+                </div>
 
-                  {/* Input Field */}
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={handlePhoneChange}
-                    placeholder="Whatsapp Number"
-                    maxLength={10}
-                    autoFocus
-                    className="flex-1 bg-transparent text-slate-800 text-xs sm:text-sm font-semibold px-3.5 sm:px-4 py-3 outline-none focus:outline-none placeholder:text-slate-400 placeholder:font-medium"
-                  />
+                {/* WhatsApp Mobile Number */}
+                <div>
+                  <label className="text-slate-700 font-semibold text-xs sm:text-sm mb-1.5 block text-left">
+                    Whatsapp Number <span className="text-red-500">*</span>
+                  </label>
+
+                  {/* Pill Shaped Input Box */}
+                  <div className="flex items-center bg-[#F8FAFC] border border-[#E2E8F0] focus-within:border-[#A1CB35] focus-within:ring-2 focus-within:ring-[#A1CB35]/25 rounded-xl sm:rounded-2xl overflow-hidden transition-all shadow-2xs">
+                    {/* +91 Badge */}
+                    <div className="bg-[#A1CB35]/15 text-[#35520D] font-bold text-xs sm:text-sm px-3.5 sm:px-4 py-3 border-r border-[#E2E8F0] flex items-center gap-1.5 shrink-0 select-none">
+                      <span>+91</span>
+                      <ChevronDown className="w-3.5 h-3.5 text-[#35520D]" />
+                    </div>
+
+                    {/* Input Field */}
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={handlePhoneChange}
+                      placeholder="10-digit mobile number"
+                      maxLength={10}
+                      className="flex-1 bg-transparent text-slate-800 text-xs sm:text-sm font-semibold px-3.5 sm:px-4 py-3 outline-none focus:outline-none placeholder:text-slate-400 placeholder:font-medium"
+                      required
+                    />
+                  </div>
                 </div>
 
                 {error && <p className="text-xs text-red-600 font-bold mt-2 text-center">{error}</p>}
@@ -339,7 +370,7 @@ export const UserLoginModal: React.FC<UserLoginModalProps> = ({ isOpen, onClose,
               <div className="pt-2 flex justify-center">
                 <button
                   type="submit"
-                  disabled={isSubmitting || phone.length !== 10}
+                  disabled={isSubmitting || phone.length !== 10 || !name.trim()}
                   className="w-full sm:w-auto bg-[#A1CB35] hover:bg-[#8FB82B] active:scale-95 text-gray-950 font-black tracking-wider py-3.5 px-8 sm:px-12 rounded-xl sm:rounded-2xl uppercase text-xs sm:text-sm shadow-md disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer transition-all min-w-[200px]"
                 >
                   {isSubmitting ? (
@@ -358,14 +389,20 @@ export const UserLoginModal: React.FC<UserLoginModalProps> = ({ isOpen, onClose,
               </p>
             </form>
           ) : (
-            /* STEP 2: OTP & NAME INPUT */
+            /* STEP 2: OTP VERIFICATION */
             <form onSubmit={handleVerifyOtp} className="space-y-4 font-sans max-w-lg mx-auto">
               <div className="text-center space-y-1.5">
                 <p className="text-xs sm:text-sm text-slate-600 font-semibold">
                   Enter verification code sent to <strong className="text-slate-900 font-black">+91 {phone}</strong>
                 </p>
-                <div className="bg-[#A1CB35]/20 text-[#35520D] font-black text-xs px-3.5 py-1 rounded-full border border-[#A1CB35]/40 inline-block">
-                  DEMO CODE: {generatedOtp || "1234"}
+                <div className="inline-flex items-center gap-1.5 bg-[#F4F9EA] text-[#2D4505] text-xs font-bold px-3 py-1 rounded-full border border-[#A1CB35]/40">
+                  <User className="w-3.5 h-3.5 text-[#35520D]" />
+                  <span>Logging in as: <strong>{name}</strong></span>
+                </div>
+                <div>
+                  <div className="bg-[#A1CB35]/20 text-[#35520D] font-black text-xs px-3.5 py-1 rounded-full border border-[#A1CB35]/40 inline-block">
+                    DEMO CODE: {generatedOtp || "1234"}
+                  </div>
                 </div>
               </div>
 
@@ -390,23 +427,6 @@ export const UserLoginModal: React.FC<UserLoginModalProps> = ({ isOpen, onClose,
                     className="w-full bg-[#F8FAFC] border border-[#E2E8F0] focus:border-[#A1CB35] focus:ring-2 focus:ring-[#A1CB35]/25 h-11 px-4 text-center font-black tracking-widest text-base sm:text-lg rounded-xl sm:rounded-2xl outline-none transition-all"
                   />
                 </div>
-
-                <div>
-                  <label className="text-slate-700 font-semibold text-xs mb-1 block text-left">
-                    Your Full Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => {
-                      setName(e.target.value);
-                      if (error) setError("");
-                    }}
-                    placeholder="Enter your full name"
-                    className="w-full bg-[#F8FAFC] border border-[#E2E8F0] focus:border-[#A1CB35] focus:ring-2 focus:ring-[#A1CB35]/25 h-11 px-4 text-xs sm:text-sm font-semibold rounded-xl sm:rounded-2xl outline-none transition-all"
-                    required
-                  />
-                </div>
               </div>
 
               <div className="flex justify-between items-center text-xs pt-1">
@@ -414,12 +434,11 @@ export const UserLoginModal: React.FC<UserLoginModalProps> = ({ isOpen, onClose,
                   type="button"
                   onClick={() => {
                     setStep("phone");
-                    setName("");
                     setError("");
                   }}
                   className="text-[#35520D] font-bold hover:underline cursor-pointer"
                 >
-                  ← Change Number
+                  ← Change Details
                 </button>
                 {isResendDisabled ? (
                   <span className="text-slate-400 font-bold">Resend in {timer}s</span>
