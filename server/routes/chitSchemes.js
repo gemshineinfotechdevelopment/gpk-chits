@@ -4,6 +4,7 @@ import {
   getAdminChitSchemes,
   createChitScheme,
   updateChitScheme,
+  removeChitSchemeImage,
   deleteChitScheme
 } from '../controllers/chitSchemeController.js';
 import { auth, adminOnly } from '../middleware/auth.js';
@@ -16,6 +17,8 @@ router.get('/admin', auth, adminOnly, getAdminChitSchemes);
 
 router.post('/', auth, adminOnly, upload.single('image'), createChitScheme);
 router.put('/:id', auth, adminOnly, upload.single('image'), updateChitScheme);
+router.put('/:id/remove-image', auth, adminOnly, removeChitSchemeImage);
+router.delete('/:id/image', auth, adminOnly, removeChitSchemeImage);
 router.delete('/:id', auth, adminOnly, deleteChitScheme);
 
 export default router;

@@ -18,6 +18,7 @@ import {
   getChitSchemes,
   createChitScheme,
   updateChitScheme,
+  removeChitSchemeImageApi,
   deleteChitScheme,
   ChitSchemeItem,
   getChitSubscriptions,
@@ -407,6 +408,18 @@ const AdminChitScheme: React.FC = () => {
     setEditUrl("");
   };
 
+  // Quick Remove Image from Scheme
+  const handleQuickRemoveImage = async (schemeId: string, schemeName: string) => {
+    try {
+      toast.loading("Removing image from scheme...", { id: "rem-img-toast" });
+      await removeChitSchemeImageApi(schemeId);
+      toast.success(`Image removed from "${schemeName || 'Scheme'}"!`, { id: "rem-img-toast" });
+      loadChitSchemes();
+    } catch (err: any) {
+      toast.error(`Failed to remove image: ${err.message || err}`, { id: "rem-img-toast" });
+    }
+  };
+
   // Open Edit Scheme Modal
   const handleOpenEditModal = (sch: ChitSchemeImage) => {
     const monthly = sch.monthlyAmount || 0;
@@ -420,9 +433,10 @@ const AdminChitScheme: React.FC = () => {
     setEditDueDateDay(String(sch.dueDateDay || sch.paymentDueDay || 10));
     setEditMonthlyAmount(String(monthly));
     setEditStatus(sch.status || 'Active');
-    setEditUrl(sch.url || "");
+    const safeUrl = (sch.url && !sch.url.includes("unsplash.com")) ? sch.url : "";
+    setEditUrl(safeUrl);
     setEditSelectedFile(null);
-    setEditFilePreview(sch.url || null);
+    setEditFilePreview(safeUrl || null);
   };
 
   // Save Edit Scheme Handler
@@ -445,13 +459,14 @@ const AdminChitScheme: React.FC = () => {
       const monthly = parseFloat(editMonthlyAmount) || 0;
       const months = parseInt(editTotalMonths, 10) || 9;
       const totalExpected = monthly * months;
+      const isRemovingImage = !finalUrl || finalUrl.trim().length === 0;
 
       await updateChitScheme(editingScheme.id, {
         title: editTitle.trim(),
         schemeName: editTitle.trim(),
         description: editDescription.trim(),
-        url: finalUrl,
-        removeImage: !finalUrl,
+        url: isRemovingImage ? "" : finalUrl,
+        removeImage: isRemovingImage,
         startDate: editStartDate,
         totalMonths: months,
         numberOfMonths: months,
@@ -1672,6 +1687,34 @@ _GPK Crackers_`;
                           </div>
                         </div>
 
+                        {/* Scheme Image Preview on Admin Card */}
+                        {sch.url && sch.url.trim().length > 0 && !sch.url.includes("unsplash.com") ? (
+                          <div className="relative rounded-xl overflow-hidden border border-gray-200 bg-gray-50 h-32 group/img">
+                            <img src={sch.url} alt={sch.title || 'Scheme Banner'} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleQuickRemoveImage(sch.id, sch.title || sch.schemeName || '')}
+                                className="px-2.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold flex items-center gap-1 shadow-md cursor-pointer"
+                                title="Remove image from scheme"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" /> Remove Image
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between text-[11px] text-gray-500 bg-gray-50 border border-dashed border-gray-200 rounded-xl px-3 py-2">
+                            <span>No banner image attached</span>
+                            <button
+                              type="button"
+                              onClick={() => handleOpenEditModal(sch)}
+                              className="text-[#2D4505] hover:underline font-bold text-[10px] flex items-center gap-1 cursor-pointer"
+                            >
+                              <ImageIcon className="w-3 h-3" /> Add Image
+                            </button>
+                          </div>
+                        )}
+
                         {sch.description && (
                           <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
                             {sch.description}
@@ -1738,7 +1781,7 @@ _GPK Crackers_`;
               <div>
                 <h2 className="text-xl font-extrabold text-gray-950 flex items-center gap-2">
                   <ImageIcon className="w-5 h-5 text-[#2D4505]" />
-                  Chit Scheme Promotional Images ({schemes.filter(s => s.url).length})
+                  Chit Scheme Promotional Images ({schemes.filter(s => s.url && s.url.trim().length > 0 && !s.url.includes("unsplash.com")).length})
                 </h2>
                 <p className="text-xs text-gray-500 font-medium mt-0.5">
                   Upload promotional image banners here. These images will be displayed to users on the Chit Scheme portal.
@@ -1759,13 +1802,13 @@ _GPK Crackers_`;
               </button>
             </div>
 
-            {schemes.filter(s => s.url).length === 0 ? (
+            {schemes.filter(s => s.url && s.url.trim().length > 0 && !s.url.includes("unsplash.com")).length === 0 ? (
               <div className="py-12 text-center text-gray-400 font-medium text-xs border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50">
                 No promotional images uploaded yet. Click <strong>+ Upload New Image</strong> above to add banners for customers!
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {schemes.filter(s => s.url).map((sch) => (
+                {schemes.filter(s => s.url && s.url.trim().length > 0 && !s.url.includes("unsplash.com")).map((sch) => (
                   <div key={sch.id} className="relative group bg-gray-50 border border-gray-200 rounded-2xl overflow-hidden shadow-2xs p-2 flex flex-col justify-between">
                     <img
                       src={sch.url}
@@ -1774,10 +1817,10 @@ _GPK Crackers_`;
                     />
                     <div className="flex items-center justify-between pt-2 px-1">
                       <span className="text-[11px] font-semibold text-gray-500 truncate">
-                        Promotional Image
+                        {sch.title || sch.schemeName || "Promotional Image"}
                       </span>
                       <button
-                        onClick={() => handleDeleteSchemePrompt(sch)}
+                        onClick={() => handleQuickRemoveImage(sch.id, sch.title || sch.schemeName || '')}
                         className="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1"
                         title="Delete Image"
                       >

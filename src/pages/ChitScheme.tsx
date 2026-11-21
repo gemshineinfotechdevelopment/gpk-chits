@@ -210,6 +210,12 @@ const ChitScheme: React.FC = () => {
       getChitSchemes()
         .then((data) => {
           if (Array.isArray(data)) {
+            const isCustomUploadedImage = (url?: string) => {
+              if (!url || typeof url !== 'string') return false;
+              const trimmed = url.trim();
+              return trimmed.length > 0 && !trimmed.includes('unsplash.com');
+            };
+
             const schemeList = data
               .filter((item: ChitSchemeItem) => item.title || item.schemeName)
               .map((item: ChitSchemeItem) => ({
@@ -220,11 +226,11 @@ const ChitScheme: React.FC = () => {
                 totalMonths: item.totalMonths || item.numberOfMonths || 10,
                 dueDateDay: item.dueDateDay || item.paymentDueDay || 10,
                 monthlyAmount: item.monthlyAmount || 0,
-                url: item.url || ''
+                url: isCustomUploadedImage(item.url) ? item.url : ''
               }));
 
             const imageList = data
-              .filter((item: ChitSchemeItem) => item.url && item.url.trim().length > 0)
+              .filter((item: ChitSchemeItem) => isCustomUploadedImage(item.url))
               .map((item: ChitSchemeItem) => ({
                 id: item._id || item.id || '',
                 url: item.url || '',
@@ -629,7 +635,7 @@ const ChitScheme: React.FC = () => {
                       </div>
 
                       {/* Scheme Image Banner if assigned */}
-                      {sch.url && sch.url.trim().length > 0 && (
+                      {sch.url && sch.url.trim().length > 0 && !sch.url.includes("unsplash.com") && (
                         <div
                           onClick={(e) => {
                             e.stopPropagation();

@@ -116,7 +116,7 @@ const autoSeedIfEmpty = async () => {
         status: "Active",
         isActive: true,
         displayOrder: 1,
-        url: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1200&auto=format&fit=crop"
+        url: ""
       },
       {
         title: "Diwali Family Savings Scheme",
@@ -128,7 +128,7 @@ const autoSeedIfEmpty = async () => {
         status: "Active",
         isActive: true,
         displayOrder: 2,
-        url: "https://images.unsplash.com/photo-1531058020387-3be344556be6?q=80&w=1200&auto=format&fit=crop"
+        url: ""
       },
       {
         title: "Diwali Economy Savings Scheme",
@@ -140,9 +140,15 @@ const autoSeedIfEmpty = async () => {
         status: "Active",
         isActive: true,
         displayOrder: 3,
-        url: "https://images.unsplash.com/photo-1498931299472-f7a63a5a1cfa?q=80&w=1200&auto=format&fit=crop"
+        url: ""
       }
     ];
+
+    // Wipe any legacy default Unsplash placeholder images from existing chit schemes in database
+    await ChitScheme.updateMany(
+      { url: { $regex: /unsplash\.com/i } },
+      { $set: { url: '', public_id: '' } }
+    );
 
     for (const sch of defaultSchemesData) {
       const exists = await ChitScheme.findOne({ title: sch.title });

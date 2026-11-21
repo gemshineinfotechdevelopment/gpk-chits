@@ -121,12 +121,14 @@ export const updateChitScheme = async (req, res, next) => {
       return next(new AppError('Chit Scheme not found', 404));
     }
 
-    if (req.body.removeImage === true || req.body.removeImage === 'true' || req.body.url === '') {
+    if (req.body.removeImage === true || req.body.removeImage === 'true' || req.body.url === '' || req.body.removeImage === '1') {
       if (chitScheme.url) {
         await deleteFromBoth(chitScheme.url, chitScheme.public_id).catch(() => {});
       }
       chitScheme.url = '';
       chitScheme.public_id = '';
+      chitScheme.markModified('url');
+      chitScheme.markModified('public_id');
     } else if (req.file || req.body.image || req.body.base64 || (req.body.url && req.body.url !== chitScheme.url)) {
       const imageResult = await processChitImageUpload(req);
       if (imageResult && imageResult.url) {
@@ -136,6 +138,8 @@ export const updateChitScheme = async (req, res, next) => {
         }
         chitScheme.url = imageResult.url;
         chitScheme.public_id = imageResult.public_id || '';
+        chitScheme.markModified('url');
+        chitScheme.markModified('public_id');
       }
     }
 
@@ -157,6 +161,32 @@ export const updateChitScheme = async (req, res, next) => {
 
     const updated = await chitScheme.save();
     res.json(updated);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// REMOVE IMAGE from Chit Scheme
+export const removeChitSchemeImage = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const chitScheme = await ChitScheme.findById(id);
+
+    if (!chitScheme) {
+      return next(new AppError('Chit Scheme not found', 404));
+    }
+
+    if (chitScheme.url) {
+      await deleteFromBoth(chitScheme.url, chitScheme.public_id).catch(() => {});
+    }
+
+    chitScheme.url = '';
+    chitScheme.public_id = '';
+    chitScheme.markModified('url');
+    chitScheme.markModified('public_id');
+
+    const updated = await chitScheme.save();
+    res.json({ message: 'Scheme image removed successfully', scheme: updated });
   } catch (error) {
     next(error);
   }

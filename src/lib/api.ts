@@ -22,7 +22,12 @@ function resolveAuthToken(path: string): string | null {
     cleanPath.includes('/mark-read') ||
     cleanPath.includes('/status')
   );
-  const isAdminOnlyRoute = cleanPath === '/api/orders' || cleanPath.startsWith('/api/orders/') || cleanPath === '/orders' || cleanPath === '/api/settings' || cleanPath.startsWith('/api/settings/') || cleanPath === '/settings' || cleanPath.includes('/admin/') || isChitAdminRoute;
+  const isChitSchemeAdminRoute = cleanPath.includes('/chit-schemes') && (
+    cleanPath.includes('/admin') ||
+    cleanPath.includes('/remove-image') ||
+    cleanPath.includes('/image')
+  );
+  const isAdminOnlyRoute = cleanPath === '/api/orders' || cleanPath.startsWith('/api/orders/') || cleanPath === '/orders' || cleanPath === '/api/settings' || cleanPath.startsWith('/api/settings/') || cleanPath === '/settings' || cleanPath.includes('/admin/') || isChitAdminRoute || isChitSchemeAdminRoute;
 
   if (isCustomerRoute) {
     return customerToken || adminToken;
@@ -706,6 +711,10 @@ export async function updateChitScheme(id: string, data: Partial<ChitSchemeItem>
 
 export async function deleteChitScheme(id: string): Promise<{ message: string }> {
   return fetchJSON<{ message: string }>(`/api/chit-schemes/${id}`, 'DELETE');
+}
+
+export async function removeChitSchemeImageApi(id: string): Promise<{ message: string; scheme: ChitSchemeItem }> {
+  return fetchJSON<{ message: string; scheme: ChitSchemeItem }>(`/api/chit-schemes/${id}/remove-image`, 'PUT');
 }
 
 export interface MonthlyPaymentLog {
