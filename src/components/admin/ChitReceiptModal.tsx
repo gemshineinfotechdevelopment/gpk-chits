@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 import { Download, Printer, CheckCircle2, ShieldCheck, X } from "lucide-react";
 import { toast } from "sonner";
 import { useSiteSettings } from "@/context/SiteSettingsContext";
@@ -296,23 +296,76 @@ export const ChitReceiptModal: React.FC<ChitReceiptModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-[95vw] sm:max-w-2xl p-4 sm:p-7 bg-white rounded-2xl sm:rounded-3xl font-sans max-h-[95vh] overflow-y-auto space-y-4">
-        <DialogHeader className="border-b border-gray-100 pb-3 flex flex-row items-center justify-between">
-          <div>
-            <DialogTitle className="text-lg font-extrabold text-[#2A1B54] flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-emerald-600" />
-              <span>Chit Scheme Official Payment Receipt</span>
-            </DialogTitle>
-            <DialogDescription className="text-xs text-gray-500 font-medium">
-              Receipt No: <span className="font-mono font-bold text-gray-800">{formattedReceiptNo}</span>
-            </DialogDescription>
+      <DialogContent className="w-[95vw] sm:max-w-2xl p-4 sm:p-7 bg-white rounded-2xl sm:rounded-3xl font-sans max-h-[95vh] overflow-y-auto space-y-4 [&>button]:hidden">
+        <DialogHeader className="border-b border-gray-100 pb-3 sm:pb-4 space-y-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <DialogTitle className="text-base sm:text-lg font-extrabold text-[#2A1B54] flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
+                <span className="truncate">Chit Scheme Official Payment Receipt</span>
+              </DialogTitle>
+              <DialogDescription className="text-xs text-gray-500 font-medium mt-0.5">
+                Receipt No: <span className="font-mono font-bold text-gray-800">{formattedReceiptNo}</span>
+              </DialogDescription>
+            </div>
+
+            {/* Mobile close button: isolated at top right */}
+            <DialogClose asChild>
+              <button
+                type="button"
+                onClick={onClose}
+                className="sm:hidden w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 flex items-center justify-center transition-all cursor-pointer shrink-0 border border-gray-200/80 shadow-2xs"
+                title="Close receipt"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </DialogClose>
+
+            {/* Desktop actions + separated close button */}
+            <div className="hidden sm:flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs border border-gray-200/60"
+                title="Print Receipt"
+              >
+                <Printer className="w-3.5 h-3.5 text-gray-700" />
+                <span>Print</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleDownloadPDF}
+                disabled={isDownloading}
+                className="bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 text-xs font-black px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-sm border border-[#8FB82B]/60 disabled:opacity-50"
+                title="Download PDF"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>{isDownloading ? "Generating..." : "Download PDF"}</span>
+              </button>
+
+              <div className="h-5 w-px bg-gray-200 mx-1 shrink-0" />
+
+              <DialogClose asChild>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 flex items-center justify-center transition-all cursor-pointer shrink-0 border border-gray-200/80 shadow-2xs ml-0.5"
+                  title="Close receipt (Esc)"
+                  aria-label="Close"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </DialogClose>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* Mobile actions row: cleanly separated below title with full touch area, away from cross button */}
+          <div className="flex sm:hidden items-center gap-2 pt-1">
             <button
               type="button"
               onClick={handlePrint}
-              className="bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs border border-gray-200/60"
               title="Print Receipt"
             >
               <Printer className="w-3.5 h-3.5 text-gray-700" />
@@ -322,7 +375,7 @@ export const ChitReceiptModal: React.FC<ChitReceiptModalProps> = ({
               type="button"
               onClick={handleDownloadPDF}
               disabled={isDownloading}
-              className="bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 text-xs font-black px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-sm border border-[#8FB82B]/60 disabled:opacity-50"
+              className="flex-1 bg-[#A1CB35] hover:bg-[#8FB82B] text-gray-950 text-xs font-black py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm border border-[#8FB82B]/60 disabled:opacity-50"
               title="Download PDF"
             >
               <Download className="w-3.5 h-3.5" />
