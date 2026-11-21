@@ -218,11 +218,40 @@ export const ChitReceiptModal: React.FC<ChitReceiptModalProps> = ({
       const jsPDFModule = await import("jspdf");
 
       const canvas = await html2canvasModule.default(receiptRef.current, {
-        scale: 2.5,
+        scale: 2,
         backgroundColor: "#ffffff",
         allowTaint: true,
         useCORS: true,
-        logging: false
+        logging: false,
+        windowWidth: 1024,
+        onclone: (clonedDoc, element) => {
+          const target = (element ||
+            clonedDoc.querySelector('[data-receipt-container="true"]') ||
+            clonedDoc.querySelector(".receipt-print-target")) as HTMLElement | null;
+
+          if (target) {
+            // Ensure parent container in the cloned iframe doesn't constrain width on mobile
+            if (target.parentElement) {
+              target.parentElement.style.width = "780px";
+              target.parentElement.style.maxWidth = "780px";
+              target.parentElement.style.overflow = "visible";
+            }
+
+            target.style.width = "720px";
+            target.style.maxWidth = "720px";
+            target.style.minWidth = "720px";
+            target.style.padding = "24px";
+            target.style.boxSizing = "border-box";
+
+            // Enforce clean 2-column desktop grid for subscriber & scheme info
+            const subGrid = target.querySelector(".subscriber-grid") as HTMLElement | null;
+            if (subGrid) {
+              subGrid.style.display = "grid";
+              subGrid.style.gridTemplateColumns = "repeat(2, minmax(0, 1fr))";
+              subGrid.style.gap = "14px";
+            }
+          }
+        }
       });
 
       const pdf = new jsPDFModule.jsPDF({
@@ -231,58 +260,28 @@ export const ChitReceiptModal: React.FC<ChitReceiptModalProps> = ({
         format: "a4"
       });
 
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
+      const pageWidth = pdf.internal.pageSize.getWidth(); // 210 mm
+      const pageHeight = pdf.internal.pageSize.getHeight(); // 297 mm
       const margin = 10;
-      const imgWidth = pageWidth - margin * 2;
-      const maxPageContentHeight = pageHeight - margin * 2;
-      const totalImgHeight = (canvas.height * imgWidth) / canvas.width;
+      const maxAvailableWidth = pageWidth - margin * 2; // 190 mm
+      const maxAvailableHeight = pageHeight - margin * 2; // 277 mm
 
-      if (totalImgHeight <= maxPageContentHeight) {
-        // Fits comfortably on 1 page
-        const imgData = canvas.toDataURL("image/jpeg", 0.95);
-        pdf.addImage(imgData, "JPEG", margin, margin, imgWidth, totalImgHeight);
-      } else {
-        // Multi-page slicing: Slice canvas cleanly by page height so no content is cut off
-        const pageCanvasHeight = (canvas.width * maxPageContentHeight) / imgWidth;
-        let renderedHeight = 0;
-        let pageIndex = 0;
+      const aspectRatio = canvas.width / canvas.height;
+      let finalWidth = maxAvailableWidth;
+      let finalHeight = finalWidth / aspectRatio;
 
-        while (renderedHeight < canvas.height) {
-          if (pageIndex > 0) {
-            pdf.addPage();
-          }
-
-          const sliceHeight = Math.min(pageCanvasHeight, canvas.height - renderedHeight);
-          const pageCanvas = document.createElement("canvas");
-          pageCanvas.width = canvas.width;
-          pageCanvas.height = sliceHeight;
-
-          const pageCtx = pageCanvas.getContext("2d");
-          if (pageCtx) {
-            pageCtx.fillStyle = "#ffffff";
-            pageCtx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
-            pageCtx.drawImage(
-              canvas,
-              0,
-              renderedHeight,
-              canvas.width,
-              sliceHeight,
-              0,
-              0,
-              pageCanvas.width,
-              sliceHeight
-            );
-
-            const sliceImgData = pageCanvas.toDataURL("image/jpeg", 0.95);
-            const sliceImgHeight = (sliceHeight * imgWidth) / canvas.width;
-            pdf.addImage(sliceImgData, "JPEG", margin, margin, imgWidth, sliceImgHeight);
-          }
-
-          renderedHeight += sliceHeight;
-          pageIndex++;
-        }
+      // Scale to fit strictly on 1 single page (prevent any 2nd page on mobile view)
+      if (finalHeight > maxAvailableHeight) {
+        finalHeight = maxAvailableHeight;
+        finalWidth = finalHeight * aspectRatio;
       }
+
+      // Center horizontally within printable area
+      const xPos = margin + (maxAvailableWidth - finalWidth) / 2;
+      const yPos = margin;
+
+      const imgData = canvas.toDataURL("image/jpeg", 0.95);
+      pdf.addImage(imgData, "JPEG", xPos, yPos, finalWidth, finalHeight);
 
       pdf.save(`Receipt_${formattedReceiptNo}_${(receipt.customerName || "Customer").replace(/\s+/g, "_")}.pdf`);
       toast.success("Receipt PDF Downloaded!", { id: "pdf-chit-receipt" });
@@ -387,7 +386,8 @@ export const ChitReceiptModal: React.FC<ChitReceiptModalProps> = ({
         {/* RECEIPT PAPER CONTAINER (Target for PDF & Print) */}
         <div
           ref={receiptRef}
-          className="bg-white border-2 border-[#7A1416] rounded-xl sm:rounded-2xl p-4 sm:p-6 text-gray-800 space-y-4 shadow-sm"
+          data-receipt-container="true"
+          className="bg-white border-2 border-[#7A1416] rounded-xl sm:rounded-2xl p-4 sm:p-6 text-gray-800 space-y-4 shadow-sm receipt-print-target"
         >
           {/* Header with Logo & Shop Info */}
           <div className="text-center border-b-2 border-[#7A1416] pb-3 space-y-1">
